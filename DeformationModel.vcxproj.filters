@@ -1,0 +1,138 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Исходные файлы">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Файлы заголовков">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Файлы ресурсов">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Файлы заголовков\model">
+      <UniqueIdentifier>{8f62f2dc-f62c-475d-a0e8-d0705798e2f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\features">
+      <UniqueIdentifier>{93ce0810-d0ff-4e85-80cf-8226999afad3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\core">
+      <UniqueIdentifier>{bc7ec4a1-76ce-4b4d-a7e8-26c8f6d6bf7e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\core">
+      <UniqueIdentifier>{9b0c5030-01c5-492f-9741-900720c58f03}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\features">
+      <UniqueIdentifier>{62b6e977-e1a2-45b3-a7d0-afc03e590696}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\model">
+      <UniqueIdentifier>{b49ff0c8-ffa3-41d9-add2-a0e2ec765427}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\utils">
+      <UniqueIdentifier>{5e46dd21-1324-46cd-923c-2175bb8d021d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\util">
+      <UniqueIdentifier>{a35a4276-82aa-4aa8-901d-43fec1b495a7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\CommonCore.h">
+      <Filter>Файлы заголовков\core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\CoreFuctions.h">
+      <Filter>Файлы заголовков\core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\SlipSystem.h">
+      <Filter>Файлы заголовков\core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Tensor.h">
+      <Filter>Файлы заголовков\core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Tensor4.h">
+      <Filter>Файлы заголовков\core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Vector.h">
+      <Filter>Файлы заголовков\core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Features\Fragmentation.h">
+      <Filter>Файлы заголовков\features</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Features\Hardening.h">
+      <Filter>Файлы заголовков\features</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Features\Rotations.h">
+      <Filter>Файлы заголовков\features</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Features\Tension.h">
+      <Filter>Файлы заголовков\features</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Model\Fragment.h">
+      <Filter>Файлы заголовков\model</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Model\Polycrystall.h">
+      <Filter>Файлы заголовков\model</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Util\Distributions.h">
+      <Filter>Файлы заголовков\util</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Util\Functions.h">
+      <Filter>Файлы заголовков\util</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Util\Materials.h">
+      <Filter>Файлы заголовков\util</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Util\Params.h">
+      <Filter>Файлы заголовков\util</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="DeformationModel.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MathCore.cpp">
+      <Filter>Исходные файлы\core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\fragmentation.cpp">
+      <Filter>Исходные файлы\features</Filter>
+    </ClCompile>
+    <ClCompile Include="src\rotations.cpp">
+      <Filter>Исходные файлы\features</Filter>
+    </ClCompile>
+    <ClCompile Include="src\fragment.cpp">
+      <Filter>Исходные файлы\model</Filter>
+    </ClCompile>
+    <ClCompile Include="src\polycrystall.cpp">
+      <Filter>Исходные файлы\model</Filter>
+    </ClCompile>
+    <ClCompile Include="src\functions.cpp">
+      <Filter>Исходные файлы\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hardening.cpp">
+      <Filter>Исходные файлы\features</Filter>
+    </ClCompile>
+    <ClCompile Include="src\distributions.cpp">
+      <Filter>Исходные файлы\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\params.cpp">
+      <Filter>Исходные файлы\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tension.cpp">
+      <Filter>Исходные файлы\features</Filter>
+    </ClCompile>
+    <ClCompile Include="dependency\TinyXML\tinyxml2.cpp">
+      <Filter>Исходные файлы\utils</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
