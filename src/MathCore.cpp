@@ -796,7 +796,7 @@ namespace model
 
 	double Tensor::getL(int n)
 	{
-		/*Eigen::MatrixXf m(DIM, DIM);
+		Eigen::MatrixXf m(DIM, DIM);
 		for (int i = 0; i < DIM; i++)
 		{
 			for (int j = 0; j < DIM; j++)
@@ -805,6 +805,6 @@ namespace model
 			}
 		}
 		Eigen::EigenSolver<Eigen::MatrixXf> solver(m);
-		return solver.eigenvalues().col(0)[n].real();*/
+		return solver.eigenvalues().col(0)[n].real();
 	}
 }
