@@ -1,7 +1,6 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
-#pragma warning (disable : 4996)
 
 #include "stdafx.h"
 
@@ -521,7 +520,7 @@ namespace model
 	
 	void Polycrystall::BoundsAnalize()
 	{
-		double TOTAL_BOUNDS = pow(fragm_count, 3) * prms::surround_count;	//Всего фасеток
+		double TOTAL_BOUNDS = pow(fragm_count, 3) * prms::surroundCount;	//Всего фасеток
 		int HIGH_ANGLE = 0;
 		double M = 0.09;		//Мера для границы наклона 10 градусов
 		for (int q1 = 0; q1 < fragm_count; q1++)
@@ -530,7 +529,7 @@ namespace model
 			{
 				for (int q3 = 0; q3 < fragm_count; q3++)
 				{
-					for (int h = 0; h < prms::surround_count; h++)	//Цикл по фасеткам			
+					for (int h = 0; h < prms::surroundCount; h++)	//Цикл по фасеткам			
 					{
 						double mesure = C[q1][q2][q3].DisorientMeasure(h);
 						if (mesure > M) HIGH_ANGLE++;
@@ -568,7 +567,7 @@ namespace model
 				{
 					int pos1 = get1DPos(q1, q2, q3);	//Позиция первого элемента
 					
-					for (int h = 0; h < prms::surround_count; h++)
+					for (int h = 0; h < prms::surroundCount; h++)
 					{
 						if (C[q1][q2][q3].contact[h] == 0) continue;//Если фрагменты не контактируют
 						int pos2 = C[q1][q2][q3].surrounds[h].position;//Позиция второго элемента

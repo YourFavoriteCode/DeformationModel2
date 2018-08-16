@@ -89,7 +89,7 @@ namespace model
 	{
 		if (f->sum_angle > 100*EPS)
 		{
-			double dmc = prms::ROT_HARD_K1 + prms::ROT_HARD_K2*f->sum_angle / f->volume;
+			double dmc = prms::rotationParamHardK1 + prms::rotationParamHardK2*f->sum_angle / f->volume;
 			f->dmc = dmc;
 			f->rot_Mc += dmc*prms::dt;//Приращение критического момента
 		}
@@ -99,7 +99,7 @@ namespace model
 	{
 		Vector dM;						//Производная вектор-момента
 		double S = f->size*f->size;		//Площадь фасетки (полная)
-		for (int h = 0; h < prms::surround_count; h++)//Пробегаем по всем соседям фрагмента
+		for (int h = 0; h < prms::surroundCount; h++)//Пробегаем по всем соседям фрагмента
 		{
 			if (f->contact[h] == 0) continue;//Если нет контакта - пропускаем
 			Tensor d_in1, d_in2;

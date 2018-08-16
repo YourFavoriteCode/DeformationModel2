@@ -1,7 +1,6 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
-//#pragma warning (disable : 4996)
 
 #include "stdafx.h"
 
@@ -27,7 +26,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	}
 	if (!isDirectoryExists(L"Polus"))
 	{
-		CreateDirectory((LPCTSTR)"Polus", NULL);//Для ПФ
+		CreateDirectory((LPCTSTR)"Polus", NULL);//Для полюсных фигур
 	}
 	if (!isDirectoryExists(L"DBG"))
 	{
@@ -47,7 +46,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	printf(" ==========================================\n");
 	const int total_fragm_count = (int)pow(prms::fragm_count, 3);	//Общее кол-во фрагментов
 	printf(" Fragments count: %d\n", total_fragm_count);
-	printf(" Max. strain: %g\n", prms::strain_max);
+	printf(" Max. strain: %g\n", prms::maxStrainIntencity);
 	if (prms::cycle_count != 1)
 	{
 		printf(" Number of cycles: %d\n", prms::cycle_count);
@@ -56,8 +55,8 @@ int _tmain(int argc, _TCHAR* argv[])
 	if (prms::ROTATIONS_HARDENING)
 	{
 		printf(" Using rotation hardening model\n");
-		printf("       K1: %g\n", prms::ROT_HARD_K1);
-		printf("       K2: %g\n", prms::ROT_HARD_K2);
+		printf("       K1: %g\n", prms::rotationParamHardK1);
+		printf("       K2: %g\n", prms::rotationParamHardK2);
 	}
 	if (prms::ROTATIONS_TAYLOR)
 	{
@@ -66,22 +65,22 @@ int _tmain(int argc, _TCHAR* argv[])
 	if (prms::ROTATIONS_TRUSOV)
 	{
 		printf(" Using Trusov's rotation model\n");
-		printf("       A: %g\n", prms::ROT_A);
-		printf("       H: %g\n", prms::ROT_H);
-		printf("       L: %g\n", prms::ROT_L);
-		printf("       MC: %g\n", prms::ROT_MC);
+		printf("       A: %g\n", prms::rotationParamA);
+		printf("       H: %g\n", prms::rotationParamH);
+		printf("       L: %g\n", prms::rotationParamL);
+		printf("       MC: %g\n", prms::rotationParamMc);
 	}
-	if (prms::HARDENING_BASE)
+	if (prms::usingHardeningBase)
 	{
 		printf(" Using basic hardening\n");
-		printf("       A: %g\n", prms::HARD_BASE_A);
-		printf("       Delta: %g\n", prms::HARD_BASE_DELTA);
-		printf("       Psi: %g\n", prms::HARD_BASE_PSI);
+		printf("       A: %g\n", prms::hardeningParamBaseA);
+		printf("       Delta: %g\n", prms::hardeningParamBaseDelta);
+		printf("       Psi: %g\n", prms::hardeningParamBasePsi);
 	}
-	if (prms::HARDENING_BOUND)
+	if (prms::usingHardeningBound)
 	{
 		printf(" Using boundary hardening\n");
-		printf("       K: %g\n", prms::HARD_BOUND_K);
+		printf("       K: %g\n", prms::hardeningParamBoundK);
 	}
 	if (prms::debug_period > 0)
 	{
@@ -90,11 +89,11 @@ int _tmain(int argc, _TCHAR* argv[])
 		printf("       Start: %d\n", prms::DEBUG_START);
 		printf("       Stop: %d\n", prms::DEBUG_STOP);
 	}
-	if (prms::fix_orient == 1)
+	if (prms::fixedOrientations == 1)
 	{
 		printf(" Saving current orientations and normals\n");
 	}
-	if (prms::fix_orient == 2)
+	if (prms::fixedOrientations == 2)
 	{
 		printf(" Reading saved orientations and normals\n");
 	}
@@ -116,17 +115,17 @@ int _tmain(int argc, _TCHAR* argv[])
 	{
 	case 0:
 	{
-		prms::surround_count = 6;			//Обычный уровень
+		prms::surroundCount = 6;			//Обычный уровень
 		break;
 	}
 	case 1:
 	{
-		prms::surround_count = 18;		//Повышенный уровень
+		prms::surroundCount = 18;		//Повышенный уровень
 		break;
 	}
 	case 2:
 	{
-		prms::surround_count = 26;		//Самый высокий уровень
+		prms::surroundCount = 26;		//Самый высокий уровень
 		break;
 	}
 	}
@@ -136,7 +135,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	if (prms::FRAGMENTATION) PC.MakeGrains2();//Формирование зёренной структуры
 
 
-	if (prms::fix_orient == 2)	//Считывание записанных ориентаций
+	if (prms::fixedOrientations == 2)	//Считывание записанных ориентаций
 	{
 		std::ifstream StreamO("DBG\\o.txt", std::ios_base::in);
 		std::ifstream StreamNorm("DBG\\Norm.txt", std::ios_base::in);
@@ -153,7 +152,7 @@ int _tmain(int argc, _TCHAR* argv[])
 							StreamO >> PC.C[q1][q2][q3].o.C[i][j];
 						}
 					}
-					for (int h = 0; h < prms::surround_count; h++)//Считываем значения нормалей
+					for (int h = 0; h < prms::surroundCount; h++)//Считываем значения нормалей
 					{
 						for (int i = 0; i < DIM; i++)
 						{
@@ -167,7 +166,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		StreamNorm.close();
 	}
 
-	if (prms::fix_orient == 1)//Запоминание начальных ориентаций
+	if (prms::fixedOrientations == 1)//Запоминание начальных ориентаций
 	{
 		std::ofstream StreamO("DBG\\o.txt", std::ios_base::out | std::ios_base::trunc);
 		std::ofstream StreamNorm("DBG\\Norm.txt", std::ios_base::out | std::ios_base::trunc);
@@ -178,7 +177,7 @@ int _tmain(int argc, _TCHAR* argv[])
 				for (int q3 = 0; q3 < prms::fragm_count; q3++)
 				{
 					WriteDebugInfo(StreamO, PC.C[q1][q2][q3].o.C);//Записываем значения тензоров ориентации
-					for (int h = 0; h < prms::surround_count; h++)//Записываем значения нормалей
+					for (int h = 0; h < prms::surroundCount; h++)//Записываем значения нормалей
 					{
 						for (int i = 0; i < DIM; i++)
 						{

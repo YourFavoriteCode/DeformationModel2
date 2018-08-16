@@ -466,7 +466,7 @@ namespace model
 			***********              Закон Шмида             ************
 			************************************************************/
 			SS[k].t = 0;
-			if (!prms::SYMMETRY)
+			if (!prms::isSymmetrycal)
 			{
 				for (int i = 0; i < DIM; i++)
 				{
@@ -509,7 +509,7 @@ namespace model
 		**********    Вычисление неупругих деформаций     ***********
 		************************************************************/
 		d_in.setZero();
-		if (!prms::SYMMETRY)
+		if (!prms::isSymmetrycal)
 		{
 			for (int i = 0; i < DIM; i++)
 			{

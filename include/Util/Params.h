@@ -9,19 +9,19 @@ namespace prms
 	/********************************************************
 	**********   Различные параметры нагружения   ***********
 	********************************************************/
-	extern bool REAL_UNIAX;					//Условие одноосности
-	extern bool UNLOADING;					//Упругая разгрузка
-	extern double strain_max;				//Предел интенсивности деформаций
+	extern bool trueUniaxial;					//Условие одноосности
+	extern bool withUnloading;					//Упругая разгрузка
+	extern double maxStrainIntencity;				//Предел интенсивности деформаций
 	extern int cycle_count;					//Кол-во циклов нагружения
 	extern model::Tensor gradV;					//Градиент места
 
 	/********************************************************
 	**********		   Прочие параметры			 ************
 	********************************************************/
-	extern bool SYMMETRY;					//Симметризация диад nb
-	extern bool RAND_ORIENT;				//Случайное распределение начальных ориентаций
-	extern int ORIENT_TYPE;					//Тип задания ориентации
-	extern int fix_orient;					//Считывание ориентаций и нормалей из файлы
+	extern bool isSymmetrycal;					//Симметризация диад nb
+	extern bool randomOrientations;				//Случайное распределение начальных ориентаций
+	extern int orientationType;					//Тип задания ориентации
+	extern int fixedOrientations;					//Считывание ориентаций и нормалей из файлы
 	extern double dt;						//Шаг интегрирования
 	extern int thread_count;				//Кол-во потоков
 	extern int debug_period;				//Период сохранения отладочных данных
@@ -33,9 +33,9 @@ namespace prms
 	/********************************************************
 	**********		Параметры поликристалла	     ************
 	********************************************************/
-	extern int material;					//Используемый материал
+	extern int materialType;					//Используемый материал
 	extern int SurroundsGrade;				//Степень учёта соседних элементов
-	extern int surround_count;				//Кол-во учитываемых соседей
+	extern int surroundCount;				//Кол-во учитываемых соседей
 	extern int fragm_count;					//Кол-во фрагментов
 	extern int material_purity;				//Процент основной фазы в материале
 	
@@ -58,25 +58,25 @@ namespace prms
 	extern bool ROTATIONS_TRUSOV;			//Модель несовместности свдигов
 	extern bool ROTATIONS_HARDENING;		//Ротационное упрочнение
 
-	extern double ROT_A;					//Параметр упругой составляющей
-	extern double ROT_H;					//Параметр пластической составляющей
-	extern double ROT_L;					//Параметр лямбда
-	extern double ROT_MC;					//Начальный критический момент
+	extern double rotationParamA;					//Параметр упругой составляющей
+	extern double rotationParamH;					//Параметр пластической составляющей
+	extern double rotationParamL;					//Параметр лямбда
+	extern double rotationParamMc;					//Начальный критический момент
 
-	extern double ROT_HARD_K1;
-	extern double ROT_HARD_K2;
+	extern double rotationParamHardK1;
+	extern double rotationParamHardK2;
 	
 	/********************************************************
 	*****************     Упрочнения     ********************
 	********************************************************/
 
-	extern bool HARDENING_BASE;				//Базовое слагаемое упрочнения
-	extern bool HARDENING_BOUND;			//Зерно-граничное упрочнение
+	extern bool usingHardeningBase;				//Базовое слагаемое упрочнения
+	extern bool usingHardeningBound;			//Зерно-граничное упрочнение
 
-	extern double HARD_BOUND_K;				//Параметр зернограничного упрочнения
-	extern double HARD_BASE_DELTA;			//Парметр дельта
-	extern double HARD_BASE_PSI;			//Параметр пси
-	extern double HARD_BASE_A;				//Парметр А
+	extern double hardeningParamBoundK;				//Параметр зернограничного упрочнения
+	extern double hardeningParamBaseDelta;			//Парметр дельта
+	extern double hardeningParamBasePsi;			//Параметр пси
+	extern double hardeningParamBaseA;				//Парметр А
 	
 	/********************************************************
 	***********			Фрагментация		*****************
@@ -91,19 +91,19 @@ namespace prms
 
 	extern double plot_period;				//Период сохранения диаграммы НДС
 	extern double polus_period;				//Период сохранения ПФ
-	extern bool SaveIntense;				//Сохранение интенсивностей тензоров
-	extern bool SaveMacro;					//Сохранение данных макроуровня
-	extern bool SaveMeso;					//Сохранение данных мехоуровня
-	extern bool SaveActiveSS;				//Сохранение активных СС	
-	extern bool Save11;						//Покомпонентное сохранение
-	extern bool Save12;
-	extern bool Save13;
-	extern bool Save21;
-	extern bool Save22;
-	extern bool Save23;
-	extern bool Save31;
-	extern bool Save32;
-	extern bool Save33;
+	extern bool isSaveIntensity;				//Сохранение интенсивностей тензоров
+	extern bool isSaveMacro;					//Сохранение данных макроуровня
+	extern bool isSaveMeso;					//Сохранение данных мехоуровня
+	extern bool isSaveActiveSS;				//Сохранение активных СС	
+	extern bool save11;						//Покомпонентное сохранение
+	extern bool save12;
+	extern bool save13;
+	extern bool save21;
+	extern bool save22;
+	extern bool save23;
+	extern bool save31;
+	extern bool save32;
+	extern bool save33;
 
 	int ReadParams(const char *);			//Считывание параметров из файла
 
