@@ -27,7 +27,7 @@ namespace model
 				double a = (j == k ? prms::hardeningParamBaseA : 1.25 * prms::hardeningParamBaseA);
 				if ((f->SS[j].dgm > EPS) && (fabs(nsd) > EPS))
 				{
-					osn += a*pow(f->SS[j].gmm, prms::hardeningParamBasePsi)*pow((f->SS[j].dgm / prms::dgm0), prms::hardeningParamBaseDelta) / nsd;
+					osn += a*pow(f->SS[j].gmm, prms::hardeningParamBasePsi)*pow((f->SS[j].dgm / prms::shearRateLawDgm0), prms::hardeningParamBaseDelta) / nsd;
 				}
 			}
 			double napr = 0;
@@ -103,7 +103,7 @@ namespace model
 			Vector b1 = ScalMult(f->o, f->SS[k].b);//Перевели вектор b текущей СС данного зерна в ЛСК
 			double zgu = 0;
 			double tbs=0;
-			for (int h = 0; h < prms::surroundCount; h++)	//Цикл по фасеткам			
+			for (int h = 0; h < prms::grainSurroundCount; h++)	//Цикл по фасеткам			
 			{
 				if (f->contact[h] == 0) continue;//Если нет контакта - пропускаем
 				if (f->SS[k].b.ScalMult(f->normals[h]) < 0) continue; //Скольжение от границы - пропускаем

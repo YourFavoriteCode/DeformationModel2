@@ -17,19 +17,19 @@ namespace model
 	int get1DPos(int q1, int q2, int q3)
 	{
 		//По трём координатам в объёме поликристалла возвращает уникальный номер фрагмента
-		int res = q1*prms::fragm_count*prms::fragm_count + q2*prms::fragm_count + q3;
+		int res = q1*prms::grainCountLinear*prms::grainCountLinear + q2*prms::grainCountLinear + q3;
 		return res;
 	}
 
 	void get3DPos(int pos, int* q1, int* q2, int* q3)
 	{
 		//Восстанавливает пространственные координаты поликристалла по уникальному номеру
-		int C2d = prms::fragm_count*prms::fragm_count;
-		int C3d = C2d*prms::fragm_count;
+		int C2d = prms::grainCountLinear*prms::grainCountLinear;
+		int C3d = C2d*prms::grainCountLinear;
 
 		int qq1 = pos / C2d;
-		int qq2 = (pos - qq1*C2d) / prms::fragm_count;
-		int qq3 = (pos - qq1*C2d) % prms::fragm_count;
+		int qq2 = (pos - qq1*C2d) / prms::grainCountLinear;
+		int qq3 = (pos - qq1*C2d) % prms::grainCountLinear;
 
 		*q1 = qq1;
 		*q2 = qq2;
@@ -327,7 +327,7 @@ namespace model
 
 	void Polycrystall::MakeGrains()
 	{
-		int gsz = prms::Grain_size;					//Желаемый размер зерна (во фрагментах на ребере)
+		int gsz = prms::grainPartsSizeLinear;					//Желаемый размер зерна (во фрагментах на ребере)
 		int cnt = 2*pow(int(fragm_count / gsz), 3);	//Желаемое кол-во зёрен
 		
 		mass = new int**[fragm_count];
@@ -458,7 +458,7 @@ namespace model
 
 	void Polycrystall::MakeGrains2()
 	{
-		int size = prms::Grain_size;
+		int size = prms::grainPartsSizeLinear;
 		mass = new int**[fragm_count];
 		for (int i = 0; i < fragm_count; i++)
 		{
@@ -520,7 +520,7 @@ namespace model
 	
 	void Polycrystall::BoundsAnalize()
 	{
-		double TOTAL_BOUNDS = pow(fragm_count, 3) * prms::surroundCount;	//Всего фасеток
+		double TOTAL_BOUNDS = pow(fragm_count, 3) * prms::grainSurroundCount;	//Всего фасеток
 		int HIGH_ANGLE = 0;
 		double M = 0.09;		//Мера для границы наклона 10 градусов
 		for (int q1 = 0; q1 < fragm_count; q1++)
@@ -529,7 +529,7 @@ namespace model
 			{
 				for (int q3 = 0; q3 < fragm_count; q3++)
 				{
-					for (int h = 0; h < prms::surroundCount; h++)	//Цикл по фасеткам			
+					for (int h = 0; h < prms::grainSurroundCount; h++)	//Цикл по фасеткам			
 					{
 						double mesure = C[q1][q2][q3].DisorientMeasure(h);
 						if (mesure > M) HIGH_ANGLE++;
@@ -567,7 +567,7 @@ namespace model
 				{
 					int pos1 = get1DPos(q1, q2, q3);	//Позиция первого элемента
 					
-					for (int h = 0; h < prms::surroundCount; h++)
+					for (int h = 0; h < prms::grainSurroundCount; h++)
 					{
 						if (C[q1][q2][q3].contact[h] == 0) continue;//Если фрагменты не контактируют
 						int pos2 = C[q1][q2][q3].surrounds[h].position;//Позиция второго элемента

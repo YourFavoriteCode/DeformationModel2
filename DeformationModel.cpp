@@ -44,25 +44,25 @@ int _tmain(int argc, _TCHAR* argv[])
 	if (prms::ReadParams(param_file) == 1) printf(" Error in file!\n");		//Считали параметры из файла
 	delete[] param_file;//Больше не нужен
 	printf(" ==========================================\n");
-	const int total_fragm_count = (int)pow(prms::fragm_count, 3);	//Общее кол-во фрагментов
+	const int total_fragm_count = (int)pow(prms::grainCountLinear, 3);	//Общее кол-во фрагментов
 	printf(" Fragments count: %d\n", total_fragm_count);
 	printf(" Max. strain: %g\n", prms::maxStrainIntencity);
-	if (prms::cycle_count != 1)
+	if (prms::loadCycleCount != 1)
 	{
-		printf(" Number of cycles: %d\n", prms::cycle_count);
+		printf(" Number of cycles: %d\n", prms::loadCycleCount);
 	}
 	printf(" Integration step: %g\n", prms::dt);
-	if (prms::ROTATIONS_HARDENING)
+	if (prms::usingRotationsHardening)
 	{
 		printf(" Using rotation hardening model\n");
 		printf("       K1: %g\n", prms::rotationParamHardK1);
 		printf("       K2: %g\n", prms::rotationParamHardK2);
 	}
-	if (prms::ROTATIONS_TAYLOR)
+	if (prms::usingRotationsTaylor)
 	{
 		printf(" Using Taylor's rotation model\n");
 	}
-	if (prms::ROTATIONS_TRUSOV)
+	if (prms::usingRotationsTrusov)
 	{
 		printf(" Using Trusov's rotation model\n");
 		printf("       A: %g\n", prms::rotationParamA);
@@ -82,12 +82,12 @@ int _tmain(int argc, _TCHAR* argv[])
 		printf(" Using boundary hardening\n");
 		printf("       K: %g\n", prms::hardeningParamBoundK);
 	}
-	if (prms::debug_period > 0)
+	if (prms::saveVariablesPeriodStep > 0)
 	{
 		printf(" ============= DEBUG MODE =============\n");
-		printf("       Period: %d\n", prms::debug_period);
-		printf("       Start: %d\n", prms::DEBUG_START);
-		printf("       Stop: %d\n", prms::DEBUG_STOP);
+		printf("       Period: %d\n", prms::saveVariablesPeriodStep);
+		printf("       Start: %d\n", prms::saveVariablesStartStep);
+		printf("       Stop: %d\n", prms::saveVariablesStopStep);
 	}
 	if (prms::fixedOrientations == 1)
 	{
@@ -99,7 +99,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	}
 
 	Polycrystall PC;				//Создание и инициализация поликристалла
-	PC.Init(prms::fragm_count);
+	PC.Init(prms::grainCountLinear);
 
 	unsigned long t1, t2;			//Отсечки времени
 
@@ -111,39 +111,39 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	std::srand(time(NULL));
 
-	switch (prms::SurroundsGrade)			//Степень учёта соседних элементов
+	switch (prms::grainSurroundGrade)			//Степень учёта соседних элементов
 	{
 	case 0:
 	{
-		prms::surroundCount = 6;			//Обычный уровень
+		prms::grainSurroundCount = 6;			//Обычный уровень
 		break;
 	}
 	case 1:
 	{
-		prms::surroundCount = 18;		//Повышенный уровень
+		prms::grainSurroundCount = 18;		//Повышенный уровень
 		break;
 	}
 	case 2:
 	{
-		prms::surroundCount = 26;		//Самый высокий уровень
+		prms::grainSurroundCount = 26;		//Самый высокий уровень
 		break;
 	}
 	}
 
 	PC.setParams();					//Заполнение всех параметров поликристалла
 	PC.MakeStruct();				//Формирование фрагментной структуры
-	if (prms::FRAGMENTATION) PC.MakeGrains2();//Формирование зёренной структуры
+	if (prms::usingFragmentation) PC.MakeGrains2();//Формирование зёренной структуры
 
 
 	if (prms::fixedOrientations == 2)	//Считывание записанных ориентаций
 	{
 		std::ifstream StreamO("DBG\\o.txt", std::ios_base::in);
 		std::ifstream StreamNorm("DBG\\Norm.txt", std::ios_base::in);
-		for (int q1 = 0; q1 < prms::fragm_count; q1++)
+		for (int q1 = 0; q1 < prms::grainCountLinear; q1++)
 		{
-			for (int q2 = 0; q2 < prms::fragm_count; q2++)
+			for (int q2 = 0; q2 < prms::grainCountLinear; q2++)
 			{
-				for (int q3 = 0; q3 < prms::fragm_count; q3++)
+				for (int q3 = 0; q3 < prms::grainCountLinear; q3++)
 				{
 					for (int i = 0; i < DIM; i++)	//Считываем значения ориентационных тензоров
 					{
@@ -152,7 +152,7 @@ int _tmain(int argc, _TCHAR* argv[])
 							StreamO >> PC.C[q1][q2][q3].o.C[i][j];
 						}
 					}
-					for (int h = 0; h < prms::surroundCount; h++)//Считываем значения нормалей
+					for (int h = 0; h < prms::grainSurroundCount; h++)//Считываем значения нормалей
 					{
 						for (int i = 0; i < DIM; i++)
 						{
@@ -170,14 +170,14 @@ int _tmain(int argc, _TCHAR* argv[])
 	{
 		std::ofstream StreamO("DBG\\o.txt", std::ios_base::out | std::ios_base::trunc);
 		std::ofstream StreamNorm("DBG\\Norm.txt", std::ios_base::out | std::ios_base::trunc);
-		for (int q1 = 0; q1 < prms::fragm_count; q1++)
+		for (int q1 = 0; q1 < prms::grainCountLinear; q1++)
 		{
-			for (int q2 = 0; q2 < prms::fragm_count; q2++)
+			for (int q2 = 0; q2 < prms::grainCountLinear; q2++)
 			{
-				for (int q3 = 0; q3 < prms::fragm_count; q3++)
+				for (int q3 = 0; q3 < prms::grainCountLinear; q3++)
 				{
 					WriteDebugInfo(StreamO, PC.C[q1][q2][q3].o.C);//Записываем значения тензоров ориентации
-					for (int h = 0; h < prms::surroundCount; h++)//Записываем значения нормалей
+					for (int h = 0; h < prms::grainSurroundCount; h++)//Записываем значения нормалей
 					{
 						for (int i = 0; i < DIM; i++)
 						{
@@ -192,15 +192,15 @@ int _tmain(int argc, _TCHAR* argv[])
 		StreamNorm.close();
 	}
 
-	if (prms::read_init_stress)	//Считывание остаточных напряжений
+	if (prms::usingInititalStress)	//Считывание остаточных напряжений
 	{
 		std::ifstream StreamSgm("DBG\\sgm.txt", std::ios_base::in);
 
-		for (int q1 = 0; q1 < prms::fragm_count; q1++)
+		for (int q1 = 0; q1 < prms::grainCountLinear; q1++)
 		{
-			for (int q2 = 0; q2 < prms::fragm_count; q2++)
+			for (int q2 = 0; q2 < prms::grainCountLinear; q2++)
 			{
-				for (int q3 = 0; q3 < prms::fragm_count; q3++)
+				for (int q3 = 0; q3 < prms::grainCountLinear; q3++)
 				{
 					for (int i = 0; i < DIM; i++)	//Считываем значения тензоров
 					{
@@ -221,7 +221,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	PC.OpenFiles();				//Открытие и очистка файлов для вывода
 								//Сохранение начальных полюсных фигур и ССТ
-	if (prms::polus_period > 0)
+	if (prms::periodSavePolus > 0)
 	{
 		printf(" Saving pole figures... ");
 		t1 = clock();
@@ -234,14 +234,14 @@ int _tmain(int argc, _TCHAR* argv[])
 	PC.Deformate();		//Деформирование
 	t2 = clock();		//Финальная отсечка времени
 
-	if (prms::read_init_stress)	//Сохранение остаточных напряжений
+	if (prms::usingInititalStress)	//Сохранение остаточных напряжений
 	{
 		PC.dbgstream[3].open("DBG\\sgm.txt", std::ios_base::out | std::ios_base::trunc);
-		for (int q1 = 0; q1 < prms::fragm_count; q1++)
+		for (int q1 = 0; q1 < prms::grainCountLinear; q1++)
 		{
-			for (int q2 = 0; q2 < prms::fragm_count; q2++)
+			for (int q2 = 0; q2 < prms::grainCountLinear; q2++)
 			{
-				for (int q3 = 0; q3 < prms::fragm_count; q3++)
+				for (int q3 = 0; q3 < prms::grainCountLinear; q3++)
 				{
 
 					WriteDebugInfo(PC.dbgstream[3], PC.C[q1][q2][q3].sgm.C);

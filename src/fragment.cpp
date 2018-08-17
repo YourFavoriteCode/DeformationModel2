@@ -501,7 +501,7 @@ namespace model
 				fclose(G_File);
 				}*/
 			//	SS[k].dgm = prms::dgm0 * pow((SS[k].t -(SS[k].tbs)) / SS[k].tc, prms::m) * H(SS[k].t - (SS[k].tbs) /*- SS[k].tc*/);
-			SS[k].dgm = prms::dgm0 * pow(SS[k].t / SS[k].tc, prms::m) * H(SS[k].t - SS[k].tc);
+			SS[k].dgm = prms::shearRateLawDgm0 * pow(SS[k].t / SS[k].tc, prms::shearRateLawM) * H(SS[k].t - SS[k].tc);
 
 			SS[k].gmm += SS[k].dgm * prms::dt; //Сдвиг по СС
 		}

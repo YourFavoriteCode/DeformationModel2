@@ -63,53 +63,53 @@ namespace model
 		Datastream = new std::ofstream[1];
 
 		//Файлы для вывода макро-данных
-		if (prms::isSaveMacro && prms::isSaveIntensity)
+		if (prms::saveMacro && prms::saveIntensity)
 		{
 			DataXStream[0].open("Plot\\macroXint.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 			DataYStream[0].open("Plot\\macroYint.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 		}
 
-		if (prms::isSaveMacro && prms::save11)
+		if (prms::saveMacro && prms::save11)
 		{
 			DataXStream[1].open("Plot\\macroX11.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 			DataYStream[1].open("Plot\\macroY11.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 		}
-		if (prms::isSaveMacro && prms::save12)
+		if (prms::saveMacro && prms::save12)
 		{
 			DataXStream[2].open("Plot\\macroX12.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 			DataYStream[2].open("Plot\\macroY12.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 		}
-		if (prms::isSaveMacro && prms::save13)
+		if (prms::saveMacro && prms::save13)
 		{
 			DataXStream[3].open("Plot\\macroX13.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 			DataYStream[3].open("Plot\\macroY13.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 		}
-		if (prms::isSaveMacro && prms::save21)
+		if (prms::saveMacro && prms::save21)
 		{
 			DataXStream[4].open("Plot\\macroX21.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 			DataYStream[4].open("Plot\\macroY21.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 		}
-		if (prms::isSaveMacro && prms::save22)
+		if (prms::saveMacro && prms::save22)
 		{
 			DataXStream[5].open("Plot\\macroX22.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 			DataYStream[5].open("Plot\\macroY22.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 		}
-		if (prms::isSaveMacro && prms::save23)
+		if (prms::saveMacro && prms::save23)
 		{
 			DataXStream[6].open("Plot\\macroX23.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 			DataYStream[6].open("Plot\\macroY23.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 		}
-		if (prms::isSaveMacro && prms::save31)
+		if (prms::saveMacro && prms::save31)
 		{
 			DataXStream[7].open("Plot\\macroX31.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 			DataYStream[7].open("Plot\\macroY31.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 		}
-		if (prms::isSaveMacro && prms::save32)
+		if (prms::saveMacro && prms::save32)
 		{
 			DataXStream[8].open("Plot\\macroX32.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 			DataYStream[8].open("Plot\\macroY32.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 		}
-		if (prms::isSaveMacro && prms::save33)
+		if (prms::saveMacro && prms::save33)
 		{
 			DataXStream[9].open("Plot\\macroX33.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 			DataYStream[9].open("Plot\\macroY33.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
@@ -117,53 +117,53 @@ namespace model
 
 		//Файлы для мезо-данных
 
-		if (prms::isSaveMeso && prms::isSaveIntensity)
+		if (prms::saveMeso && prms::saveIntensity)
 		{
 			DataXStream[10].open("Plot\\mesoXint.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 			DataYStream[10].open("Plot\\mesoYint.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 		}
 
-		if (prms::isSaveMeso && prms::save11)
+		if (prms::saveMeso && prms::save11)
 		{
 			DataXStream[11].open("Plot\\mesoX11.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 			DataYStream[11].open("Plot\\mesoY11.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 		}
-		if (prms::isSaveMeso && prms::save12)
+		if (prms::saveMeso && prms::save12)
 		{
 			DataXStream[12].open("Plot\\mesoX12.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 			DataYStream[12].open("Plot\\mesoY12.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 		}
-		if (prms::isSaveMeso && prms::save13)
+		if (prms::saveMeso && prms::save13)
 		{
 			DataXStream[13].open("Plot\\mesoX13.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 			DataYStream[13].open("Plot\\mesoY13.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 		}
-		if (prms::isSaveMeso && prms::save21)
+		if (prms::saveMeso && prms::save21)
 		{
 			DataXStream[14].open("Plot\\mesoX21.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 			DataYStream[14].open("Plot\\mesoY21.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 		}
-		if (prms::isSaveMeso && prms::save22)
+		if (prms::saveMeso && prms::save22)
 		{
 			DataXStream[15].open("Plot\\mesoX22.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 			DataYStream[15].open("Plot\\mesoY22.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 		}
-		if (prms::isSaveMeso && prms::save23)
+		if (prms::saveMeso && prms::save23)
 		{
 			DataXStream[16].open("Plot\\mesoX23.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 			DataYStream[16].open("Plot\\mesoY23.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 		}
-		if (prms::isSaveMeso && prms::save31)
+		if (prms::saveMeso && prms::save31)
 		{
 			DataXStream[17].open("Plot\\mesoX31.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 			DataYStream[17].open("Plot\\mesoY31.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 		}
-		if (prms::isSaveMeso && prms::save32)
+		if (prms::saveMeso && prms::save32)
 		{
 			DataXStream[18].open("Plot\\mesoX32.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 			DataYStream[18].open("Plot\\mesoY32.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 		}
-		if (prms::isSaveMeso && prms::save33)
+		if (prms::saveMeso && prms::save33)
 		{
 			DataXStream[19].open("Plot\\mesoX33.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 			DataYStream[19].open("Plot\\mesoY33.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
@@ -172,7 +172,7 @@ namespace model
 		Datastream[0].open("Plot\\ActiveSS.dat", std::ios_base::out | std::ios_base::trunc | std::ios::binary);
 
 		dbgstream = new std::ofstream[file_count];
-		if (prms::debug_period > 0)				//Открытие файлов для отладочных данных
+		if (prms::saveVariablesPeriodStep > 0)				//Открытие файлов для отладочных данных
 		{
 			dbgstream[0].open("DBG\\o.txt", std::ios_base::out | std::ios_base::trunc);
 			dbgstream[1].open("DBG\\e.txt", std::ios_base::out | std::ios_base::trunc);
@@ -214,7 +214,7 @@ namespace model
 			TestStream[i].close();
 		}
 
-		if (prms::debug_period > 0)
+		if (prms::saveVariablesPeriodStep > 0)
 		{
 			for (int i = 0; i < file_count; i++)
 			{
@@ -252,7 +252,7 @@ namespace model
 					another_material = (prms::materialType == 1) ? 0 : 1;
 
 					int a = (int)(((double)rand() / RAND_MAX) * 100);//На всё воля божья
-					if (a <= prms::material_purity)
+					if (a <= prms::mainPhasePercent)
 					{
 						C[q1][q2][q3].setMaterialParams(prms::materialType);
 					}
@@ -334,37 +334,37 @@ namespace model
 					}
 
 					//Задание размеров фрагментов
-					switch (prms::fragm_size_law)
+					switch (prms::grainSizeDistribLaw)
 					{
-					case 0://Равномерное
+					case prms::UNIFORM_DISTRIB:
 					{
-						C[q1][q2][q3].size = UniformDistrib(prms::fragm_size_m, prms::fragm_size_dsp);
+						C[q1][q2][q3].size = UniformDistrib(prms::grainSizeDistribM, prms::grainSizeDistribD);
 						break;
 					}
-					case 1://Нормальное
+					case prms::NORMAL_DISTRIB:
 					{
-						C[q1][q2][q3].size = NormalDistrib(prms::fragm_size_m, prms::fragm_size_dsp);
+						C[q1][q2][q3].size = NormalDistrib(prms::grainSizeDistribM, prms::grainSizeDistribD);
 						break;
 					}
-					case 2://Логнормальное
+					case prms::LOGNORMAL_DISTRIB:
 					{
-						C[q1][q2][q3].size = LogNormalDistrib(prms::fragm_size_m, prms::fragm_size_dsp);
+						C[q1][q2][q3].size = LogNormalDistrib(prms::grainSizeDistribM, prms::grainSizeDistribD);
 						break;
 					}
-					case 3://Показательное
+					case prms::EXPONENT_DISTRIB:
 					{
-						C[q1][q2][q3].size = ExpDistrib(prms::fragm_size_m);//Только один параметр
+						C[q1][q2][q3].size = ExpDistrib(prms::grainSizeDistribM);//Только один параметр
 						break;
 					}
 					}
 					C[q1][q2][q3].volume = pow(C[q1][q2][q3].size, 3);	//Объём фрагмента
 
 					//Выделение памяти под массивы, необходимые для работы с окружением
-					C[q1][q2][q3].surrounds = new Fragment[prms::surroundCount];
-					C[q1][q2][q3].normals = new Vector[prms::surroundCount];
-					C[q1][q2][q3].contact = new int[prms::surroundCount];
+					C[q1][q2][q3].surrounds = new Fragment[prms::grainSurroundCount];
+					C[q1][q2][q3].normals = new Vector[prms::grainSurroundCount];
+					C[q1][q2][q3].contact = new int[prms::grainSurroundCount];
 
-					for (int h = 0; h < prms::surroundCount; h++)
+					for (int h = 0; h < prms::grainSurroundCount; h++)
 					{
 						C[q1][q2][q3].contact[h] = -1;		//Изначально контакт не задан
 					}
@@ -382,7 +382,7 @@ namespace model
 				for (int q3 = 0; q3 < fragm_count; q3++)
 				{
 
-					for (int h = 0; h < prms::surroundCount; h++)
+					for (int h = 0; h < prms::grainSurroundCount; h++)
 					{
 						//Если контакт уже был задан - пропускаем
 						if (C[q1][q2][q3].contact[h] != -1) continue;
@@ -632,14 +632,14 @@ namespace model
 						else if (h < 14) C[q1][q2][q3].contact[h] = 3;	//Контакт на вершине октаэдра
 						else C[q1][q2][q3].contact[h] = 2;				//Контакт на ребре
 					}
-					if (prms::surroundCount > 6)	//Уменьшение объёма из-за отсечений
+					if (prms::grainSurroundCount > 6)	//Уменьшение объёма из-за отсечений
 					{
 						double a = C[q1][q2][q3].size * 0.1;			//Длина срезанной части вдоль ребра
 						double vol_edge = a*a*C[q1][q2][q3].size / 2.0;	//Объём, срезанный рёбрами
 						double vol_vertex = a*a*a / SQRT3;				//Объём, срезанный вершинами
 						int cut_edge = 0;		//Кол-во срезанных рёбер
 						int cut_vertex = 0;		//Кол-во срезанных вершин
-						for (int h = 6; h < prms::surroundCount; h++)
+						for (int h = 6; h < prms::grainSurroundCount; h++)
 						{
 							if (C[q1][q2][q3].contact[h] != 0)
 							{
@@ -664,7 +664,7 @@ namespace model
 				for (int q3 = 0; q3 < fragm_count; q3++)
 				{
 					GetPoleFig(&C[q1][q2][q3]);
-					if (prms::SST_SAVING) GetSST(&C[q1][q2][q3]);
+					if (prms::usingStandardTriangleSaving) GetSST(&C[q1][q2][q3]);
 				}
 			}
 		}
@@ -805,12 +805,12 @@ namespace model
 						Base_hardening(&C[q1][q2][q3]);
 					}
 
-					if (prms::ROTATIONS_TAYLOR)		//Ротации по Тейлору
+					if (prms::usingRotationsTaylor)		//Ротации по Тейлору
 					{
 						Taylor_rotations(&C[q1][q2][q3]);
 					}
 
-					if (prms::ROTATIONS_TRUSOV && prms::ROTATIONS_HARDENING)	//Ротационное упрочнение
+					if (prms::usingRotationsTrusov && prms::usingRotationsHardening)	//Ротационное упрочнение
 					{
 						Rotation_hardening(&C[q1][q2][q3]);
 					}
@@ -820,7 +820,7 @@ namespace model
 						Boundary_hardening(&C[q1][q2][q3]);
 					}
 
-					if (prms::ROTATIONS_TRUSOV)		//Ротации по Трусову
+					if (prms::usingRotationsTrusov)		//Ротации по Трусову
 					{
 						Trusov_rotations(&C[q1][q2][q3]);
 					}
@@ -866,7 +866,7 @@ namespace model
 			progress = prms::trueUniaxial ? fabs(E.C[0][0]) : Strain;
 			progress = progress / prms::maxStrainIntencity * 100.0;
 
-			if (!(prms::cycle_count == 1 || cycle == 0))	//Для многоцикловых нагружений
+			if (!(prms::loadCycleCount == 1 || cycle == 0))	//Для многоцикловых нагружений
 			{
 				progress /= 2.0;
 				/************************************************
@@ -915,13 +915,13 @@ namespace model
 		***********	    Запись данных для графиков НДС    ***********
 		************************************************************/
 
-		if ((progress - PLOT_STEP > prms::plot_period || unload) && prms::plot_period > 0)
+		if ((progress - PLOT_STEP > prms::periodSavePlot || unload) && prms::periodSavePlot > 0)
 		{
 			BoundsAnalize();		//Подсчет доли большеугловых границ
 
-			if (prms::isSaveMacro)	//Запись компонент тензоров макроуровня
+			if (prms::saveMacro)	//Запись компонент тензоров макроуровня
 			{
-				if (prms::isSaveIntensity)
+				if (prms::saveIntensity)
 				{
 					DataXStream[0].write((char *)&Strain, sizeof(double));
 					DataYStream[0].write((char *)&Stress, sizeof(double));
@@ -973,7 +973,7 @@ namespace model
 				}
 			}
 
-			if (prms::isSaveMeso)	//Запись компонент тензоров мезоуровня
+			if (prms::saveMeso)	//Запись компонент тензоров мезоуровня
 			{
 				for (int q1 = 0; q1 < fragm_count; q1++)
 				{
@@ -982,7 +982,7 @@ namespace model
 						for (int q3 = 0; q3 < fragm_count; q3++)
 						{
 
-							if (prms::isSaveIntensity)
+							if (prms::saveIntensity)
 							{
 								DataXStream[10].write((char *)&C[q1][q2][q3].strain, sizeof(double));
 								DataYStream[10].write((char *)&C[q1][q2][q3].stress, sizeof(double));
@@ -1075,7 +1075,7 @@ namespace model
 			Mc /= total_fragm_count;
 			dmc /= total_fragm_count;
 			ActiveSysCount /= total_fragm_count;
-			if (prms::isSaveActiveSS) Datastream[0].write((char *)&ActiveSysCount, sizeof ActiveSysCount);//Запись кол-ва активных СС
+			if (prms::saveActiveSS) Datastream[0].write((char *)&ActiveSysCount, sizeof ActiveSysCount);//Запись кол-ва активных СС
 			if (RotCount != 0)
 			{
 				RotSpeed /= RotCount;
@@ -1108,7 +1108,7 @@ namespace model
 		/************************************************************
 		***********	      Сохранение полюсных фигур	      ***********
 		************************************************************/
-		if (progress - POLUS_STEP > prms::polus_period && prms::polus_period > 0)
+		if (progress - POLUS_STEP > prms::periodSavePolus && prms::periodSavePolus > 0)
 		{
 			SavePoleFig();
 			POLUS_STEP = progress;
@@ -1117,14 +1117,14 @@ namespace model
 		/************************************************************
 		***********	       Запись пошаговых данных	      ***********
 		************************************************************/
-		if (CURR_STEP >= prms::DEBUG_START && CURR_STEP <= prms::DEBUG_STOP && DEBUG_STEP == prms::debug_period)
+		if (CURR_STEP >= prms::saveVariablesStartStep && CURR_STEP <= prms::saveVariablesStopStep && DEBUG_STEP == prms::saveVariablesPeriodStep)
 		{
 			DEBUG_STEP = 0;
 			SaveDbgInfo();
 		}
 		CURR_STEP++;
 		PROC_STEP++;
-		if (CURR_STEP >= prms::DEBUG_START && CURR_STEP <= prms::DEBUG_STOP) DEBUG_STEP++;
+		if (CURR_STEP >= prms::saveVariablesStartStep && CURR_STEP <= prms::saveVariablesStopStep) DEBUG_STEP++;
 
 	}
 
@@ -1134,7 +1134,7 @@ namespace model
 		*объема поликристала.
 		*****************************************/
 	{
-		omp_set_num_threads(prms::thread_count);	//Кол-во используемых потоков
+		omp_set_num_threads(prms::ompThreadCount);	//Кол-во используемых потоков
 
 		if (prms::trueUniaxial)
 		{
@@ -1144,14 +1144,14 @@ namespace model
 			***************************************************/
 			tension_component = D.C[0][0];
 		}
-		for (cycle = 0; cycle < prms::cycle_count; cycle++)
+		for (cycle = 0; cycle < prms::loadCycleCount; cycle++)
 		{
 			unsigned long t1, t2;
 
 			PLOT_STEP = 0;		//Обнуление счетчиков для периодического вывода данных в файлы
 			POLUS_STEP = 0;
 			PROC_STEP = 0;
-			if (prms::cycle_count > 1)
+			if (prms::loadCycleCount > 1)
 			{
 				printf("\n Loading #%d", cycle + 1);
 				t1 = clock();		//Начальная отсечка времени
@@ -1167,7 +1167,7 @@ namespace model
 				Load(false);
 				//if (prms::FRAGMENTATION) GrainRotate();
 			}
-			if (prms::cycle_count > 1)
+			if (prms::loadCycleCount > 1)
 			{
 				t2 = clock();		//Конечная отсечка времени
 				printf("\b\b\b\b\b\bDone in %g sec", (t2 - t1) / 1000.0);
@@ -1198,13 +1198,13 @@ namespace model
 				printf("\b\b\b\b\b\bDone in %g sec", (t2 - t1) / 1000.0);
 			}
 
-			if (prms::cycle_count > 1)	//Цикоическое знакопеременное нагружение
+			if (prms::loadCycleCount > 1)	//Цикоическое знакопеременное нагружение
 			{
 				D.C[0][0] = pow(-1, cycle + 1) * tension_component;	//Меняем знак растягивающей компоненты
 				prms::maxStrainIntencity += prms::maxStrainIntencity * addition_strain;	//Повышаем предел интенсивности
 			}
 
-			if (prms::FRAGMENTATION) Fragmentate();
+			if (prms::usingFragmentation) Fragmentate();
 
 		}
 	}

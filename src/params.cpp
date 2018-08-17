@@ -19,81 +19,81 @@ namespace prms
 	*****	Если в файле параметров не будет найден параметр,	******
 	*****	его значение будет взято по-умолчанию				******
 	*****************************************************************/
-	bool isSymmetrycal					= true;
-	bool trueUniaxial					= false;
-	bool withUnloading					= false;
-	bool randomOrientations				= true;
-	int orientationType					= 0;
-	int fixedOrientations				= 0;
-	double dt							= 5e-4;
-	int materialType					= 0;
-	double maxStrainIntencity			= 1e-1;
+	bool isSymmetrycal						= true;
+	bool trueUniaxial						= false;
+	bool withUnloading						= false;
+	bool randomOrientations					= true;
+	int orientationType						= 0;
+	int fixedOrientations					= 0;
+	double dt								= 5e-4;
+	int materialType						= 0;
+	double maxStrainIntencity				= 1e-1;
 	model::Tensor gradV;
 	
-	int surroundCount					= 6;
-	int material_purity					= 100;
-	bool read_init_stress				= false;
+	int grainSurroundCount					= 6;
+	int mainPhasePercent					= 100;
+	bool usingInititalStress				= false;
 	
-	int fragm_size_law					= 0;
-	double fragm_size_m					= 5e-5;
-	double fragm_size_dsp				= 0;
+	DistributionType grainSizeDistribLaw	= NORMAL_DISTRIB;
+	double grainSizeDistribM				= 5e-5;
+	double grainSizeDistribD				= 0;
 
-	int fragm_count						= 4;
-	int cycle_count						= 1;
-	int thread_count					= 1;
+	int grainCountLinear					= 4;
+	int loadCycleCount						= 1;
+	int ompThreadCount						= 1;
 
-	double plot_period					= 2;
-	double polus_period					= 25;
-	int debug_period					= 0;
-	int DEBUG_START						= 0;
-	int DEBUG_STOP						= INT_MAX;
+	double periodSavePlot					= 2;
+	double periodSavePolus					= 25;
+	int saveVariablesPeriodStep				= 0;
+	int saveVariablesStartStep				= 0;
+	int saveVariablesStopStep				= INT_MAX;
 
-	double dgm0							= 1e-5;
-	double m							= 100;
+	double shearRateLawDgm0					= 1e-5;
+	double shearRateLawM					= 100;
 
-	bool ROTATIONS_TAYLOR				= false;
-	bool ROTATIONS_TRUSOV				= false;
-	bool ROTATIONS_HARDENING			= false;
+	bool usingRotationsTaylor				= false;
+	bool usingRotationsTrusov				= false;
+	bool usingRotationsHardening			= false;
 
-	double rotationParamA				= 3e-9;
-	double rotationParamH				= 1e-7;
-	double rotationParamL				= 10;
-	double rotationParamMc				= 3e4;
+	double rotationParamA					= 3e-9;
+	double rotationParamH					= 1e-7;
+	double rotationParamL					= 10;
+	double rotationParamMc					= 3e4;
 
 	double rotationParamHardK1;
 	double rotationParamHardK2;
 
-	bool usingHardeningBase				= false;
-	bool usingHardeningBound			= false;
+	bool usingHardeningBase					= false;
+	bool usingHardeningBound				= false;
 
-	double hardeningParamBoundK			= 0;
-	double hardeningParamBaseDelta		= 0;
-	double hardeningParamBasePsi		= 0;
-	double hardeningParamBaseA			= 0;
+	double hardeningParamBoundK				= 0;
+	double hardeningParamBaseDelta			= 0;
+	double hardeningParamBasePsi			= 0;
+	double hardeningParamBaseA				= 0;
 
-	int SurroundsGrade					= 1;
-	bool SST_SAVING						= false;
+	int grainSurroundGrade					= 1;
+	bool usingStandardTriangleSaving		= false;
 
-	bool FRAGMENTATION					= false;
-	int Grain_size						= 3;
+	bool usingFragmentation					= false;
+	int grainPartsSizeLinear				= 3;
 
-	
-	bool isSaveIntensity				= true;
-	bool isSaveMacro					= true;
-	bool isSaveMeso						= false;
-	bool isSaveActiveSS					= false;
+	bool saveIntensity						= true;
+	bool saveMacro							= true;
+	bool saveMeso							= false;
+	bool saveActiveSS						= false;
 
-	bool save11							= false;
-	bool save12							= false;
-	bool save13							= false;
-	bool save21							= false;
-	bool save22							= false;
-	bool save23							= false;
-	bool save31							= false;
-	bool save32							= false;
-	bool save33							= false;
+	bool save11								= false;
+	bool save12								= false;
+	bool save13								= false;
+	bool save21								= false;
+	bool save22								= false;
+	bool save23								= false;
+	bool save31								= false;
+	bool save32								= false;
+	bool save33								= false;
 
-	int getValue(tinyxml2::XMLElement *rootnode, const char* name, int* var)//Целочисленные
+	//Чтение целочисленных параметров
+	int getValue(tinyxml2::XMLElement *rootnode, const char* name, int* var)
 	{
 		if (rootnode->FirstChildElement(name) != NULL)//Проверка, есть ли в файле такой элемент
 		{
@@ -108,7 +108,8 @@ namespace prms
 		return 1;
 	}
 	
-	int getValue(tinyxml2::XMLElement *rootnode, const char* name, double* var)//Вещественные
+	//Чтение вещественных параметров
+	int getValue(tinyxml2::XMLElement *rootnode, const char* name, double* var)
 	{
 		if (rootnode->FirstChildElement(name) != NULL)//Проверка, есть ли в файле такой элемент
 		{
@@ -123,7 +124,8 @@ namespace prms
 		return 1;
 	}
 
-	int getValue(tinyxml2::XMLElement *rootnode, const char* name, bool* var)//Логические
+	//Чтение логических параметров
+	int getValue(tinyxml2::XMLElement *rootnode, const char* name, bool* var)
 	{
 		if (rootnode->FirstChildElement(name) != NULL)//Проверка, есть ли в файле такой элемент
 		{
@@ -145,11 +147,12 @@ namespace prms
 
 		tinyxml2::XMLElement *rootnode = doc.FirstChildElement("Parameters");
 		if (rootnode == NULL) return 1;
-		getValue(rootnode, "GrainCount", &fragm_count);
+
+		getValue(rootnode, "GrainCount", &grainCountLinear);
 		getValue(rootnode, "Material", &materialType);
 		getValue(rootnode, "RandomOrientations", &randomOrientations);
-		getValue(rootnode, "M", &m);
-		getValue(rootnode, "dGamma0", &dgm0);
+		getValue(rootnode, "M", &shearRateLawM);
+		getValue(rootnode, "dGamma0", &shearRateLawDgm0);
 		getValue(rootnode, "DeformationLimit", &maxStrainIntencity);
 		getValue(rootnode, "IntegrationStep", &dt);
 		getValue(rootnode, "RealUniaxial", &trueUniaxial);
@@ -162,24 +165,24 @@ namespace prms
 		getValue(rootnode, "HardBaseA", &hardeningParamBaseA);
 		getValue(rootnode, "HardBoundK", &hardeningParamBoundK);
 		/*Ротации*/
-		int rt;
-		getValue(rootnode, "Rotate", &rt);
-		if (rt == 0) ROTATIONS_TAYLOR = true;
-		else if (rt == 1) ROTATIONS_TRUSOV = true;
+		int buf;
+		getValue(rootnode, "Rotate", &buf);
+		if (buf == 0) usingRotationsTaylor = true;
+		else if (buf == 1) usingRotationsTrusov = true;
 		getValue(rootnode, "RotateA", &rotationParamA);
 		getValue(rootnode, "RotateH", &rotationParamH);
 		getValue(rootnode, "RotateLambda", &rotationParamL);
 		getValue(rootnode, "RotateMc", &rotationParamMc);
 
-		getValue(rootnode, "CycleCount", &cycle_count);
+		getValue(rootnode, "CycleCount", &loadCycleCount);
 		getValue(rootnode, "Unloading", &withUnloading);
-		getValue(rootnode, "SurroundsDegree", &SurroundsGrade);
-		getValue(rootnode, "RotationHardening", &ROTATIONS_HARDENING);
-		getValue(rootnode, "MaterialPurity", &material_purity);
-		getValue(rootnode, "PlotPeriod", &plot_period);
-		getValue(rootnode, "PolusPeriod", &polus_period);
-		getValue(rootnode, "DebugPeriod", &debug_period);
-		getValue(rootnode, "ThreadCount", &thread_count);
+		getValue(rootnode, "SurroundsDegree", &grainSurroundGrade);
+		getValue(rootnode, "RotationHardening", &usingRotationsHardening);
+		getValue(rootnode, "MaterialPurity", &mainPhasePercent);
+		getValue(rootnode, "PlotPeriod", &periodSavePlot);
+		getValue(rootnode, "PolusPeriod", &periodSavePolus);
+		getValue(rootnode, "DebugPeriod", &saveVariablesPeriodStep);
+		getValue(rootnode, "ThreadCount", &ompThreadCount);
 		getValue(rootnode, "FixedOrientations", &fixedOrientations);
 		getValue(rootnode, "OrientationType", &orientationType);
 
@@ -195,17 +198,19 @@ namespace prms
 		getValue(rootnode, "gradV21", &gradV.C[2][1]);
 		getValue(rootnode, "gradV22", &gradV.C[2][2]);
 	
-		getValue(rootnode, "FragmSizeLaw", &fragm_size_law);
-		getValue(rootnode, "FragmSizeM", &fragm_size_m);
-		getValue(rootnode, "FragmSizeDsp", &fragm_size_dsp);
-		getValue(rootnode, "StartWritingDbgInfo", &DEBUG_START);
-		getValue(rootnode, "StopWritingDbgInfo", &DEBUG_STOP);
+		buf = 0;
+		getValue(rootnode, "FragmSizeLaw", &buf);
+		grainSizeDistribLaw = DistributionType(buf);
+		getValue(rootnode, "FragmSizeM", &grainSizeDistribM);
+		getValue(rootnode, "FragmSizeDsp", &grainSizeDistribD);
+		getValue(rootnode, "StartWritingDbgInfo", &saveVariablesStartStep);
+		getValue(rootnode, "StopWritingDbgInfo", &saveVariablesStopStep);
 
 		/*Выходные данные*/
-		getValue(rootnode, "SaveIntense", &isSaveIntensity);
-		getValue(rootnode, "SaveMacro", &isSaveMacro);
-		getValue(rootnode, "SaveMeso", &isSaveMeso);
-		getValue(rootnode, "SaveActiveSS", &isSaveActiveSS);
+		getValue(rootnode, "SaveIntense", &saveIntensity);
+		getValue(rootnode, "SaveMacro", &saveMacro);
+		getValue(rootnode, "SaveMeso", &saveMeso);
+		getValue(rootnode, "SaveActiveSS", &saveActiveSS);
 
 		getValue(rootnode, "Save11", &save11);
 		getValue(rootnode, "Save12", &save12);
@@ -218,15 +223,14 @@ namespace prms
 		getValue(rootnode, "Save33", &save33);
 
 		/*Экспериментальные параметры*/
-		getValue(rootnode, "ReadInitStress", &read_init_stress);
-		getValue(rootnode, "SaveSST", &SST_SAVING);
-		getValue(rootnode, "Fragmentation", &FRAGMENTATION);
-		getValue(rootnode, "GrainSize", &Grain_size);
+		getValue(rootnode, "ReadInitStress", &usingInititalStress);
+		getValue(rootnode, "SaveSST", &usingStandardTriangleSaving);
+		getValue(rootnode, "Fragmentation", &usingFragmentation);
+		getValue(rootnode, "GrainSize", &grainPartsSizeLinear);
 
 		getValue(rootnode, "ROT_HARD_K1", &rotationParamHardK1);
 		getValue(rootnode, "ROT_HARD_K2", &rotationParamHardK2);
 	
-
 		return 0;
 	}
 }

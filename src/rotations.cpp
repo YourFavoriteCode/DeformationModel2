@@ -99,7 +99,7 @@ namespace model
 	{
 		Vector dM;						//Производная вектор-момента
 		double S = f->size*f->size;		//Площадь фасетки (полная)
-		for (int h = 0; h < prms::surroundCount; h++)//Пробегаем по всем соседям фрагмента
+		for (int h = 0; h < prms::grainSurroundCount; h++)//Пробегаем по всем соседям фрагмента
 		{
 			if (f->contact[h] == 0) continue;//Если нет контакта - пропускаем
 			Tensor d_in1, d_in2;
