@@ -34,7 +34,7 @@ namespace prms
 	int mainPhasePercent					= 100;
 	bool usingInititalStress				= false;
 	
-	DistributionType grainSizeDistribLaw	= NORMAL_DISTRIB;
+	DistributionType grainSizeDistribLaw	= DISTRIB_NORMAL;
 	double grainSizeDistribM				= 5e-5;
 	double grainSizeDistribD				= 0;
 
@@ -71,7 +71,7 @@ namespace prms
 	double hardeningParamBasePsi			= 0;
 	double hardeningParamBaseA				= 0;
 
-	int grainSurroundGrade					= 1;
+	SurroundGrade grainSurroundGrade		= GRADE_BASE;
 	bool usingStandardTriangleSaving		= false;
 
 	bool usingFragmentation					= false;
@@ -176,7 +176,8 @@ namespace prms
 
 		getValue(rootnode, "CycleCount", &loadCycleCount);
 		getValue(rootnode, "Unloading", &withUnloading);
-		getValue(rootnode, "SurroundsDegree", &grainSurroundGrade);
+		getValue(rootnode, "SurroundsDegree", &buf);
+		grainSurroundGrade = SurroundGrade(buf);
 		getValue(rootnode, "RotationHardening", &usingRotationsHardening);
 		getValue(rootnode, "MaterialPurity", &mainPhasePercent);
 		getValue(rootnode, "PlotPeriod", &periodSavePlot);
@@ -188,17 +189,16 @@ namespace prms
 
 		/*Градиент скорости*/
 		gradV.setZero();
-		getValue(rootnode, "gradV00", &gradV.C[0][0]);
-		getValue(rootnode, "gradV01", &gradV.C[0][1]);
-		getValue(rootnode, "gradV02", &gradV.C[0][2]);
-		getValue(rootnode, "gradV10", &gradV.C[1][0]);
-		getValue(rootnode, "gradV11", &gradV.C[1][1]);
-		getValue(rootnode, "gradV12", &gradV.C[1][2]);
-		getValue(rootnode, "gradV20", &gradV.C[2][0]);
-		getValue(rootnode, "gradV21", &gradV.C[2][1]);
-		getValue(rootnode, "gradV22", &gradV.C[2][2]);
+		getValue(rootnode, "gradV00", &gradV.c[0][0]);
+		getValue(rootnode, "gradV01", &gradV.c[0][1]);
+		getValue(rootnode, "gradV02", &gradV.c[0][2]);
+		getValue(rootnode, "gradV10", &gradV.c[1][0]);
+		getValue(rootnode, "gradV11", &gradV.c[1][1]);
+		getValue(rootnode, "gradV12", &gradV.c[1][2]);
+		getValue(rootnode, "gradV20", &gradV.c[2][0]);
+		getValue(rootnode, "gradV21", &gradV.c[2][1]);
+		getValue(rootnode, "gradV22", &gradV.c[2][2]);
 	
-		buf = 0;
 		getValue(rootnode, "FragmSizeLaw", &buf);
 		grainSizeDistribLaw = DistributionType(buf);
 		getValue(rootnode, "FragmSizeM", &grainSizeDistribM);

@@ -83,7 +83,7 @@ namespace model
 				break;
 			}
 			}
-			B(i) = P.C[k][l][0][0] * (-tens_comp + D_in.C[0][0]);
+			B(i) = P.C[k][l][0][0] * (-tens_comp + D_in.c[0][0]);
 			for (int j = 0; j < 5; j++)
 			{
 				int y, z;
@@ -123,12 +123,12 @@ namespace model
 				if (y != z)
 				{
 					A(i, j) = P.C[k][l][y][z] + P.C[k][l][z][y];
-					B(i) += (P.C[k][l][y][z] + P.C[k][l][z][y])*D_in.C[y][z];
+					B(i) += (P.C[k][l][y][z] + P.C[k][l][z][y])*D_in.c[y][z];
 				}
 				else
 				{
 					A(i, j) = P.C[k][l][y][z];
-					B(i) += P.C[k][l][y][z]*D_in.C[y][z];
+					B(i) += P.C[k][l][y][z]*D_in.c[y][z];
 				}
 			}
 		}
@@ -156,12 +156,12 @@ namespace model
 		X = A.fullPivHouseholderQr().solve(B);
 
 		Tensor res;
-		res.C[0][1] = res.C[1][0] = X(0);
-		res.C[0][2] = res.C[2][0] = X(1);
-		res.C[1][2] = res.C[2][1] = X(2);
-		res.C[1][1] = X(3);
-		res.C[2][2] = X(4);
-		res.C[0][0] = tens_comp;
+		res.c[0][1] = res.c[1][0] = X(0);
+		res.c[0][2] = res.c[2][0] = X(1);
+		res.c[1][2] = res.c[2][1] = X(2);
+		res.c[1][1] = X(3);
+		res.c[2][2] = X(4);
+		res.c[0][0] = tens_comp;
 		return res;
 	}
 
@@ -176,7 +176,7 @@ namespace model
 				{
 					for (int l = 0; l < 3; l++)
 					{
-						res.C[i][j] += P.C[i][j][k][l] * (D.C[l][k] - D_in.C[l][k]);
+						res.c[i][j] += P.C[i][j][k][l] * (D.c[l][k] - D_in.c[l][k]);
 					}
 				}
 			}
@@ -290,7 +290,7 @@ namespace model
 				break;
 			}
 			}
-			Br(i) = -lam*Sgm.C[k][l];
+			Br(i) = -lam*Sgm.c[k][l];
 			for (int j = 0; j < 6; j++)
 			{
 				int y, z;
@@ -336,12 +336,12 @@ namespace model
 				if (y != z)
 				{
 					Ar(i, j) = P.C[k][l][y][z] + P.C[k][l][z][y];
-					Br(i) += (P.C[k][l][y][z] + P.C[k][l][z][y])*D_in.C[y][z];
+					Br(i) += (P.C[k][l][y][z] + P.C[k][l][z][y])*D_in.c[y][z];
 				}
 				else
 				{
 					Ar(i, j) = P.C[k][l][y][z];
-					Br(i) += P.C[k][l][y][z] * D_in.C[y][z];
+					Br(i) += P.C[k][l][y][z] * D_in.c[y][z];
 				}
 			}
 		}
@@ -349,12 +349,12 @@ namespace model
 
 		Xr = Ar.fullPivHouseholderQr().solve(Br);
 		Tensor res;
-		res.C[0][1] = res.C[1][0] = Xr(0);
-		res.C[0][2] = res.C[2][0] = Xr(1);
-		res.C[1][2] = res.C[2][1] = Xr(2);
-		res.C[1][1] = Xr(3);
-		res.C[2][2] = Xr(4);
-		res.C[0][0] = Xr(5);
+		res.c[0][1] = res.c[1][0] = Xr(0);
+		res.c[0][2] = res.c[2][0] = Xr(1);
+		res.c[1][2] = res.c[2][1] = Xr(2);
+		res.c[1][1] = Xr(3);
+		res.c[2][2] = Xr(4);
+		res.c[0][0] = Xr(5);
 		return res;
 	}
 }

@@ -29,16 +29,16 @@ namespace model
 	***********************************************************************/
 	Vector::Vector()
 	{
-		C[0] = 0;
-		C[1] = 0;
-		C[2] = 0;
+		c[0] = 0;
+		c[1] = 0;
+		c[2] = 0;
 	}
 
 	void Vector::set(const double x, const double y, const double z)
 	{
-		C[0] = x;
-		C[1] = y;
-		C[2] = z;
+		c[0] = x;
+		c[1] = y;
+		c[2] = z;
 	}
 
 	double Vector::getNorm()
@@ -46,7 +46,7 @@ namespace model
 		double sum = 0;
 		for (int i = 0; i < DIM; i++)
 		{
-			sum += C[i] * C[i];
+			sum += c[i] * c[i];
 		}
 		double res;	
 		if (isnormal(sum)) res = sqrt(sum); 
@@ -54,14 +54,14 @@ namespace model
 		return res;
 	}
 
-	int Vector::Normalize()
+	int Vector::normalize()
 	{
 		double norm = getNorm();
 		if (norm > 0)
 		{
 			for (int i = 0; i < DIM; i++)
 			{
-				C[i] /= norm;
+				c[i] /= norm;
 			}
 			return 0;
 		}
@@ -76,21 +76,21 @@ namespace model
 	{
 		for (int i = 0; i < DIM; i++)
 		{
-			C[i] = 0;
+			c[i] = 0;
 		}
 	}
 
-	double Vector::ScalMult(const Vector v)
+	double Vector::scalMult(const Vector v)
 	{
 		double res = 0;
 		for (int i = 0; i < DIM; i++)
 		{
-			res += C[i] * v.C[i];
+			res += c[i] * v.c[i];
 		}
 		return res;
 	}
 	
-	Vector Vector::VectMult(const Vector v)
+	Vector Vector::vectMult(const Vector v)
 	{
 		Vector res;
 		for (int i = 0; i < DIM; i++)
@@ -99,7 +99,7 @@ namespace model
 			{
 				for (int k = 0; k < DIM; k++)
 				{
-					res.C[i] += LeviCivit(i, j, k) * C[j] * v.C[k];
+					res.c[i] += LeviCivit(i, j, k) * c[j] * v.c[k];
 				}
 			}
 		}
@@ -111,7 +111,7 @@ namespace model
 		Vector buf;
 		for (int i = 0; i < DIM; i++)
 		{
-			buf.C[i] = C[i] + v.C[i];
+			buf.c[i] = c[i] + v.c[i];
 		}
 		return buf;
 	}
@@ -121,7 +121,7 @@ namespace model
 		Vector buf;
 		for (int i = 0; i < DIM; i++)
 		{
-			buf.C[i] = C[i] - v.C[i];
+			buf.c[i] = c[i] - v.c[i];
 		}
 		return buf;
 	}
@@ -131,7 +131,7 @@ namespace model
 		Vector buf;
 		for (int i = 0; i < DIM; i++)
 		{
-			buf.C[i] = -C[i];
+			buf.c[i] = -c[i];
 		}
 		return buf;
 	}
@@ -141,7 +141,7 @@ namespace model
 		Vector buf;
 		for (int i = 0; i < DIM; i++)
 		{
-			buf.C[i] = C[i] * r;
+			buf.c[i] = c[i] * r;
 		}
 		return buf;
 	}
@@ -150,21 +150,21 @@ namespace model
 	{
 		for (int i = 0; i < DIM; i++)
 		{
-			C[i] += v.C[i];
+			c[i] += v.c[i];
 		}
 	}
 	void Vector::operator -= (const Vector v)
 	{
 		for (int i = 0; i < DIM; i++)
 		{
-			C[i] -= v.C[i];
+			c[i] -= v.c[i];
 		}
 	}
 	void Vector::operator *= (const double r)
 	{
 		for (int i = 0; i < DIM; i++)
 		{
-			C[i] *= r;
+			c[i] *= r;
 		}
 	}
 
@@ -174,7 +174,7 @@ namespace model
 		{
 			for (int i = 0; i < DIM; i++)
 			{
-				C[i] /= r;
+				c[i] /= r;
 			}
 		}
 		else
@@ -192,42 +192,42 @@ namespace model
 	****************      Методы для работы с тензором     *****************
 	***********************************************************************/
 
-	void Tensor::Transp()
+	void Tensor::transp()
 	{
 		double buf;
 		for (int i = DIM-1; i >= 0; --i)
 		{
 			for (int j = i - 1; j >= 0; --j)
 			{
-				buf = C[i][j];
-				C[i][j] = C[j][i];
-				C[j][i] = buf;
+				buf = c[i][j];
+				c[i][j] = c[j][i];
+				c[j][i] = buf;
 			}
 		}
 	}
 
 	double Tensor::getDet()
 	{
-		return (C[0][0] * C[1][1] * C[2][2] + C[0][1] * C[1][2] * C[2][0] +
-			C[1][0] * C[2][1] * C[0][2] - C[2][0] * C[1][1] * C[0][2] -
-			C[0][0] * C[1][2] * C[2][1] - C[2][2] * C[0][1] * C[1][0]);
+		return (c[0][0] * c[1][1] * c[2][2] + c[0][1] * c[1][2] * c[2][0] +
+			c[1][0] * c[2][1] * c[0][2] - c[2][0] * c[1][1] * c[0][2] -
+			c[0][0] * c[1][2] * c[2][1] - c[2][2] * c[0][1] * c[1][0]);
 	}
 
 	void Tensor::set(double C00, double C01, double C02,
 		double C10, double C11, double C12,
 		double C20, double C21, double C22)
 	{
-		C[0][0] = C00;
-		C[0][1] = C01;
-		C[0][2] = C02;
+		c[0][0] = C00;
+		c[0][1] = C01;
+		c[0][2] = C02;
 
-		C[1][0] = C10;
-		C[1][1] = C11;
-		C[1][2] = C12;
+		c[1][0] = C10;
+		c[1][1] = C11;
+		c[1][2] = C12;
 
-		C[2][0] = C20;
-		C[2][1] = C21;
-		C[2][2] = C22;
+		c[2][0] = C20;
+		c[2][1] = C21;
+		c[2][2] = C22;
 	}
 
 	void Tensor::setZero()
@@ -236,7 +236,7 @@ namespace model
 		{
 			for (int j = 0; j < DIM; j++)
 			{
-				C[i][j] = 0;
+				c[i][j] = 0;
 			}
 		}
 	}
@@ -244,14 +244,14 @@ namespace model
 	Vector Tensor::getRow(const int n)
 	{
 		Vector res;
-		res.set(C[n][0], C[n][1], C[n][2]);
+		res.set(c[n][0], c[n][1], c[n][2]);
 		return res;
 	}
 
 	Vector Tensor::getCol(const int n)
 	{
 		Vector res;
-		res.set(C[0][n], C[1][n], C[2][n]);
+		res.set(c[0][n], c[1][n], c[2][n]);
 		return res;
 	}
 
@@ -261,7 +261,7 @@ namespace model
 		{
 			for (int j = 0; j < DIM; j++)
 			{
-				C[i][j] = (i == j) ? 1.0 : 0;
+				c[i][j] = (i == j) ? 1.0 : 0;
 			}
 		}
 	}
@@ -273,7 +273,7 @@ namespace model
 		{
 			for (int j = 0; j < DIM; j++)
 			{
-				res += C[i][j] * t.C[j][i];
+				res += c[i][j] * t.c[j][i];
 			}
 		}
 		return res;
@@ -286,7 +286,7 @@ namespace model
 		{
 			for (int j = 0; j < DIM; j++)
 			{
-				res.C[i][j] = C[i][j] + C[j][i];
+				res.c[i][j] = c[i][j] + c[j][i];
 			}
 		}
 		res /= 2.0;
@@ -300,43 +300,43 @@ namespace model
 		{
 			for (int j = 0; j < DIM; j++)
 			{
-				res.C[i][j] = C[i][j] - C[j][i];
+				res.c[i][j] = c[i][j] - c[j][i];
 			}
 		}
 		res /= 2.0;
 		return res;
 	}
 	
-	void Tensor::RotMatr(double fi, Vector v)
+	void Tensor::rotationMatrix(double fi, Vector v)
 	{
-		double c = cos(fi);
-		double s = sin(fi);
-		double cf = (1 - c);
+		double cosFi = cos(fi);
+		double sinFi = sin(fi);
+		double cosFi1 = (1 - cosFi);
 
-		C[0][0] = c + cf * v.C[0] * v.C[0];
-		C[0][1] = cf * v.C[0] * v.C[1] - s * v.C[2];
-		C[0][2] = cf * v.C[0] * v.C[2] + s * v.C[1];
+		c[0][0] = cosFi1 * v.c[0] * v.c[0] + cosFi;
+		c[0][1] = cosFi1 * v.c[0] * v.c[1] - sinFi * v.c[2];
+		c[0][2] = cosFi1 * v.c[0] * v.c[2] + sinFi * v.c[1];
 
-		C[1][0] = cf * v.C[0] * v.C[1] + s * v.C[2];
-		C[1][1] = c + cf * v.C[1] * v.C[1];
-		C[1][2] = cf * v.C[1] * v.C[2] - s * v.C[0];
+		c[1][0] = cosFi1 * v.c[1] * v.c[0] + sinFi * v.c[2];
+		c[1][1] = cosFi1 * v.c[1] * v.c[1] + cosFi;
+		c[1][2] = cosFi1 * v.c[1] * v.c[2] - sinFi * v.c[0];
 
-		C[2][0] = cf * v.C[0] * v.C[2] - s * v.C[1];
-		C[2][1] = cf * v.C[1] * v.C[2] + s * v.C[0];
-		C[2][2] = c + cf * v.C[2] * v.C[2];
+		c[2][0] = cosFi1 * v.c[2] * v.c[0] - sinFi * v.c[1];
+		c[2][1] = cosFi1 * v.c[2] * v.c[1] + sinFi * v.c[0];
+		c[2][2] = cosFi1 * v.c[2] * v.c[2] + cosFi;
 	}
 
 	void Tensor::getAxisAngle(double* fi, Vector* v)
 	{
-		double tr = C[0][0] + C[1][1] + C[2][2];
+		double tr = c[0][0] + c[1][1] + c[2][2];
 		double theta = acos((tr - 1) * 0.5);
 
-		double omprecalc = 1.0 / (2 * sin(theta));
+		double omPreCalc = 1.0 / (2 * sin(theta));
 
 		Vector w;
-		w.C[0] = omprecalc * (C[2][1] - C[1][2]);
-		w.C[1] = omprecalc * (C[0][2] - C[2][0]);
-		w.C[2] = omprecalc * (C[1][0] - C[0][1]);
+		w.c[0] = omPreCalc * (c[2][1] - c[1][2]);
+		w.c[1] = omPreCalc * (c[0][2] - c[2][0]);
+		w.c[2] = omPreCalc * (c[1][0] - c[0][1]);
 
 		*fi = theta;
 		*v = w;
@@ -348,7 +348,7 @@ namespace model
 		{
 			for (int j = 0; j < DIM; j++)
 			{
-				C[i][j] = 0;
+				c[i][j] = 0;
 			}
 		}
 	}
@@ -360,7 +360,7 @@ namespace model
 		{
 			for (int j = 0; j < DIM; j++)
 			{
-				res.C[i][j] = C[i][j] + t.C[i][j];
+				res.c[i][j] = c[i][j] + t.c[i][j];
 			}
 		}
 		return res;
@@ -372,7 +372,7 @@ namespace model
 		{
 			for (int j = 0; j < DIM; j++)
 			{
-				C[i][j] += t.C[i][j];
+				c[i][j] += t.c[i][j];
 			}
 		}
 	}
@@ -384,7 +384,7 @@ namespace model
 		{
 			for (int j = 0; j < DIM; j++)
 			{
-				res.C[i][j] = C[i][j] - t.C[i][j];
+				res.c[i][j] = c[i][j] - t.c[i][j];
 			}
 		}
 		return res;
@@ -397,7 +397,7 @@ namespace model
 		{
 			for (int j = 0; j < DIM; j++)
 			{
-				res.C[i][j] = -C[i][j];
+				res.c[i][j] = -c[i][j];
 			}
 		}
 		return res;
@@ -409,7 +409,7 @@ namespace model
 		{
 			for (int j = 0; j < DIM; j++)
 			{
-				C[i][j] -= t.C[i][j];
+				c[i][j] -= t.c[i][j];
 			}
 		}
 	}
@@ -421,7 +421,7 @@ namespace model
 		{
 			for (int j = 0; j < DIM; j++)
 			{
-				res.C[i][j] = t.C[i][j]*r;
+				res.c[i][j] = t.c[i][j]*r;
 			}
 		}
 		return res;
@@ -434,7 +434,7 @@ namespace model
 		{
 			for (int j = 0; j < DIM; j++)
 			{
-				res.C[i][j] = t.C[i][j] * r;
+				res.c[i][j] = t.c[i][j] * r;
 			}
 		}
 		return res;
@@ -449,7 +449,7 @@ namespace model
 			{
 				for (int k = 0; k < DIM; k++)
 				{
-					res.C[i][j] += C[i][k] * t.C[k][j];
+					res.c[i][j] += c[i][k] * t.c[k][j];
 				}
 			}
 		}
@@ -465,9 +465,9 @@ namespace model
 			{
 				for (int k = 0; k < DIM; k++)
 				{
-					buf.C[i][j] += C[i][k] * t.C[k][j];
+					buf.c[i][j] += c[i][k] * t.c[k][j];
 				}
-				C[i][j] = buf.C[i][j];
+				c[i][j] = buf.c[i][j];
 			}
 		}
 	}
@@ -478,7 +478,7 @@ namespace model
 		{
 			for (int j = 0; j < DIM; j++)
 			{
-				C[i][j] *= r;
+				c[i][j] *= r;
 			}
 		}
 	}
@@ -491,7 +491,7 @@ namespace model
 			{
 				for (int j = 0; j < DIM; j++)
 				{
-					C[i][j] /= r;
+					c[i][j] /= r;
 				}
 			}
 		}
@@ -519,8 +519,8 @@ namespace model
 		n.set(nx, ny, nz);
 		b.set(bx, by, bz);
 		
-		n.Normalize();
-		b.Normalize();
+		n.normalize();
+		b.normalize();
 	}
 
 	void SlipSystem::Initialize(int nx1, int nx2, int nx3, int nx4,
@@ -536,8 +536,8 @@ namespace model
 		double w = bx4 / 3.0;
 		b.set(u, v, w);
 
-		n.Normalize();
-		b.Normalize();
+		n.normalize();
+		b.normalize();
 	}
 
 	SlipSystem::SlipSystem()
@@ -637,7 +637,7 @@ namespace model
 								{
 									for (int l1 = 0; l1 < DIM; l1++)
 									{
-										e.C[i][j][k][l] += O.C[i][i1] * O.C[j][j1] * O.C[k][k1] * O.C[l][l1] * C[i1][j1][k1][l1];
+										e.C[i][j][k][l] += O.c[i][i1] * O.c[j][j1] * O.c[k][k1] * O.c[l][l1] * C[i1][j1][k1][l1];
 									}
 								}
 							}
@@ -735,10 +735,10 @@ namespace model
 		for (int k = 0; k < DIM; k++)
 		{
 			Vector buf = t.getCol(k);
-			Vector r = v.VectMult(buf);
+			Vector r = v.vectMult(buf);
 			for (int i = 0; i < DIM; i++)
 			{
-				res.C[i][k] = r.C[i];
+				res.c[i][k] = r.c[i];
 			}
 		}
 		return res;
@@ -750,10 +750,10 @@ namespace model
 		for (int k = 0; k < DIM; k++)
 		{
 			Vector buf = t.getRow(k);
-			Vector r = buf.VectMult(v);
+			Vector r = buf.vectMult(v);
 			for (int i = 0; i < DIM; i++)
 			{
-				res.C[k][i] = r.C[i];
+				res.c[k][i] = r.c[i];
 			}
 		}
 		return res;
@@ -765,7 +765,7 @@ namespace model
 		for (int k = 0; k < DIM; k++)
 		{
 			Vector buf = t.getCol(k);
-			res.C[k] = v.ScalMult(buf);
+			res.c[k] = v.scalMult(buf);
 		}
 		return res;
 	}
@@ -776,7 +776,7 @@ namespace model
 		for (int k = 0; k < DIM; k++)
 		{
 			Vector buf = t.getRow(k);
-			res.C[k] = buf.ScalMult(v);
+			res.c[k] = buf.scalMult(v);
 		}
 		return res;
 	}
@@ -788,7 +788,7 @@ namespace model
 		{
 			for (int j = 0; j < DIM; j++)
 			{
-				res.C[i][j] = t.C[j][i];
+				res.c[i][j] = t.c[j][i];
 			}
 		}
 		return res;
@@ -801,7 +801,7 @@ namespace model
 		{
 			for (int j = 0; j < DIM; j++)
 			{
-				m(i, j) = C[i][j];
+				m(i, j) = c[i][j];
 			}
 		}
 		Eigen::EigenSolver<Eigen::MatrixXf> solver(m);

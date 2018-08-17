@@ -302,7 +302,7 @@ namespace model
 							//Запись оси
 							Vector axis;
 							axis.set(x, y, z);
-							axis.Normalize();
+							axis.normalize();
 							C[q1][q2][q3].OrientateAxis(cf, axis);
 						}
 						else//Получение ориентационного тензора (КСК=ЛСК)
@@ -336,22 +336,22 @@ namespace model
 					//Задание размеров фрагментов
 					switch (prms::grainSizeDistribLaw)
 					{
-					case prms::UNIFORM_DISTRIB:
+					case prms::DISTRIB_UNIFORM:
 					{
 						C[q1][q2][q3].size = UniformDistrib(prms::grainSizeDistribM, prms::grainSizeDistribD);
 						break;
 					}
-					case prms::NORMAL_DISTRIB:
+					case prms::DISTRIB_NORMAL:
 					{
 						C[q1][q2][q3].size = NormalDistrib(prms::grainSizeDistribM, prms::grainSizeDistribD);
 						break;
 					}
-					case prms::LOGNORMAL_DISTRIB:
+					case prms::DISTRIB_LOGNORMAL:
 					{
 						C[q1][q2][q3].size = LogNormalDistrib(prms::grainSizeDistribM, prms::grainSizeDistribD);
 						break;
 					}
-					case prms::EXPONENT_DISTRIB:
+					case prms::DISTRIB_EXPONENT:
 					{
 						C[q1][q2][q3].size = ExpDistrib(prms::grainSizeDistribM);//Только один параметр
 						break;
@@ -621,11 +621,11 @@ namespace model
 
 						C[q1][q2][q3].surrounds[h] = C[qq1][qq2][qq3];//Здравствуй, сосед!
 						C[qq1][qq2][qq3].surrounds[y] = C[q1][q2][q3];//Приятно познакомиться!
-						C[q1][q2][q3].normals[h].Normalize();
+						C[q1][q2][q3].normals[h].normalize();
 
 						for (int i = 0; i < DIM; i++)
 						{
-							C[qq1][qq2][qq3].normals[y].C[i] = -C[q1][q2][q3].normals[h].C[i];//Поделись нормалью
+							C[qq1][qq2][qq3].normals[y].c[i] = -C[q1][q2][q3].normals[h].c[i];//Поделись нормалью
 						}
 
 						if (h < 6) C[q1][q2][q3].contact[h] = 1;		//Контакт на грани октаэдра
@@ -684,14 +684,14 @@ namespace model
 			{
 				for (int q3 = 0; q3 < fragm_count; q3++)
 				{
-					WriteDebugInfo(dbgstream[0], C[q1][q2][q3].o.C);
-					WriteDebugInfo(dbgstream[1], C[q1][q2][q3].e.C);
-					WriteDebugInfo(dbgstream[2], C[q1][q2][q3].d.C);
-					WriteDebugInfo(dbgstream[3], C[q1][q2][q3].sgm.C);
-					WriteDebugInfo(dbgstream[4], C[q1][q2][q3].om.C);
-					WriteDebugInfo(dbgstream[5], C[q1][q2][q3].dsgm.C);
-					WriteDebugInfo(dbgstream[6], C[q1][q2][q3].d_in.C);
-					WriteDebugInfo(dbgstream[7], C[q1][q2][q3].w.C);
+					WriteDebugInfo(dbgstream[0], C[q1][q2][q3].o.c);
+					WriteDebugInfo(dbgstream[1], C[q1][q2][q3].e.c);
+					WriteDebugInfo(dbgstream[2], C[q1][q2][q3].d.c);
+					WriteDebugInfo(dbgstream[3], C[q1][q2][q3].sgm.c);
+					WriteDebugInfo(dbgstream[4], C[q1][q2][q3].om.c);
+					WriteDebugInfo(dbgstream[5], C[q1][q2][q3].dsgm.c);
+					WriteDebugInfo(dbgstream[6], C[q1][q2][q3].d_in.c);
+					WriteDebugInfo(dbgstream[7], C[q1][q2][q3].w.c);
 					for (int f = 0; f < C[q1][q2][q3].SS_count; f++)
 					{
 						dbgstream[8] << C[q1][q2][q3].SS[f].dgm << " ";
@@ -702,16 +702,16 @@ namespace model
 						dbgstream[9] << C[q1][q2][q3].SS[f].t << " ";
 					}
 					dbgstream[9] << std::endl << std::endl;
-					dbgstream[15] << C[q1][q2][q3].moment.C[0] << " " << C[q1][q2][q3].moment.C[1] << " " << C[q1][q2][q3].moment.C[2] << std::endl;
+					dbgstream[15] << C[q1][q2][q3].moment.c[0] << " " << C[q1][q2][q3].moment.c[1] << " " << C[q1][q2][q3].moment.c[2] << std::endl;
 				}
 			}
 		}
 		//Запись тензоров представительного объема
-		WriteDebugInfo(dbgstream[10], D.C);
-		WriteDebugInfo(dbgstream[11], D_in.C);
-		WriteDebugInfo(dbgstream[12], Sgm.C);
-		WriteDebugInfo(dbgstream[13], dSgm.C);
-		WriteDebugInfo(dbgstream[14], E.C);
+		WriteDebugInfo(dbgstream[10], D.c);
+		WriteDebugInfo(dbgstream[11], D_in.c);
+		WriteDebugInfo(dbgstream[12], Sgm.c);
+		WriteDebugInfo(dbgstream[13], dSgm.c);
+		WriteDebugInfo(dbgstream[14], E.c);
 	}
 
 	void Polycrystall::Load(bool unload)
@@ -741,7 +741,7 @@ namespace model
 			//Симметризация тензора упругих констант
 			P.Symmetrize();
 
-			D = !unload ? TensionStrainCalc(P, D_in, D.C[0][0]) : UnloadingStrainCalc(P, D_in, Sgm, lam);
+			D = !unload ? TensionStrainCalc(P, D_in, D.c[0][0]) : UnloadingStrainCalc(P, D_in, Sgm, lam);
 
 			Strain = SQRT2_3*sqrt(E.doubleScalMult(E));//Вычисление интенсивности деформаций
 
@@ -786,7 +786,7 @@ namespace model
 
 					Tensor O = C[q1][q2][q3].o;
 					Tensor OT = O;
-					OT.Transp();
+					OT.transp();
 					C[q1][q2][q3].d = O*D*OT;//Гипотеза Фойгта
 					C[q1][q2][q3].w = O*W*OT /*- C[q1][q2][q3].om*/;//Расширенная
 
@@ -863,7 +863,7 @@ namespace model
 		double progress;
 		if (!unload)
 		{
-			progress = prms::trueUniaxial ? fabs(E.C[0][0]) : Strain;
+			progress = prms::trueUniaxial ? fabs(E.c[0][0]) : Strain;
 			progress = progress / prms::maxStrainIntencity * 100.0;
 
 			if (!(prms::loadCycleCount == 1 || cycle == 0))	//Для многоцикловых нагружений
@@ -873,9 +873,9 @@ namespace model
 				*Этот код позволяет корректно отображать прогресс
 				*выполнения во время циклических нагружений
 				*************************************************/
-				if (E.C[0][0] > 0)
+				if (E.c[0][0] > 0)
 				{
-					if (Sgm.C[0][0] > 0)
+					if (Sgm.c[0][0] > 0)
 					{
 						progress += 50.0;
 					}
@@ -886,7 +886,7 @@ namespace model
 				}
 				else
 				{
-					if (Sgm.C[0][0] > 0)
+					if (Sgm.c[0][0] > 0)
 					{
 						progress = 50.0 - progress;
 					}
@@ -899,7 +899,7 @@ namespace model
 		}
 		else
 		{
-			progress = final_stress / fabs(Sgm.C[0][0]) * 100.0;	//Индикация прогресса при разгрузке
+			progress = final_stress / fabs(Sgm.c[0][0]) * 100.0;	//Индикация прогресса при разгрузке
 		}
 
 		int period = unload ? proc_period / 40 : proc_period;
@@ -928,48 +928,48 @@ namespace model
 				}
 				if (prms::save11)
 				{
-					DataXStream[1].write((char *)&E.C[0][0], sizeof(double));
-					DataYStream[1].write((char *)&Sgm.C[0][0], sizeof(double));
+					DataXStream[1].write((char *)&E.c[0][0], sizeof(double));
+					DataYStream[1].write((char *)&Sgm.c[0][0], sizeof(double));
 				}
 				if (prms::save12)
 				{
-					DataXStream[2].write((char *)&E.C[0][1], sizeof(double));
-					DataYStream[2].write((char *)&Sgm.C[0][1], sizeof(double));
+					DataXStream[2].write((char *)&E.c[0][1], sizeof(double));
+					DataYStream[2].write((char *)&Sgm.c[0][1], sizeof(double));
 				}
 				if (prms::save13)
 				{
-					DataXStream[3].write((char *)&E.C[0][2], sizeof(double));
-					DataYStream[3].write((char *)&Sgm.C[0][2], sizeof(double));
+					DataXStream[3].write((char *)&E.c[0][2], sizeof(double));
+					DataYStream[3].write((char *)&Sgm.c[0][2], sizeof(double));
 				}
 				if (prms::save21)
 				{
-					DataXStream[4].write((char *)&E.C[1][0], sizeof(double));
-					DataYStream[4].write((char *)&Sgm.C[1][0], sizeof(double));
+					DataXStream[4].write((char *)&E.c[1][0], sizeof(double));
+					DataYStream[4].write((char *)&Sgm.c[1][0], sizeof(double));
 				}
 				if (prms::save22)
 				{
-					DataXStream[5].write((char *)&E.C[1][1], sizeof(double));
-					DataYStream[5].write((char *)&Sgm.C[1][1], sizeof(double));
+					DataXStream[5].write((char *)&E.c[1][1], sizeof(double));
+					DataYStream[5].write((char *)&Sgm.c[1][1], sizeof(double));
 				}
 				if (prms::save23)
 				{
-					DataXStream[6].write((char *)&E.C[1][2], sizeof(double));
-					DataYStream[6].write((char *)&Sgm.C[1][2], sizeof(double));
+					DataXStream[6].write((char *)&E.c[1][2], sizeof(double));
+					DataYStream[6].write((char *)&Sgm.c[1][2], sizeof(double));
 				}
 				if (prms::save31)
 				{
-					DataXStream[7].write((char *)&E.C[2][0], sizeof(double));
-					DataYStream[7].write((char *)&Sgm.C[2][0], sizeof(double));
+					DataXStream[7].write((char *)&E.c[2][0], sizeof(double));
+					DataYStream[7].write((char *)&Sgm.c[2][0], sizeof(double));
 				}
 				if (prms::save32)
 				{
-					DataXStream[8].write((char *)&E.C[2][1], sizeof(double));
-					DataYStream[8].write((char *)&Sgm.C[2][1], sizeof(double));
+					DataXStream[8].write((char *)&E.c[2][1], sizeof(double));
+					DataYStream[8].write((char *)&Sgm.c[2][1], sizeof(double));
 				}
 				if (prms::save33)
 				{
-					DataXStream[9].write((char *)&E.C[2][2], sizeof(double));
-					DataYStream[9].write((char *)&Sgm.C[2][2], sizeof(double));
+					DataXStream[9].write((char *)&E.c[2][2], sizeof(double));
+					DataYStream[9].write((char *)&Sgm.c[2][2], sizeof(double));
 				}
 			}
 
@@ -989,48 +989,48 @@ namespace model
 							}
 							if (prms::save11)
 							{
-								DataXStream[11].write((char *)&C[q1][q2][q3].e.C[0][0], sizeof(double));
-								DataYStream[11].write((char *)&C[q1][q2][q3].sgm.C[0][0], sizeof(double));
+								DataXStream[11].write((char *)&C[q1][q2][q3].e.c[0][0], sizeof(double));
+								DataYStream[11].write((char *)&C[q1][q2][q3].sgm.c[0][0], sizeof(double));
 							}
 							if (prms::save12)
 							{
-								DataXStream[12].write((char *)&C[q1][q2][q3].e.C[0][1], sizeof(double));
-								DataYStream[12].write((char *)&C[q1][q2][q3].sgm.C[0][1], sizeof(double));
+								DataXStream[12].write((char *)&C[q1][q2][q3].e.c[0][1], sizeof(double));
+								DataYStream[12].write((char *)&C[q1][q2][q3].sgm.c[0][1], sizeof(double));
 							}
 							if (prms::save13)
 							{
-								DataXStream[13].write((char *)&C[q1][q2][q3].e.C[0][2], sizeof(double));
-								DataYStream[13].write((char *)&C[q1][q2][q3].sgm.C[0][2], sizeof(double));
+								DataXStream[13].write((char *)&C[q1][q2][q3].e.c[0][2], sizeof(double));
+								DataYStream[13].write((char *)&C[q1][q2][q3].sgm.c[0][2], sizeof(double));
 							}
 							if (prms::save21)
 							{
-								DataXStream[14].write((char *)&C[q1][q2][q3].e.C[1][0], sizeof(double));
-								DataYStream[14].write((char *)&C[q1][q2][q3].sgm.C[1][0], sizeof(double));
+								DataXStream[14].write((char *)&C[q1][q2][q3].e.c[1][0], sizeof(double));
+								DataYStream[14].write((char *)&C[q1][q2][q3].sgm.c[1][0], sizeof(double));
 							}
 							if (prms::save22)
 							{
-								DataXStream[15].write((char *)&C[q1][q2][q3].e.C[1][1], sizeof(double));
-								DataYStream[15].write((char *)&C[q1][q2][q3].sgm.C[1][1], sizeof(double));
+								DataXStream[15].write((char *)&C[q1][q2][q3].e.c[1][1], sizeof(double));
+								DataYStream[15].write((char *)&C[q1][q2][q3].sgm.c[1][1], sizeof(double));
 							}
 							if (prms::save23)
 							{
-								DataXStream[16].write((char *)&C[q1][q2][q3].e.C[1][2], sizeof(double));
-								DataYStream[16].write((char *)&C[q1][q2][q3].sgm.C[1][2], sizeof(double));
+								DataXStream[16].write((char *)&C[q1][q2][q3].e.c[1][2], sizeof(double));
+								DataYStream[16].write((char *)&C[q1][q2][q3].sgm.c[1][2], sizeof(double));
 							}
 							if (prms::save31)
 							{
-								DataXStream[17].write((char *)&C[q1][q2][q3].e.C[2][0], sizeof(double));
-								DataYStream[17].write((char *)&C[q1][q2][q3].sgm.C[2][0], sizeof(double));
+								DataXStream[17].write((char *)&C[q1][q2][q3].e.c[2][0], sizeof(double));
+								DataYStream[17].write((char *)&C[q1][q2][q3].sgm.c[2][0], sizeof(double));
 							}
 							if (prms::save32)
 							{
-								DataXStream[18].write((char *)&C[q1][q2][q3].e.C[2][1], sizeof(double));
-								DataYStream[18].write((char *)&C[q1][q2][q3].sgm.C[2][1], sizeof(double));
+								DataXStream[18].write((char *)&C[q1][q2][q3].e.c[2][1], sizeof(double));
+								DataYStream[18].write((char *)&C[q1][q2][q3].sgm.c[2][1], sizeof(double));
 							}
 							if (prms::save33)
 							{
-								DataXStream[19].write((char *)&C[q1][q2][q3].e.C[2][2], sizeof(double));
-								DataYStream[19].write((char *)&C[q1][q2][q3].sgm.C[2][2], sizeof(double));
+								DataXStream[19].write((char *)&C[q1][q2][q3].e.c[2][2], sizeof(double));
+								DataYStream[19].write((char *)&C[q1][q2][q3].sgm.c[2][2], sizeof(double));
 							}
 
 						}
@@ -1142,7 +1142,7 @@ namespace model
 			*Выбор растягивающей компоненты тензора D.
 			*Относительно неё на каждом шаге будет решаться СЛАУ
 			***************************************************/
-			tension_component = D.C[0][0];
+			tension_component = D.c[0][0];
 		}
 		for (cycle = 0; cycle < prms::loadCycleCount; cycle++)
 		{
@@ -1158,7 +1158,7 @@ namespace model
 			}
 			printf("\n        00.00%");
 			double* counter;
-			counter = !prms::trueUniaxial ? &Strain : &E.C[0][0];
+			counter = !prms::trueUniaxial ? &Strain : &E.c[0][0];
 			//Для циклических нагружений цикл ведется по значению растягивающей компоненты
 			//а для остальных - по значению интенсивности тензора деформации
 
@@ -1190,7 +1190,7 @@ namespace model
 				printf("\n Unloading #%d", cycle + 1);
 				printf("\n        00.00%");
 				t1 = clock();		//Начальная отсечка времени
-				while (fabs(Sgm.C[0][0]) > final_stress) //Цикл по напряжениям
+				while (fabs(Sgm.c[0][0]) > final_stress) //Цикл по напряжениям
 				{
 					Load(true);
 				}
@@ -1200,7 +1200,7 @@ namespace model
 
 			if (prms::loadCycleCount > 1)	//Цикоическое знакопеременное нагружение
 			{
-				D.C[0][0] = pow(-1, cycle + 1) * tension_component;	//Меняем знак растягивающей компоненты
+				D.c[0][0] = pow(-1, cycle + 1) * tension_component;	//Меняем знак растягивающей компоненты
 				prms::maxStrainIntencity += prms::maxStrainIntencity * addition_strain;	//Повышаем предел интенсивности
 			}
 

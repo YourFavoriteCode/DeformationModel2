@@ -57,17 +57,17 @@ namespace model
 		double ca = cos(a);
 		double cg = cos(g);
 
-		o.C[0][0] = ca * cg - sa * cb * sg;
-		o.C[0][1] = -ca * sg - sa * cb * cg;
-		o.C[0][2] = sa * sb;
+		o.c[0][0] = ca * cg - sa * cb * sg;
+		o.c[0][1] = -ca * sg - sa * cb * cg;
+		o.c[0][2] = sa * sb;
 
-		o.C[1][0] = sa * cg + ca * cb * sg;
-		o.C[1][1] = -sa * sg + ca * cb * cg;
-		o.C[1][2] = -ca * sb;
+		o.c[1][0] = sa * cg + ca * cb * sg;
+		o.c[1][1] = -sa * sg + ca * cb * cg;
+		o.c[1][2] = -ca * sb;
 
-		o.C[2][0] = sb * sg;
-		o.C[2][1] = sb * cg;
-		o.C[2][2] = cb;
+		o.c[2][0] = sb * sg;
+		o.c[2][1] = sb * cg;
+		o.c[2][2] = cb;
 
 	}
 
@@ -78,22 +78,22 @@ namespace model
 		* Заданной оси на заданный угол
 		*/
 		double sf = sqrt(1.0 - cf * cf);
-		double sfx = sf*a.C[0];
-		double sfy = sf*a.C[1];
-		double sfz = sf*a.C[2];
+		double sfx = sf*a.c[0];
+		double sfy = sf*a.c[1];
+		double sfz = sf*a.c[2];
 		double COS = (1.0 - cf);
 
-		o.C[0][0] = cf + COS * a.C[0] * a.C[0];
-		o.C[0][1] = COS * a.C[0] * a.C[1] - sfz;
-		o.C[0][2] = COS * a.C[0] * a.C[2] + sfy;
+		o.c[0][0] = cf + COS * a.c[0] * a.c[0];
+		o.c[0][1] = COS * a.c[0] * a.c[1] - sfz;
+		o.c[0][2] = COS * a.c[0] * a.c[2] + sfy;
 
-		o.C[1][0] = COS * a.C[0] * a.C[1] + sfz;
-		o.C[1][1] = cf + COS * a.C[1] * a.C[1];
-		o.C[1][2] = COS * a.C[1] * a.C[2] - sfx;
+		o.c[1][0] = COS * a.c[0] * a.c[1] + sfz;
+		o.c[1][1] = cf + COS * a.c[1] * a.c[1];
+		o.c[1][2] = COS * a.c[1] * a.c[2] - sfx;
 
-		o.C[2][0] = COS * a.C[0] * a.C[2] - sfy;
-		o.C[2][1] = COS * a.C[1] * a.C[2] + sfx;
-		o.C[2][2] = cf + COS * a.C[2] * a.C[2];
+		o.c[2][0] = COS * a.c[0] * a.c[2] - sfy;
+		o.c[2][1] = COS * a.c[1] * a.c[2] + sfx;
+		o.c[2][2] = cf + COS * a.c[2] * a.c[2];
 
 	}
 
@@ -103,17 +103,17 @@ namespace model
 		* Ориентация решётки на основе кватерниона
 		*/
 		
-		o.C[0][0] = 1 - 2 * y*y - 2 * z*z;
-		o.C[0][1] = 2 * x*y - 2 * z*w;
-		o.C[0][2] = 2 * x*z + 2 * y*w;
+		o.c[0][0] = 1 - 2 * y*y - 2 * z*z;
+		o.c[0][1] = 2 * x*y - 2 * z*w;
+		o.c[0][2] = 2 * x*z + 2 * y*w;
 
-		o.C[1][0] = 2 * x*y + 2 * z*w;
-		o.C[1][1] = 1 - 2 * x*x - 2 * z*z;
-		o.C[1][2] = 2 * y*z - 2 * x*w;
+		o.c[1][0] = 2 * x*y + 2 * z*w;
+		o.c[1][1] = 1 - 2 * x*x - 2 * z*z;
+		o.c[1][2] = 2 * y*z - 2 * x*w;
 
-		o.C[2][0] = 2 * x*z - 2 * y*w;
-		o.C[2][1] = 2 * y*z + 2 * x*w;
-		o.C[2][2] = 1 - 2 * x*x - 2 * y*y;
+		o.c[2][0] = 2 * x*z - 2 * y*w;
+		o.c[2][1] = 2 * y*z + 2 * x*w;
+		o.c[2][2] = 1 - 2 * x*x - 2 * y*y;
 
 	}
 
@@ -472,7 +472,7 @@ namespace model
 				{
 					for (int j = 0; j < DIM; j++)
 					{
-						SS[k].t += sgm.C[i][j] * SS[k].n.C[i] * SS[k].b.C[j];
+						SS[k].t += sgm.c[i][j] * SS[k].n.c[i] * SS[k].b.c[j];
 					}
 				}
 			}
@@ -483,7 +483,7 @@ namespace model
 				{
 					for (int j = 0; j < DIM; j++)
 					{
-						SS[k].t += sgm.C[i][j] * (SS[k].n.C[i] * SS[k].b.C[j] + SS[k].n.C[j] * SS[k].b.C[i]);
+						SS[k].t += sgm.c[i][j] * (SS[k].n.c[i] * SS[k].b.c[j] + SS[k].n.c[j] * SS[k].b.c[i]);
 					}
 				}
 				SS[k].t /= 2.0;
@@ -517,7 +517,7 @@ namespace model
 				{
 					for (int k = 0; k < SS_count; k++)
 					{
-						d_in.C[i][j] += SS[k].dgm * SS[k].n.C[i] * SS[k].b.C[j];
+						d_in.c[i][j] += SS[k].dgm * SS[k].n.c[i] * SS[k].b.c[j];
 					}
 				}
 			}
@@ -531,7 +531,7 @@ namespace model
 					for (int k = 0; k < SS_count; k++)
 
 					{
-						d_in.C[i][j] += SS[k].dgm * (SS[k].n.C[i] * SS[k].b.C[j] + SS[k].n.C[j] * SS[k].b.C[i]);
+						d_in.c[i][j] += SS[k].dgm * (SS[k].n.c[i] * SS[k].b.c[j] + SS[k].n.c[j] * SS[k].b.c[i]);
 					}
 				}
 			}
@@ -557,7 +557,7 @@ namespace model
 				{
 					for (int n = 0; n < DIM; n++)
 					{
-						dsgm.C[i][j] += p.C[i][j][l][n] * (d.C[n][l] - d_in.C[n][l]);
+						dsgm.c[i][j] += p.C[i][j][l][n] * (d.c[n][l] - d_in.c[n][l]);
 					}
 				}
 			}
@@ -575,8 +575,8 @@ namespace model
 		{
 			for (int j = 0; j < DIM; j++)
 			{
-				e.C[i][j] += d.C[i][j] * prms::dt;
-				sgm.C[i][j] += dsgm.C[i][j] * prms::dt;
+				e.c[i][j] += d.c[i][j] * prms::dt;
+				sgm.c[i][j] += dsgm.c[i][j] * prms::dt;
 			}
 		}
 
@@ -593,38 +593,38 @@ namespace model
 		for (int i = 0; i < 3; i++)
 		{
 			Vector e;	//Направления [100], [110], [111] в КСК
-			for (int j = 0; j <= i; j++) e.C[j] = 1;
-			e.Normalize();
+			for (int j = 0; j <= i; j++) e.c[j] = 1;
+			e.normalize();
 
 			Vector e1 = ScalMult(e, o);//Перевод вектора в ЛСК
 			Vector e2 = ScalMult(e, surrounds[h].o);
-			e1.Normalize();
-			e2.Normalize();
+			e1.normalize();
+			e2.normalize();
 			//Теперь нужно отразить оба эти вектора в одну четверть сферы (x>0,y>0,z>0)
 			for (int k = 0; k < 3; k++)
 			{
-				e1.C[k] = fabs(e1.C[k]);
-				e2.C[k] = fabs(e2.C[k]);
+				e1.c[k] = fabs(e1.c[k]);
+				e2.c[k] = fabs(e2.c[k]);
 			}
 			//А потом свернуть ещё пополам
-			if (e1.C[0] < e1.C[1])
+			if (e1.c[0] < e1.c[1])
 			{
-				double buf = e1.C[0];
-				e1.C[0] = e1.C[1];
-				e1.C[1] = buf;
+				double buf = e1.c[0];
+				e1.c[0] = e1.c[1];
+				e1.c[1] = buf;
 			}
-			if (e2.C[0] < e2.C[1])
+			if (e2.c[0] < e2.c[1])
 			{
-				double buf = e2.C[0];
-				e2.C[0] = e2.C[1];
-				e2.C[1] = buf;
+				double buf = e2.c[0];
+				e2.c[0] = e2.c[1];
+				e2.c[1] = buf;
 			}
 
-			double teta1 = atan(sqrt(e1.C[0] * e1.C[0] + e1.C[1] * e1.C[1]) / e1.C[2]);
-			double fi1 = atan(e1.C[1] / e1.C[0]);
+			double teta1 = atan(sqrt(e1.c[0] * e1.c[0] + e1.c[1] * e1.c[1]) / e1.c[2]);
+			double fi1 = atan(e1.c[1] / e1.c[0]);
 
-			double teta2 = atan(sqrt(e2.C[0] * e2.C[0] + e2.C[1] * e2.C[1]) / e2.C[2]);
-			double fi2 = atan(e2.C[1] / e2.C[0]);
+			double teta2 = atan(sqrt(e2.c[0] * e2.c[0] + e2.c[1] * e2.c[1]) / e2.c[2]);
+			double fi2 = atan(e2.c[1] / e2.c[0]);
 			//Нахождение длины дуги между двумя точками на единичной сфере
 			double L = acos(cos(teta1)*cos(teta2) + sin(teta1)*sin(teta2)*cos(fi1 - fi2)) / PI_2;//Нормировка по PI/2
 			M = (L > M) ? L : M;

@@ -22,24 +22,24 @@ namespace model
 		* Заданной оси на заданный угол
 		*/
 		double CosFi = cos(dFi);
-		double SinFiX = sin(dFi)*a.C[0];
-		double SinFiY = sin(dFi)*a.C[1];
-		double SinFiZ = sin(dFi)*a.C[2];
+		double SinFiX = sin(dFi)*a.c[0];
+		double SinFiY = sin(dFi)*a.c[1];
+		double SinFiZ = sin(dFi)*a.c[2];
 		double COS = (1.0 - CosFi);
 
 		Tensor dO;			//Тензор поворота на шаге
 
-		dO.C[0][0] = CosFi + COS * a.C[0] * a.C[0];
-		dO.C[0][1] = COS * a.C[0] * a.C[1] - SinFiZ;
-		dO.C[0][2] = COS * a.C[0] * a.C[2] + SinFiY;
+		dO.c[0][0] = CosFi + COS * a.c[0] * a.c[0];
+		dO.c[0][1] = COS * a.c[0] * a.c[1] - SinFiZ;
+		dO.c[0][2] = COS * a.c[0] * a.c[2] + SinFiY;
 
-		dO.C[1][0] = COS * a.C[0] * a.C[1] + SinFiZ;
-		dO.C[1][1] = CosFi + COS * a.C[1] * a.C[1];
-		dO.C[1][2] = COS * a.C[1] * a.C[2] - SinFiX;
+		dO.c[1][0] = COS * a.c[0] * a.c[1] + SinFiZ;
+		dO.c[1][1] = CosFi + COS * a.c[1] * a.c[1];
+		dO.c[1][2] = COS * a.c[1] * a.c[2] - SinFiX;
 
-		dO.C[2][0] = COS * a.C[0] * a.C[2] - SinFiY;
-		dO.C[2][1] = COS * a.C[1] * a.C[2] + SinFiX;
-		dO.C[2][2] = CosFi + COS * a.C[2] * a.C[2];
+		dO.c[2][0] = COS * a.c[0] * a.c[2] - SinFiY;
+		dO.c[2][1] = COS * a.c[1] * a.c[2] + SinFiX;
+		dO.c[2][2] = CosFi + COS * a.c[2] * a.c[2];
 
 		Tensor buf = dO*f->o;
 		f->o = buf;
@@ -56,7 +56,7 @@ namespace model
 			{
 				for (int k = 0; k < f->SS_count; k++)
 				{
-					f->om.C[i][j] -= f->SS[k].dgm * (f->SS[k].n.C[i] * f->SS[k].b.C[j] - f->SS[k].b.C[i] * f->SS[k].n.C[j]);
+					f->om.c[i][j] -= f->SS[k].dgm * (f->SS[k].n.c[i] * f->SS[k].b.c[j] - f->SS[k].b.c[i] * f->SS[k].n.c[j]);
 				}
 			}
 		}
@@ -64,7 +64,7 @@ namespace model
 		f->om += f->w;
 		
 		Vector e;				//Ось вращения решётки
-		e.set(f->om.C[1][2], f->om.C[2][0], f->om.C[0][1]);
+		e.set(f->om.c[1][2], f->om.c[2][0], f->om.c[0][1]);
 		
 		
 		double dFi = e.getNorm();
@@ -74,7 +74,7 @@ namespace model
 			f->rot_speed = dFi;
 			dFi *= prms::dt;			//Получаем угол поворота
 			f->sum_angle += dFi;
-			e.Normalize();
+			e.normalize();
 			Rotate(f, dFi, e);
 	
 		}
@@ -109,18 +109,18 @@ namespace model
 				{
 					for (int k = 0; k < f->SS_count; k++)
 					{
-						if (f->SS[k].b.ScalMult(f->normals[h]) < 0) continue; //Скольжение от границы - вклад не вносится
-						d_in1.C[i][j] += f->SS[k].dgm * (f->SS[k].n.C[i] * f->SS[k].b.C[j]);
+						if (f->SS[k].b.scalMult(f->normals[h]) < 0) continue; //Скольжение от границы - вклад не вносится
+						d_in1.c[i][j] += f->SS[k].dgm * (f->SS[k].n.c[i] * f->SS[k].b.c[j]);
 					}
 					for (int k = 0; k < f->surrounds[h].SS_count; k++)
 					{
 						//if (f->SS[k].b.ScalMult(f->normals[h]) < 0) continue; //Скольжение от границы - вклад не вносится
-						d_in2.C[i][j] += f->surrounds[h].SS[k].dgm * (f->surrounds[h].SS[k].n.C[i] * f->surrounds[h].SS[k].b.C[j]);
+						d_in2.c[i][j] += f->surrounds[h].SS[k].dgm * (f->surrounds[h].SS[k].n.c[i] * f->surrounds[h].SS[k].b.c[j]);
 					}
 				}
 			}
 			Tensor Lp = d_in1 - d_in2;
-			Lp.Transp();
+			Lp.transp();
 			Tensor buf = VectMult(f->normals[h], Lp);
 			Vector dm = ScalMult(buf, f->normals[h]);//Поверхностный вектор-момент
 			dm *= f->rot_L;
@@ -145,7 +145,7 @@ namespace model
 		}
 	
 	
-		double pr = M.ScalMult(dM);
+		double pr = M.scalMult(dM);
 	
 		double dFi = 0;		//Скорость вращения
 		if (norm == f->rot_Mc && pr >= 0)	//Пластические и упругие развороты
@@ -161,7 +161,7 @@ namespace model
 		if (f->isRotate)
 		{
 			Vector e = M;					//Ось вращения решётки сонаправлена с вектором момента
-			e.Normalize();
+			e.normalize();
 			f->rot_speed = dFi;
 			dFi *= prms::dt;
 			f->sum_angle += dFi;		//Накопленный угол вращения увеличивается
@@ -175,7 +175,7 @@ namespace model
 				{
 					for (int k = 0; k < DIM; k++)
 					{
-						f->om.C[i][j] -= LeviCivit(i, j, k) * e.C[k] * f->rot_speed;
+						f->om.c[i][j] -= LeviCivit(i, j, k) * e.c[k] * f->rot_speed;
 					}
 				}
 			}
@@ -193,15 +193,15 @@ namespace model
 	{
 		Vector e;
 		e.set(i, j, k);
-		e.Normalize();
+		e.normalize();
 		Vector e1 = ScalMult(e, O);//Перевод в ЛСК
-		e1.Normalize();
+		e1.normalize();
 		std::ofstream of;
 		of.open(file, std::ios::out | std::ios_base::app | std::ios::binary);
 		//Запись в виде x,y,z
-		of.write((char *)&e1.C[0], sizeof(double));
-		of.write((char *)&e1.C[1], sizeof(double));
-		of.write((char *)&e1.C[2], sizeof(double));
+		of.write((char *)&e1.c[0], sizeof(double));
+		of.write((char *)&e1.c[1], sizeof(double));
+		of.write((char *)&e1.c[2], sizeof(double));
 		of.close();
 	}
 
@@ -227,38 +227,38 @@ namespace model
 	{
 		Vector a;
 		a.set(i, j, k);
-		a.Normalize();
+		a.normalize();
 
 		double CosFi = cos(dFi);
-		double SinFiX = sin(dFi) * a.C[0];
-		double SinFiY = sin(dFi) * a.C[1];
-		double SinFiZ = sin(dFi) * a.C[2];
+		double SinFiX = sin(dFi) * a.c[0];
+		double SinFiY = sin(dFi) * a.c[1];
+		double SinFiZ = sin(dFi) * a.c[2];
 		double COS = (1.0 - CosFi);
 
 		Tensor dO;			//Тензор поворота на шаге
 
-		dO.C[0][0] = CosFi + COS * a.C[0] * a.C[0];
-		dO.C[0][1] = COS * a.C[0] * a.C[1] - SinFiZ;
-		dO.C[0][2] = COS * a.C[0] * a.C[2] + SinFiY;
+		dO.c[0][0] = CosFi + COS * a.c[0] * a.c[0];
+		dO.c[0][1] = COS * a.c[0] * a.c[1] - SinFiZ;
+		dO.c[0][2] = COS * a.c[0] * a.c[2] + SinFiY;
 
-		dO.C[1][0] = COS * a.C[0] * a.C[1] + SinFiZ;
-		dO.C[1][1] = CosFi + COS * a.C[1] * a.C[1];
-		dO.C[1][2] = COS * a.C[1] * a.C[2] - SinFiX;
+		dO.c[1][0] = COS * a.c[0] * a.c[1] + SinFiZ;
+		dO.c[1][1] = CosFi + COS * a.c[1] * a.c[1];
+		dO.c[1][2] = COS * a.c[1] * a.c[2] - SinFiX;
 
-		dO.C[2][0] = COS * a.C[0] * a.C[2] - SinFiY;
-		dO.C[2][1] = COS * a.C[1] * a.C[2] + SinFiX;
-		dO.C[2][2] = CosFi + COS * a.C[2] * a.C[2];
+		dO.c[2][0] = COS * a.c[0] * a.c[2] - SinFiY;
+		dO.c[2][1] = COS * a.c[1] * a.c[2] + SinFiX;
+		dO.c[2][2] = CosFi + COS * a.c[2] * a.c[2];
 		
 		Tensor R = dO * O;
 		Vector v = ScalMult(a, R);
-		v.Normalize();
+		v.normalize();
 	
 		std::ofstream Of;
 		Of.open(FileName, std::ios::out | std::ios_base::app | std::ios::binary);
 		//Запись координат в формате [xyz] подряд для всех зёрен 
-		Of.write((char *)&v.C[0], sizeof(double));
-		Of.write((char *)&v.C[1], sizeof(double));
-		Of.write((char *)&v.C[2], sizeof(double));
+		Of.write((char *)&v.c[0], sizeof(double));
+		Of.write((char *)&v.c[1], sizeof(double));
+		Of.write((char *)&v.c[2], sizeof(double));
 		Of.close();
 	}
 

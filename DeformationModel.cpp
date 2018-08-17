@@ -37,15 +37,15 @@ int _tmain(int argc, _TCHAR* argv[])
 	********     Интерфейс ввода/вывода параметров модели     ********
 	*****************************************************************/
 	printf(" Build date %s, %s\n", __DATE__, __TIME__);
-	char* param_file = new char[256];
+	char* paramFileName = new char[256];
 	//wcstombs(param_file, argv[1], 256);//Получили имя файла с параметрами
-	param_file = argv[1];
-	printf(" Parameters file: %s\n", param_file);
-	if (prms::ReadParams(param_file) == 1) printf(" Error in file!\n");		//Считали параметры из файла
-	delete[] param_file;//Больше не нужен
+	paramFileName = argv[1];
+	printf(" Parameters file: %s\n", paramFileName);
+	if (prms::ReadParams(paramFileName) == 1) printf(" Error in file!\n");		//Считали параметры из файла
+	delete[] paramFileName;//Больше не нужен
 	printf(" ==========================================\n");
-	const int total_fragm_count = (int)pow(prms::grainCountLinear, 3);	//Общее кол-во фрагментов
-	printf(" Fragments count: %d\n", total_fragm_count);
+	const int grainCountTotal = (int)pow(prms::grainCountLinear, 3);	//Общее кол-во фрагментов
+	printf(" Fragments count: %d\n", grainCountTotal);
 	printf(" Max. strain: %g\n", prms::maxStrainIntencity);
 	if (prms::loadCycleCount != 1)
 	{
@@ -98,41 +98,41 @@ int _tmain(int argc, _TCHAR* argv[])
 		printf(" Reading saved orientations and normals\n");
 	}
 
-	Polycrystall PC;				//Создание и инициализация поликристалла
-	PC.Init(prms::grainCountLinear);
+	Polycrystall polycrystall;				//Создание и инициализация поликристалла
+	polycrystall.Init(prms::grainCountLinear);
 
 	unsigned long t1, t2;			//Отсечки времени
 
 	printf(" Initializing all fragments... ");
 	t1 = clock();
 
-	PC.D = prms::gradV.getSymmetryPart();
-	PC.W = prms::gradV.getAntiSymmetryPart();
+	polycrystall.D = prms::gradV.getSymmetryPart();
+	polycrystall.W = prms::gradV.getAntiSymmetryPart();
 
 	std::srand(time(NULL));
 
 	switch (prms::grainSurroundGrade)			//Степень учёта соседних элементов
 	{
-	case 0:
+	case prms::GRADE_BASE:
 	{
 		prms::grainSurroundCount = 6;			//Обычный уровень
 		break;
 	}
-	case 1:
+	case prms::GRADE_DETAILED:
 	{
 		prms::grainSurroundCount = 18;		//Повышенный уровень
 		break;
 	}
-	case 2:
+	case prms::GRADE_MOST_DETAILED:
 	{
 		prms::grainSurroundCount = 26;		//Самый высокий уровень
 		break;
 	}
 	}
 
-	PC.setParams();					//Заполнение всех параметров поликристалла
-	PC.MakeStruct();				//Формирование фрагментной структуры
-	if (prms::usingFragmentation) PC.MakeGrains2();//Формирование зёренной структуры
+	polycrystall.setParams();					//Заполнение всех параметров поликристалла
+	polycrystall.MakeStruct();				//Формирование фрагментной структуры
+	if (prms::usingFragmentation) polycrystall.MakeGrains2();//Формирование зёренной структуры
 
 
 	if (prms::fixedOrientations == 2)	//Считывание записанных ориентаций
@@ -149,14 +149,14 @@ int _tmain(int argc, _TCHAR* argv[])
 					{
 						for (int j = 0; j < DIM; j++)
 						{
-							StreamO >> PC.C[q1][q2][q3].o.C[i][j];
+							StreamO >> polycrystall.C[q1][q2][q3].o.c[i][j];
 						}
 					}
 					for (int h = 0; h < prms::grainSurroundCount; h++)//Считываем значения нормалей
 					{
 						for (int i = 0; i < DIM; i++)
 						{
-							StreamNorm >> PC.C[q1][q2][q3].normals[h].C[i];
+							StreamNorm >> polycrystall.C[q1][q2][q3].normals[h].c[i];
 						}
 					}
 				}
@@ -176,12 +176,12 @@ int _tmain(int argc, _TCHAR* argv[])
 			{
 				for (int q3 = 0; q3 < prms::grainCountLinear; q3++)
 				{
-					WriteDebugInfo(StreamO, PC.C[q1][q2][q3].o.C);//Записываем значения тензоров ориентации
+					WriteDebugInfo(StreamO, polycrystall.C[q1][q2][q3].o.c);//Записываем значения тензоров ориентации
 					for (int h = 0; h < prms::grainSurroundCount; h++)//Записываем значения нормалей
 					{
 						for (int i = 0; i < DIM; i++)
 						{
-							StreamNorm << PC.C[q1][q2][q3].normals[h].C[i] << " ";
+							StreamNorm << polycrystall.C[q1][q2][q3].normals[h].c[i] << " ";
 						}
 						StreamNorm << std::endl;
 					}
@@ -206,7 +206,7 @@ int _tmain(int argc, _TCHAR* argv[])
 					{
 						for (int j = 0; j < DIM; j++)
 						{
-							StreamSgm >> PC.C[q1][q2][q3].sgm.C[i][j];
+							StreamSgm >> polycrystall.C[q1][q2][q3].sgm.c[i][j];
 						}
 					}
 
@@ -219,24 +219,24 @@ int _tmain(int argc, _TCHAR* argv[])
 	t2 = clock();
 	printf("%g sec\n", (t2 - t1) / 1000.0);
 
-	PC.OpenFiles();				//Открытие и очистка файлов для вывода
+	polycrystall.OpenFiles();				//Открытие и очистка файлов для вывода
 								//Сохранение начальных полюсных фигур и ССТ
 	if (prms::periodSavePolus > 0)
 	{
 		printf(" Saving pole figures... ");
 		t1 = clock();
-		PC.SavePoleFig();
+		polycrystall.SavePoleFig();
 		t2 = clock();
 		printf("%g sec\n", (t2 - t1) / 1000.0);
 	}
 
 	t1 = clock();		//Начальная отсечка времени
-	PC.Deformate();		//Деформирование
+	polycrystall.Deformate();		//Деформирование
 	t2 = clock();		//Финальная отсечка времени
 
 	if (prms::usingInititalStress)	//Сохранение остаточных напряжений
 	{
-		PC.dbgstream[3].open("DBG\\sgm.txt", std::ios_base::out | std::ios_base::trunc);
+		polycrystall.dbgstream[3].open("DBG\\sgm.txt", std::ios_base::out | std::ios_base::trunc);
 		for (int q1 = 0; q1 < prms::grainCountLinear; q1++)
 		{
 			for (int q2 = 0; q2 < prms::grainCountLinear; q2++)
@@ -244,12 +244,12 @@ int _tmain(int argc, _TCHAR* argv[])
 				for (int q3 = 0; q3 < prms::grainCountLinear; q3++)
 				{
 
-					WriteDebugInfo(PC.dbgstream[3], PC.C[q1][q2][q3].sgm.C);
+					WriteDebugInfo(polycrystall.dbgstream[3], polycrystall.C[q1][q2][q3].sgm.c);
 
 				}
 			}
 		}
-		PC.dbgstream[3].close();
+		polycrystall.dbgstream[3].close();
 	}
 
 	/***********************************************************
@@ -259,12 +259,12 @@ int _tmain(int argc, _TCHAR* argv[])
 	*********		если она была запущена из неё		********
 	***********************************************************/
 
-	if (!isnormal(PC.Strain)) printf("\n Calculation ERROR!\n");
+	if (!isnormal(polycrystall.Strain)) printf("\n Calculation ERROR!\n");
 	else printf("\b\b\b\b\b\b\b\b\b\b\b\b\b\b Done    \n");
 	printf(" ==================================================\n");
 	printf(" Processing time: %g sec\n", (t2 - t1) / 1000.0);
-	printf(" Number of steps: %d\n", PC.CURR_STEP);
-	if (!isnormal(PC.Strain))//Если не зафиксированы ошибки - закрытие
+	printf(" Number of steps: %d\n", polycrystall.CURR_STEP);
+	if (!isnormal(polycrystall.Strain))//Если не зафиксированы ошибки - закрытие
 	{
 		printf(" ==================================================\n");
 		//printf(" Press any key or STOP button to exit...");
@@ -272,7 +272,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		system("pause");
 	}
 
-	PC.CloseFiles();				//Сохранение всех полученных данных
+	polycrystall.CloseFiles();				//Сохранение всех полученных данных
 
 	/************************************************************
 	*******      Передача данных в панель управления      *******
@@ -281,7 +281,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	hwnd = ::FindWindow(NULL, (LPCTSTR)"Панель управления моделью");
 	if (hwnd != NULL)
 	{
-		::SendMessage(hwnd, WM_USER + 1, PC.CURR_STEP, (t2 - t1));
+		::SendMessage(hwnd, WM_USER + 1, polycrystall.CURR_STEP, (t2 - t1));
 		//Аргумент 1 - количество шагов
 		//Аргумент 2 - затраченное время (мс)
 	}

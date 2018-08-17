@@ -106,7 +106,7 @@ namespace model
 			for (int h = 0; h < prms::grainSurroundCount; h++)	//Цикл по фасеткам			
 			{
 				if (f->contact[h] == 0) continue;//Если нет контакта - пропускаем
-				if (f->SS[k].b.ScalMult(f->normals[h]) < 0) continue; //Скольжение от границы - пропускаем
+				if (f->SS[k].b.scalMult(f->normals[h]) < 0) continue; //Скольжение от границы - пропускаем
 				//double zguk = prms::HARD_BOUND_K * f->SS[k].dgm * f->SS[k].gmm / f->size;
 				double min = 1.0;//Минимум
 				//min = f->DisorientMeasure(h);
@@ -114,8 +114,8 @@ namespace model
 				{
 					Vector b2 = ScalMult(f->surrounds[h].o, f->surrounds[h].SS[p].b);//Перевели вектор b p-ой СС соседнего зерна в ЛСК
 					Vector diff = b1 - b2;
-					diff.Normalize();
-					double M = fabs(diff.ScalMult(f->normals[h]));
+					diff.normalize();
+					double M = fabs(diff.scalMult(f->normals[h]));
 
 					if (M < min) min = M;
 
@@ -125,18 +125,18 @@ namespace model
 
 				
 				Tensor OT = f->o;
-				OT.Transp();
+				OT.transp();
 				
 				Vector s11 = ScalMult(OT, f->SS[k].n);
 				Vector s22 = ScalMult(OT, f->SS[k].b);
-				s11.Normalize();
-				s22.Normalize();
+				s11.normalize();
+				s22.normalize();
 				double tmp = 0;
 				for (int i = 0; i < 3; i++)
 				{
 					for (int j = 0; j < 3; j++)
 					{
-						tmp += S.C[i][j] * s11.C[i] * s22.C[j];
+						tmp += S.c[i][j] * s11.c[i] * s22.c[j];
 					}
 				}//Нашли свертку
 				tbs += tmp;

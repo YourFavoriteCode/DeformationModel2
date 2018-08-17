@@ -7,11 +7,19 @@
 namespace prms
 {
 
+	// Типы распределения
 	enum DistributionType {
-		UNIFORM_DISTRIB,	// Равномерное распределение
-		NORMAL_DISTRIB,		// Нормальное распределение
-		LOGNORMAL_DISTRIB,	// Логнормальное распределение
-		EXPONENT_DISTRIB	// Показательное распределение
+		DISTRIB_UNIFORM,	// Равномерное
+		DISTRIB_NORMAL,		// Нормальное
+		DISTRIB_LOGNORMAL,	// Логнормальное
+		DISTRIB_EXPONENT	// Показательное
+	};
+
+	// Степень учета окружения
+	enum SurroundGrade {
+		GRADE_BASE,				// Базовая
+		GRADE_DETAILED,			// Повышенная
+		GRADE_MOST_DETAILED		// Самая высокая
 	};
 
 	/********************************************************
@@ -42,7 +50,7 @@ namespace prms
 	**********		Параметры поликристалла	     ************
 	********************************************************/
 	extern int materialType;					//Используемый материал
-	extern int grainSurroundGrade;				//Степень учёта соседних элементов
+	extern SurroundGrade grainSurroundGrade;	//Степень учёта соседних элементов
 	extern int grainSurroundCount;				//Кол-во учитываемых соседей
 	extern int grainCountLinear;				//Кол-во фрагментов
 	extern int mainPhasePercent;				//Процент основной фазы в материале
