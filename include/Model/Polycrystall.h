@@ -12,7 +12,7 @@ namespace model
 	public:
 		Fragment *c;						// Массив элементов поликристалла
 		
-		Loading loading;					// Нагружение
+		Loading *loading;					// Нагружение
 
 		int grainCount;						// Кол-во фрагментов на ребре
 		int totalGrainCount;				// Общее кол-во фрагментов
@@ -47,7 +47,7 @@ namespace model
 		void init(int);						// Выделение памяти под зёрна
 		void makeGrainStruct();				// Распределение нормалей и фасеток всех фрагментов
 		void setParams();					// Распределение параметров фрагментов
-		void deformate(Loading);			// Деформирование поликристалла
+		void deformate(Loading*);			// Деформирование поликристалла
 
 		void savePoleFigData();				// Сохранение ПФ
 		void saveDebugData();				// Сохранение отладочных данных

@@ -208,10 +208,10 @@ int _tmain(int argc, _TCHAR* argv[])
 		printf("%g sec\n", (t2 - t1) / 1000.0);
 	}
 	Loading loading;						//Нагружение
-	loading.setLoad(prms::gradV);
+	loading.setLoad(prms::gradV, prms::loadCycleCount);
 
 	t1 = clock();							//Начальная отсечка времени
-	polycrystall.deformate(loading);		//Деформирование
+	polycrystall.deformate(&loading);		//Деформирование
 	t2 = clock();							//Финальная отсечка времени
 
 	if (prms::usingInititalStress)			//Сохранение остаточных напряжений

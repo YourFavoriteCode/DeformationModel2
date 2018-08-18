@@ -7,6 +7,7 @@ namespace model {
 	Loading::Loading()
 	{
 		cycle = 0;
+		cycleCount = 1;
 		currentStep = 0;
 		tensionComponent = 0;
 		maxStress = 1e4;
@@ -19,7 +20,8 @@ namespace model {
 
 	}
 
-	void Loading::setLoad(Tensor t) {
+	void Loading::setLoad(Tensor t, int count) {
 		gradV = t;
+		cycleCount = count;
 	}
 }
