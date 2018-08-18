@@ -98,7 +98,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	}
 
 	Polycrystall polycrystall;				//Создание и инициализация поликристалла
-	polycrystall.Init(prms::grainCountLinear);
+	polycrystall.init(prms::grainCountLinear);
 
 	unsigned long t1, t2;			//Отсечки времени
 
@@ -130,7 +130,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	}
 
 	polycrystall.setParams();					//Заполнение всех параметров поликристалла
-	polycrystall.MakeStruct();				//Формирование фрагментной структуры
+	polycrystall.makeGrainStruct();				//Формирование фрагментной структуры
 
 	if (prms::fixedOrientations == 2)	//Считывание записанных ориентаций
 	{
@@ -143,14 +143,14 @@ int _tmain(int argc, _TCHAR* argv[])
 			{
 				for (int j = 0; j < DIM; j++)
 				{
-					StreamO >> polycrystall.C[q].o.c[i][j];
+					StreamO >> polycrystall.c[q].o.c[i][j];
 				}
 			}
 			for (int h = 0; h < prms::grainSurroundCount; h++)//Считываем значения нормалей
 			{
 				for (int i = 0; i < DIM; i++)
 				{
-					StreamNorm >> polycrystall.C[q].normals[h].c[i];
+					StreamNorm >> polycrystall.c[q].normals[h].c[i];
 				}
 			}
 		}
@@ -164,12 +164,12 @@ int _tmain(int argc, _TCHAR* argv[])
 		std::ofstream StreamNorm("DBG\\Norm.txt", std::ios_base::out | std::ios_base::trunc);
 		for (int q = 0; q < grainCountTotal; q++)
 		{
-			writeDebugInfo(StreamO, polycrystall.C[q].o.c);//Записываем значения тензоров ориентации
+			writeDebugInfo(StreamO, polycrystall.c[q].o.c);//Записываем значения тензоров ориентации
 			for (int h = 0; h < prms::grainSurroundCount; h++)//Записываем значения нормалей
 			{
 				for (int i = 0; i < DIM; i++)
 				{
-					StreamNorm << polycrystall.C[q].normals[h].c[i] << " ";
+					StreamNorm << polycrystall.c[q].normals[h].c[i] << " ";
 				}
 				StreamNorm << std::endl;
 
@@ -189,7 +189,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			{
 				for (int j = 0; j < DIM; j++)
 				{
-					StreamSgm >> polycrystall.C[q].sgm.c[i][j];
+					StreamSgm >> polycrystall.c[q].sgm.c[i][j];
 				}
 			}
 		}
@@ -199,29 +199,29 @@ int _tmain(int argc, _TCHAR* argv[])
 	t2 = clock();
 	printf("%g sec\n", (t2 - t1) / 1000.0);
 
-	polycrystall.OpenFiles();				//Открытие и очистка файлов для вывода
+	polycrystall.openAllFiles();				//Открытие и очистка файлов для вывода
 								//Сохранение начальных полюсных фигур и ССТ
 	if (prms::periodSavePolus > 0)
 	{
 		printf(" Saving pole figures... ");
 		t1 = clock();
-		polycrystall.SavePoleFig();
+		polycrystall.savePoleFigData();
 		t2 = clock();
 		printf("%g sec\n", (t2 - t1) / 1000.0);
 	}
 
 	t1 = clock();					//Начальная отсечка времени
-	polycrystall.Deformate();		//Деформирование
+	polycrystall.deformate();		//Деформирование
 	t2 = clock();					//Финальная отсечка времени
 
 	if (prms::usingInititalStress)	//Сохранение остаточных напряжений
 	{
-		polycrystall.dbgstream[3].open("DBG\\sgm.txt", std::ios_base::out | std::ios_base::trunc);
+		polycrystall.streamDebug[3].open("DBG\\sgm.txt", std::ios_base::out | std::ios_base::trunc);
 		for (int q = 0; q < grainCountTotal; q++)
 		{
-			writeDebugInfo(polycrystall.dbgstream[3], polycrystall.C[q].sgm.c);
+			writeDebugInfo(polycrystall.streamDebug[3], polycrystall.c[q].sgm.c);
 		}
-		polycrystall.dbgstream[3].close();
+		polycrystall.streamDebug[3].close();
 	}
 
 	/***********************************************************
@@ -231,12 +231,12 @@ int _tmain(int argc, _TCHAR* argv[])
 	*********		если она была запущена из неё		********
 	***********************************************************/
 
-	if (!isNormalDouble(polycrystall.Strain)) printf("\n Calculation ERROR!\n");
+	if (!isNormalDouble(polycrystall.strain)) printf("\n Calculation ERROR!\n");
 	else printf("\b\b\b\b\b\b\b\b\b\b\b\b\b\b Done    \n");
 	printf(" ==================================================\n");
 	printf(" Processing time: %g sec\n", (t2 - t1) / 1000.0);
 	printf(" Number of steps: %d\n", polycrystall.CURR_STEP);
-	if (!isNormalDouble(polycrystall.Strain))//Если не зафиксированы ошибки - закрытие
+	if (!isNormalDouble(polycrystall.strain))//Если не зафиксированы ошибки - закрытие
 	{
 		printf(" ==================================================\n");
 		//printf(" Press any key or STOP button to exit...");
@@ -244,7 +244,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		system("pause");
 	}
 
-	polycrystall.CloseFiles();				//Сохранение всех полученных данных
+	polycrystall.closeAllFiles();				//Сохранение всех полученных данных
 
 	/************************************************************
 	*******      Передача данных в панель управления      *******

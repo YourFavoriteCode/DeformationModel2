@@ -9,35 +9,35 @@ namespace model
 	class Polycrystall
 	{
 	public:
-		Fragment *C;				//Массив элементов поликристалла
-		int grainCount;			//Кол-во фрагментов на ребре
-		int totalGrainCount;		//Общее кол-во фрагментов
+		Fragment *c;					//Массив элементов поликристалла
+		int grainCount;					//Кол-во фрагментов на ребре
+		int totalGrainCount;			//Общее кол-во фрагментов
 
-		Tensor D;					//Тензор деформации скорости
-		Tensor W;					//Тензор вихря
-		Tensor D_in;				//Тензор неупругой части деформации скорости
-		Tensor E;					//Тензор деформаций
-		Tensor dSgm;				//Тензор скоростей напряжений
-		Tensor Sgm;					//Тензор напряжений
-		Tensor4 P;					//Усреднённый тензор упругих констант
+		Tensor D;						//Тензор деформации скорости
+		Tensor W;						//Тензор вихря
+		Tensor D_in;					//Тензор неупругой части деформации скорости
+		Tensor E;						//Тензор деформаций
+		Tensor dSgm;					//Тензор скоростей напряжений
+		Tensor Sgm;						//Тензор напряжений
+		Tensor4 P;						//Усреднённый тензор упругих констант
 
 		int cycle;
-		int CURR_STEP;				//Текущий шаг интегрирования
-		double PLOT_STEP;			//Шаг сохранения графиков
-		double POLUS_STEP;			//Шаг сохранения ПФ
-		int PROC_STEP;				//Шаг отображения прогресса
-		int DEBUG_STEP;				//Шаг записи отладочных данных
-		int proc_period;			//Период обновления процента выполнения
+		int CURR_STEP;					//Текущий шаг интегрирования
+		double PLOT_STEP;				//Шаг сохранения графиков
+		double POLUS_STEP;				//Шаг сохранения ПФ
+		int PROC_STEP;					//Шаг отображения прогресса
+		int DEBUG_STEP;					//Шаг записи отладочных данных
+		int proc_period;				//Период обновления процента выполнения
 
-		double Strain;				//Интенсивность деформаций
-		double Stress;				//Интенсивность напряжений
+		double strain;					//Интенсивность деформаций
+		double stress;					//Интенсивность напряжений
 
-		int file_count;				//Кол-во отладочных файлов
-		std::ofstream *dbgstream;	//Массив файлов для отладки
-		std::ofstream *Datastream;	//Массив файлов с кривыми НДС
-		std::ofstream *DataXStream;	//Массив файлов с кривыми НДС (X)
-		std::ofstream *DataYStream;	//Массив файлов с кривыми НДС (Y)
-		std::ofstream *TestStream;	//Массив временных (тестовых) файлов
+		int fileCount;					//Кол-во отладочных файлов
+		std::ofstream *streamDebug;		//Массив файлов для отладки
+		std::ofstream *streamInternalVars;	//Массив файлов с кривыми НДС
+		std::ofstream *streamDataX;		//Массив файлов с кривыми НДС (X)
+		std::ofstream *streamDataY;		//Массив файлов с кривыми НДС (Y)
+		std::ofstream *streamDataTest;	//Массив временных (тестовых) файлов
 
 		Polycrystall();
 		~Polycrystall();
@@ -47,18 +47,18 @@ namespace model
 		double lam;					//Коэффициент в разгрузке
 		double addition_strain;		//Добавочный коэффициент для продолжения циклического нагружения
 
-		void Init(int);				//Выделение памяти под зёрна
-		void MakeStruct();			//Распределение нормалей и фасеток всех фрагментов
-		void setParams();			//Распределение параметров фрагментов
-		void Deformate();			//Деформирование поликристалла
+		void init(int);					//Выделение памяти под зёрна
+		void makeGrainStruct();			//Распределение нормалей и фасеток всех фрагментов
+		void setParams();				//Распределение параметров фрагментов
+		void deformate();				//Деформирование поликристалла
 
-		void SavePoleFig();			//Сохранение ПФ
-		void SaveDbgInfo();			//Сохранение отладочных данных
-		void OpenFiles();			//Открытие всех файлов для записи
-		void CloseFiles();			//Закрытие всех файлов для записи
+		void savePoleFigData();			//Сохранение ПФ
+		void saveDebugData();			//Сохранение отладочных данных
+		void openAllFiles();			//Открытие всех файлов для записи
+		void closeAllFiles();			//Закрытие всех файлов для записи
 
 	private:
-		void Load(bool unload);		//Нагружение поликристалла
+		void load(bool unload);		//Нагружение поликристалла
 	};
 
 	int get1DPos(int, int, int);			//Возвращает уникальный номер фрагмента в общей структуре

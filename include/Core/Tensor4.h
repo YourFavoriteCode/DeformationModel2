@@ -15,12 +15,12 @@ namespace model
 	class Tensor4
 	{
 	public:
-		double C[DIM][DIM][DIM][DIM];	//Компоненты тензора
+		double c[DIM][DIM][DIM][DIM];	//Компоненты тензора
 
 		void setZero();					//Обнуление компонент тензора
-		void Symmetrize();				//Симметризация компонент тензора
+		void symmetrize();				//Симметризация компонент тензора
 
-		Tensor4 ToLSK(Tensor O);		//Перевод компонент тензора в ЛСК
+		Tensor4 toLsk(Tensor O);		//Перевод компонент тензора в ЛСК
 
 		void operator += (Tensor4);		//Оператор прибавления тензора
 		void operator -= (Tensor4);		//Оператор отнимания тензора

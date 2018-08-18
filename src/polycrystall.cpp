@@ -21,8 +21,8 @@ namespace model
 {
 	Polycrystall::Polycrystall()
 	{
-		Strain = 0;
-		Stress = 0;
+		strain = 0;
+		stress = 0;
 
 		cycle = 0;
 		CURR_STEP = 0;
@@ -31,7 +31,7 @@ namespace model
 		PLOT_STEP = 0;
 		DEBUG_STEP = 0;
 		proc_period = 400;
-		file_count = 16;
+		fileCount = 16;
 
 		tension_component = 0;
 		final_stress = 1e4;
@@ -41,185 +41,185 @@ namespace model
 
 	Polycrystall::~Polycrystall()
 	{
-		delete[] C;
+		delete[] c;
 	}
 
-	void Polycrystall::OpenFiles()
+	void Polycrystall::openAllFiles()
 	{
 		truncPoleFigFiles();				//Очистка всех файлов полюсных фигур
 		truncSSTFiles();
 
-		DataXStream = new std::ofstream[20];//Открытие файлов для записи кривых НДС
-		DataYStream = new std::ofstream[20];
-		Datastream = new std::ofstream[1];
+		streamDataX = new std::ofstream[20];//Открытие файлов для записи кривых НДС
+		streamDataY = new std::ofstream[20];
+		streamInternalVars = new std::ofstream[1];
 
 		//Файлы для вывода макро-данных
 		if (prms::saveMacro && prms::saveIntensity)
 		{
-			DataXStream[0].open("Plot\\macroXint.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
-			DataYStream[0].open("Plot\\macroYint.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
+			streamDataX[0].open("Plot\\macroXint.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
+			streamDataY[0].open("Plot\\macroYint.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 		}
 
 		if (prms::saveMacro && prms::save11)
 		{
-			DataXStream[1].open("Plot\\macroX11.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
-			DataYStream[1].open("Plot\\macroY11.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
+			streamDataX[1].open("Plot\\macroX11.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
+			streamDataY[1].open("Plot\\macroY11.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 		}
 		if (prms::saveMacro && prms::save12)
 		{
-			DataXStream[2].open("Plot\\macroX12.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
-			DataYStream[2].open("Plot\\macroY12.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
+			streamDataX[2].open("Plot\\macroX12.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
+			streamDataY[2].open("Plot\\macroY12.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 		}
 		if (prms::saveMacro && prms::save13)
 		{
-			DataXStream[3].open("Plot\\macroX13.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
-			DataYStream[3].open("Plot\\macroY13.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
+			streamDataX[3].open("Plot\\macroX13.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
+			streamDataY[3].open("Plot\\macroY13.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 		}
 		if (prms::saveMacro && prms::save21)
 		{
-			DataXStream[4].open("Plot\\macroX21.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
-			DataYStream[4].open("Plot\\macroY21.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
+			streamDataX[4].open("Plot\\macroX21.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
+			streamDataY[4].open("Plot\\macroY21.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 		}
 		if (prms::saveMacro && prms::save22)
 		{
-			DataXStream[5].open("Plot\\macroX22.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
-			DataYStream[5].open("Plot\\macroY22.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
+			streamDataX[5].open("Plot\\macroX22.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
+			streamDataY[5].open("Plot\\macroY22.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 		}
 		if (prms::saveMacro && prms::save23)
 		{
-			DataXStream[6].open("Plot\\macroX23.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
-			DataYStream[6].open("Plot\\macroY23.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
+			streamDataX[6].open("Plot\\macroX23.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
+			streamDataY[6].open("Plot\\macroY23.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 		}
 		if (prms::saveMacro && prms::save31)
 		{
-			DataXStream[7].open("Plot\\macroX31.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
-			DataYStream[7].open("Plot\\macroY31.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
+			streamDataX[7].open("Plot\\macroX31.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
+			streamDataY[7].open("Plot\\macroY31.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 		}
 		if (prms::saveMacro && prms::save32)
 		{
-			DataXStream[8].open("Plot\\macroX32.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
-			DataYStream[8].open("Plot\\macroY32.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
+			streamDataX[8].open("Plot\\macroX32.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
+			streamDataY[8].open("Plot\\macroY32.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 		}
 		if (prms::saveMacro && prms::save33)
 		{
-			DataXStream[9].open("Plot\\macroX33.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
-			DataYStream[9].open("Plot\\macroY33.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
+			streamDataX[9].open("Plot\\macroX33.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
+			streamDataY[9].open("Plot\\macroY33.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 		}
 
 		//Файлы для мезо-данных
 
 		if (prms::saveMeso && prms::saveIntensity)
 		{
-			DataXStream[10].open("Plot\\mesoXint.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
-			DataYStream[10].open("Plot\\mesoYint.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
+			streamDataX[10].open("Plot\\mesoXint.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
+			streamDataY[10].open("Plot\\mesoYint.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 		}
 
 		if (prms::saveMeso && prms::save11)
 		{
-			DataXStream[11].open("Plot\\mesoX11.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
-			DataYStream[11].open("Plot\\mesoY11.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
+			streamDataX[11].open("Plot\\mesoX11.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
+			streamDataY[11].open("Plot\\mesoY11.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 		}
 		if (prms::saveMeso && prms::save12)
 		{
-			DataXStream[12].open("Plot\\mesoX12.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
-			DataYStream[12].open("Plot\\mesoY12.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
+			streamDataX[12].open("Plot\\mesoX12.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
+			streamDataY[12].open("Plot\\mesoY12.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 		}
 		if (prms::saveMeso && prms::save13)
 		{
-			DataXStream[13].open("Plot\\mesoX13.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
-			DataYStream[13].open("Plot\\mesoY13.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
+			streamDataX[13].open("Plot\\mesoX13.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
+			streamDataY[13].open("Plot\\mesoY13.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 		}
 		if (prms::saveMeso && prms::save21)
 		{
-			DataXStream[14].open("Plot\\mesoX21.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
-			DataYStream[14].open("Plot\\mesoY21.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
+			streamDataX[14].open("Plot\\mesoX21.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
+			streamDataY[14].open("Plot\\mesoY21.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 		}
 		if (prms::saveMeso && prms::save22)
 		{
-			DataXStream[15].open("Plot\\mesoX22.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
-			DataYStream[15].open("Plot\\mesoY22.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
+			streamDataX[15].open("Plot\\mesoX22.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
+			streamDataY[15].open("Plot\\mesoY22.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 		}
 		if (prms::saveMeso && prms::save23)
 		{
-			DataXStream[16].open("Plot\\mesoX23.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
-			DataYStream[16].open("Plot\\mesoY23.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
+			streamDataX[16].open("Plot\\mesoX23.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
+			streamDataY[16].open("Plot\\mesoY23.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 		}
 		if (prms::saveMeso && prms::save31)
 		{
-			DataXStream[17].open("Plot\\mesoX31.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
-			DataYStream[17].open("Plot\\mesoY31.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
+			streamDataX[17].open("Plot\\mesoX31.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
+			streamDataY[17].open("Plot\\mesoY31.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 		}
 		if (prms::saveMeso && prms::save32)
 		{
-			DataXStream[18].open("Plot\\mesoX32.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
-			DataYStream[18].open("Plot\\mesoY32.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
+			streamDataX[18].open("Plot\\mesoX32.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
+			streamDataY[18].open("Plot\\mesoY32.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 		}
 		if (prms::saveMeso && prms::save33)
 		{
-			DataXStream[19].open("Plot\\mesoX33.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
-			DataYStream[19].open("Plot\\mesoY33.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
+			streamDataX[19].open("Plot\\mesoX33.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
+			streamDataY[19].open("Plot\\mesoY33.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 		}
 
-		Datastream[0].open("Plot\\ActiveSS.dat", std::ios_base::out | std::ios_base::trunc | std::ios::binary);
+		streamInternalVars[0].open("Plot\\ActiveSS.dat", std::ios_base::out | std::ios_base::trunc | std::ios::binary);
 
-		dbgstream = new std::ofstream[file_count];
+		streamDebug = new std::ofstream[fileCount];
 		if (prms::saveVariablesPeriodStep > 0)				//Открытие файлов для отладочных данных
 		{
-			dbgstream[0].open("DBG\\o.txt", std::ios_base::out | std::ios_base::trunc);
-			dbgstream[1].open("DBG\\e.txt", std::ios_base::out | std::ios_base::trunc);
-			dbgstream[2].open("DBG\\d.txt", std::ios_base::out | std::ios_base::trunc);
-			dbgstream[3].open("DBG\\sgm.txt", std::ios_base::out | std::ios_base::trunc);
-			dbgstream[4].open("DBG\\om.txt", std::ios_base::out | std::ios_base::trunc);
-			dbgstream[5].open("DBG\\dsgm.txt", std::ios_base::out | std::ios_base::trunc);
-			dbgstream[6].open("DBG\\din.txt", std::ios_base::out | std::ios_base::trunc);
-			dbgstream[7].open("DBG\\w.txt", std::ios_base::out | std::ios_base::trunc);
-			dbgstream[8].open("DBG\\dgamma.txt", std::ios_base::out | std::ios_base::trunc);
-			dbgstream[9].open("DBG\\t.txt", std::ios_base::out | std::ios_base::trunc);
-			dbgstream[10].open("DBG\\Macro_D.txt", std::ios_base::out | std::ios_base::trunc);
-			dbgstream[11].open("DBG\\Macro_Din.txt", std::ios_base::out | std::ios_base::trunc);
-			dbgstream[12].open("DBG\\Macro_Sgm.txt", std::ios_base::out | std::ios_base::trunc);
-			dbgstream[13].open("DBG\\Macro_dSgm.txt", std::ios_base::out | std::ios_base::trunc);
-			dbgstream[14].open("DBG\\Macro_E.txt", std::ios_base::out | std::ios_base::trunc);
-			dbgstream[15].open("DBG\\VOL_M.txt", std::ios_base::out | std::ios_base::trunc);
+			streamDebug[0].open("DBG\\o.txt", std::ios_base::out | std::ios_base::trunc);
+			streamDebug[1].open("DBG\\e.txt", std::ios_base::out | std::ios_base::trunc);
+			streamDebug[2].open("DBG\\d.txt", std::ios_base::out | std::ios_base::trunc);
+			streamDebug[3].open("DBG\\sgm.txt", std::ios_base::out | std::ios_base::trunc);
+			streamDebug[4].open("DBG\\om.txt", std::ios_base::out | std::ios_base::trunc);
+			streamDebug[5].open("DBG\\dsgm.txt", std::ios_base::out | std::ios_base::trunc);
+			streamDebug[6].open("DBG\\din.txt", std::ios_base::out | std::ios_base::trunc);
+			streamDebug[7].open("DBG\\w.txt", std::ios_base::out | std::ios_base::trunc);
+			streamDebug[8].open("DBG\\dgamma.txt", std::ios_base::out | std::ios_base::trunc);
+			streamDebug[9].open("DBG\\t.txt", std::ios_base::out | std::ios_base::trunc);
+			streamDebug[10].open("DBG\\Macro_D.txt", std::ios_base::out | std::ios_base::trunc);
+			streamDebug[11].open("DBG\\Macro_Din.txt", std::ios_base::out | std::ios_base::trunc);
+			streamDebug[12].open("DBG\\Macro_Sgm.txt", std::ios_base::out | std::ios_base::trunc);
+			streamDebug[13].open("DBG\\Macro_dSgm.txt", std::ios_base::out | std::ios_base::trunc);
+			streamDebug[14].open("DBG\\Macro_E.txt", std::ios_base::out | std::ios_base::trunc);
+			streamDebug[15].open("DBG\\VOL_M.txt", std::ios_base::out | std::ios_base::trunc);
 		}
 
-		TestStream = new std::ofstream[6];
-		TestStream[0].open("Test0.txt", std::ios_base::out | std::ios_base::trunc);
-		TestStream[1].open("Test1.txt", std::ios_base::out | std::ios_base::trunc);
-		TestStream[2].open("Test2.txt", std::ios_base::out | std::ios_base::trunc);
-		TestStream[3].open("Test3.txt", std::ios_base::out | std::ios_base::trunc);
-		TestStream[4].open("Test4.txt", std::ios_base::out | std::ios_base::trunc);
-		TestStream[5].open("Test5.txt", std::ios_base::out | std::ios_base::trunc);
+		streamDataTest = new std::ofstream[6];
+		streamDataTest[0].open("Test0.txt", std::ios_base::out | std::ios_base::trunc);
+		streamDataTest[1].open("Test1.txt", std::ios_base::out | std::ios_base::trunc);
+		streamDataTest[2].open("Test2.txt", std::ios_base::out | std::ios_base::trunc);
+		streamDataTest[3].open("Test3.txt", std::ios_base::out | std::ios_base::trunc);
+		streamDataTest[4].open("Test4.txt", std::ios_base::out | std::ios_base::trunc);
+		streamDataTest[5].open("Test5.txt", std::ios_base::out | std::ios_base::trunc);
 	}
 
-	void Polycrystall::CloseFiles()
+	void Polycrystall::closeAllFiles()
 	{
 		for (int i = 0; i < 20; i++)
 		{
-			DataXStream[i].close();
-			DataYStream[i].close();
+			streamDataX[i].close();
+			streamDataY[i].close();
 		}
-		Datastream[0].close();
+		streamInternalVars[0].close();
 		for (int i = 0; i < 6; i++)
 		{
-			TestStream[i].close();
+			streamDataTest[i].close();
 		}
 
 		if (prms::saveVariablesPeriodStep > 0)
 		{
-			for (int i = 0; i < file_count; i++)
+			for (int i = 0; i < fileCount; i++)
 			{
-				dbgstream[i].close();
+				streamDebug[i].close();
 			}
 		}
 	}
 
-	void Polycrystall::Init(int count)
+	void Polycrystall::init(int count)
 	{
 		grainCount = count;
 		totalGrainCount = (int)pow(count, 3);
 
-		C = new Fragment[totalGrainCount];		//Выделение памяти под массив
+		c = new Fragment[totalGrainCount];		//Выделение памяти под массив
 	}
 
 	void Polycrystall::setParams()
@@ -234,18 +234,18 @@ namespace model
 			int a = (int)(((double)rand() / RAND_MAX) * 100);//На всё воля божья
 			if (a <= prms::mainPhasePercent)
 			{
-				C[q].setMaterialParams(prms::materialType);
+				c[q].setMaterialParams(prms::materialType);
 			}
 			else
 			{
-				C[q].setMaterialParams(another_material);
+				c[q].setMaterialParams(another_material);
 			}
 
-			C[q].rot_Mc = prms::rotationParamMc;	//Раздача начальных критических моментов
-			C[q].rot_A = prms::rotationParamA;	//и параметров модели ротаций
-			C[q].rot_H = prms::rotationParamH;
-			C[q].rot_L = prms::rotationParamL;
-			C[q].position = q;//Получение порядкового номера фрагмента
+			c[q].rot_Mc = prms::rotationParamMc;	//Раздача начальных критических моментов
+			c[q].rot_A = prms::rotationParamA;	//и параметров модели ротаций
+			c[q].rot_H = prms::rotationParamH;
+			c[q].rot_L = prms::rotationParamL;
+			c[q].position = q;//Получение порядкового номера фрагмента
 
 			if (prms::orientationType == 0)
 			{
@@ -257,11 +257,11 @@ namespace model
 					double y1 = ((double)rand() / RAND_MAX);
 					double y2 = ((double)rand() / RAND_MAX);
 					double cb = y1 > 0.5 ? y2 : -y2;
-					C[q].Orientate(a, g, cb);
+					c[q].Orientate(a, g, cb);
 				}
 				else//Получение ориентационного тензора (КСК=ЛСК)
 				{
-					C[q].o.setUnit();
+					c[q].o.setUnit();
 				}
 			}
 			else if (prms::orientationType == 1)
@@ -283,11 +283,11 @@ namespace model
 					Vector axis;
 					axis.set(x, y, z);
 					axis.normalize();
-					C[q].OrientateAxis(cf, axis);
+					c[q].OrientateAxis(cf, axis);
 				}
 				else//Получение ориентационного тензора (КСК=ЛСК)
 				{
-					C[q].o.setUnit();
+					c[q].o.setUnit();
 				}
 			}
 			else if (prms::orientationType == 2)
@@ -305,11 +305,11 @@ namespace model
 					double x = sin(fi)*cos(psi)*buf;
 					double y = sin(fi)*sin(psi)*buf;
 					double z = cos(fi)*buf;
-					C[q].OrientateQuater(w, x, y, z);
+					c[q].OrientateQuater(w, x, y, z);
 				}
 				else//Получение ориентационного тензора (КСК=ЛСК)
 				{
-					C[q].o.setUnit();
+					c[q].o.setUnit();
 				}
 			}
 
@@ -318,41 +318,41 @@ namespace model
 			{
 			case prms::DISTRIB_UNIFORM:
 			{
-				C[q].size = UniformDistrib(prms::grainSizeDistribM, prms::grainSizeDistribD);
+				c[q].size = UniformDistrib(prms::grainSizeDistribM, prms::grainSizeDistribD);
 				break;
 			}
 			case prms::DISTRIB_NORMAL:
 			{
-				C[q].size = NormalDistrib(prms::grainSizeDistribM, prms::grainSizeDistribD);
+				c[q].size = NormalDistrib(prms::grainSizeDistribM, prms::grainSizeDistribD);
 				break;
 			}
 			case prms::DISTRIB_LOGNORMAL:
 			{
-				C[q].size = LogNormalDistrib(prms::grainSizeDistribM, prms::grainSizeDistribD);
+				c[q].size = LogNormalDistrib(prms::grainSizeDistribM, prms::grainSizeDistribD);
 				break;
 			}
 			case prms::DISTRIB_EXPONENT:
 			{
-				C[q].size = ExpDistrib(prms::grainSizeDistribM);//Только один параметр
+				c[q].size = ExpDistrib(prms::grainSizeDistribM);//Только один параметр
 				break;
 			}
 			}
-			C[q].volume = pow(C[q].size, 3);	//Объём фрагмента
+			c[q].volume = pow(c[q].size, 3);	//Объём фрагмента
 
 			//Выделение памяти под массивы, необходимые для работы с окружением
-			C[q].surrounds = new Fragment[prms::grainSurroundCount];
-			C[q].normals = new Vector[prms::grainSurroundCount];
-			C[q].contact = new int[prms::grainSurroundCount];
+			c[q].surrounds = new Fragment[prms::grainSurroundCount];
+			c[q].normals = new Vector[prms::grainSurroundCount];
+			c[q].contact = new int[prms::grainSurroundCount];
 
 			for (int h = 0; h < prms::grainSurroundCount; h++)
 			{
-				C[q].contact[h] = -1;		//Изначально контакт не задан
+				c[q].contact[h] = -1;		//Изначально контакт не задан
 			}
 
 		}
 	}
 
-	void Polycrystall::MakeStruct()
+	void Polycrystall::makeGrainStruct()
 	{
 		for (int q = 0; q < totalGrainCount; q++)
 		{
@@ -361,14 +361,14 @@ namespace model
 			for (int h = 0; h < prms::grainSurroundCount; h++)
 			{
 				//Если контакт уже был задан - пропускаем
-				if (C[q].contact[h] != -1) continue;
+				if (c[q].contact[h] != -1) continue;
 				//Определяем, граничат ли фрагменты
 				//Первые 6, т.е. боковые грани, граничат всегда
 				double a = h < 6 ? 1 : ((double)rand() / RAND_MAX);//На всё воля божья
 				if (a < 0.5)
 				{
 					//Контакта нет - тоже пропускаем
-					C[q].contact[h] = 0;
+					c[q].contact[h] = 0;
 					continue;
 				}
 				int qq1 = q1, qq2 = q2, qq3 = q3;
@@ -380,42 +380,42 @@ namespace model
 				{
 				case 0://Вверх
 				{
-					C[q].normals[h].set(-sin(fi), sin(fi) / cos(fi), 1 / cos(fi));
+					c[q].normals[h].set(-sin(fi), sin(fi) / cos(fi), 1 / cos(fi));
 					qq3 = q3 == grainCount - 1 ? 0 : q3 + 1;
 					y = 5;
 					break;
 				}
 				case 1://От нас
 				{
-					C[q].normals[h].set(-1 / cos(fi), sin(fi), sin(fi) / cos(fi));
+					c[q].normals[h].set(-1 / cos(fi), sin(fi), sin(fi) / cos(fi));
 					qq1 = q1 == 0 ? grainCount - 1 : q1 - 1;
 					y = 3;
 					break;
 				}
 				case 2://Вправо
 				{
-					C[q].normals[h].set(sin(fi) / cos(fi), 1 / cos(fi), -sin(fi));
+					c[q].normals[h].set(sin(fi) / cos(fi), 1 / cos(fi), -sin(fi));
 					qq2 = q2 == grainCount - 1 ? 0 : q2 + 1;
 					y = 4;
 					break;
 				}
 				case 3://На нас
 				{
-					C[q].normals[h].set(1 / cos(fi), -sin(fi), sin(fi) / cos(fi));
+					c[q].normals[h].set(1 / cos(fi), -sin(fi), sin(fi) / cos(fi));
 					qq1 = q1 == grainCount - 1 ? 0 : q1 + 1;
 					y = 1;
 					break;
 				}
 				case 4://Влево
 				{
-					C[q].normals[h].set(sin(fi), -1 / cos(fi), -sin(fi) / cos(fi));
+					c[q].normals[h].set(sin(fi), -1 / cos(fi), -sin(fi) / cos(fi));
 					qq2 = q2 == 0 ? grainCount - 1 : q2 - 1;
 					y = 2;
 					break;
 				}
 				case 5://Вниз
 				{
-					C[q].normals[h].set(sin(fi) / cos(fi), sin(fi), -1 / cos(fi));
+					c[q].normals[h].set(sin(fi) / cos(fi), sin(fi), -1 / cos(fi));
 					qq3 = q3 == 0 ? grainCount - 1 : q3 - 1;
 					y = 0;
 					break;
@@ -424,7 +424,7 @@ namespace model
 				/**************           Рёбра куба          ***************************/
 				case 6://Лево от нас
 				{
-					C[q].normals[h].set(-cos(fi + PI_2) * cos(fi)*cos(PI_2), -cos(fi + PI_2) * cos(fi)*cos(PI_2), cos(fi)*cos(fi)*cos(PI_2));
+					c[q].normals[h].set(-cos(fi + PI_2) * cos(fi)*cos(PI_2), -cos(fi + PI_2) * cos(fi)*cos(PI_2), cos(fi)*cos(fi)*cos(PI_2));
 					qq1 = q1 == 0 ? grainCount - 1 : q1 - 1;
 					qq2 = q2 == 0 ? grainCount - 1 : q2 - 1;
 					y = 9;
@@ -432,7 +432,7 @@ namespace model
 				}
 				case 7://Лево на нас
 				{
-					C[q].normals[h].set(cos(fi + PI_2) * cos(fi)*cos(PI_2), -cos(fi + PI_2) * cos(fi)*cos(PI_2), cos(fi)*cos(fi)*cos(PI_2));
+					c[q].normals[h].set(cos(fi + PI_2) * cos(fi)*cos(PI_2), -cos(fi + PI_2) * cos(fi)*cos(PI_2), cos(fi)*cos(fi)*cos(PI_2));
 					qq1 = q1 == grainCount - 1 ? 0 : q1 + 1;
 					qq2 = q2 == 0 ? grainCount - 1 : q2 - 1;
 					y = 8;
@@ -440,7 +440,7 @@ namespace model
 				}
 				case 8://право от нас
 				{
-					C[q].normals[h].set(-cos(fi + PI_2) * cos(fi)*cos(PI_2), cos(fi + PI_2) * cos(fi)*cos(PI_2), cos(fi)*cos(fi)*cos(PI_2));
+					c[q].normals[h].set(-cos(fi + PI_2) * cos(fi)*cos(PI_2), cos(fi + PI_2) * cos(fi)*cos(PI_2), cos(fi)*cos(fi)*cos(PI_2));
 					qq1 = q1 == 0 ? grainCount - 1 : q1 - 1;
 					qq2 = q2 == grainCount - 1 ? 0 : q2 + 1;
 					y = 7;
@@ -448,7 +448,7 @@ namespace model
 				}
 				case 9://Право на нас
 				{
-					C[q].normals[h].set(cos(fi + PI_2) * cos(fi)*cos(PI_2), cos(fi + PI_2) * cos(fi)*cos(PI_2), cos(fi)*cos(fi)*cos(PI_2));
+					c[q].normals[h].set(cos(fi + PI_2) * cos(fi)*cos(PI_2), cos(fi + PI_2) * cos(fi)*cos(PI_2), cos(fi)*cos(fi)*cos(PI_2));
 					qq2 = q2 == grainCount - 1 ? 0 : q2 + 1;
 					qq1 = q1 == grainCount - 1 ? 0 : q1 + 1;
 					y = 6;
@@ -456,7 +456,7 @@ namespace model
 				}
 				case 10://Верх лево
 				{
-					C[q].normals[h].set(cos(fi + PI_2) * sin(fi), -cos(fi + PI_2) * cos(fi), sin(fi + PI_2)*cos(fi));
+					c[q].normals[h].set(cos(fi + PI_2) * sin(fi), -cos(fi + PI_2) * cos(fi), sin(fi + PI_2)*cos(fi));
 					qq3 = q3 == grainCount - 1 ? 0 : q3 + 1;
 					qq2 = q2 == 0 ? grainCount - 1 : q2 - 1;
 					y = 15;
@@ -464,7 +464,7 @@ namespace model
 				}
 				case 11://Верх право
 				{
-					C[q].normals[h].set(cos(fi + PI_2) * sin(fi), cos(fi + PI_2) * cos(fi), sin(fi + PI_2)*cos(fi));
+					c[q].normals[h].set(cos(fi + PI_2) * sin(fi), cos(fi + PI_2) * cos(fi), sin(fi + PI_2)*cos(fi));
 					qq3 = q3 == grainCount - 1 ? 0 : q3 + 1;
 					qq2 = q2 == grainCount - 1 ? 0 : q2 + 1;
 					y = 14;
@@ -472,7 +472,7 @@ namespace model
 				}
 				case 12://Верх на нас
 				{
-					C[q].normals[h].set(cos(fi + PI_2) * cos(fi), cos(fi + PI_2) * sin(fi), sin(fi + PI_2)*cos(fi));
+					c[q].normals[h].set(cos(fi + PI_2) * cos(fi), cos(fi + PI_2) * sin(fi), sin(fi + PI_2)*cos(fi));
 					qq3 = q3 == grainCount - 1 ? 0 : q3 + 1;
 					qq1 = q1 == grainCount - 1 ? 0 : q1 + 1;
 					y = 17;
@@ -480,7 +480,7 @@ namespace model
 				}
 				case 13://Верх от нас
 				{
-					C[q].normals[h].set(-cos(fi + PI_2) * cos(fi), cos(fi + PI_2) * sin(fi), sin(fi + PI_2)*cos(fi));
+					c[q].normals[h].set(-cos(fi + PI_2) * cos(fi), cos(fi + PI_2) * sin(fi), sin(fi + PI_2)*cos(fi));
 					qq3 = q3 == grainCount - 1 ? 0 : q3 + 1;
 					qq1 = q1 == 0 ? grainCount - 1 : q1 - 1;
 					y = 16;
@@ -488,7 +488,7 @@ namespace model
 				}
 				case 14://Низ лево
 				{
-					C[q].normals[h].set(-cos(fi + PI_2) * sin(fi), -cos(fi + PI_2) * cos(fi), -sin(fi + PI_2)*cos(fi));
+					c[q].normals[h].set(-cos(fi + PI_2) * sin(fi), -cos(fi + PI_2) * cos(fi), -sin(fi + PI_2)*cos(fi));
 					qq2 = q2 == 0 ? grainCount - 1 : q2 - 1;
 					qq3 = q3 == 0 ? grainCount - 1 : q3 - 1;
 					y = 11;
@@ -496,7 +496,7 @@ namespace model
 				}
 				case 15://Низ право
 				{
-					C[q].normals[h].set(-cos(fi + PI_2) * sin(fi), cos(fi + PI_2) * cos(fi), -sin(fi + PI_2)*cos(fi));
+					c[q].normals[h].set(-cos(fi + PI_2) * sin(fi), cos(fi + PI_2) * cos(fi), -sin(fi + PI_2)*cos(fi));
 					qq2 = q2 == grainCount - 1 ? 0 : q2 + 1;
 					qq3 = q3 == 0 ? grainCount - 1 : q3 - 1;
 					y = 10;
@@ -504,7 +504,7 @@ namespace model
 				}
 				case 16://Низ на нас
 				{
-					C[q].normals[h].set(cos(fi + PI_2) * cos(fi), -cos(fi + PI_2) * sin(fi), -sin(fi + PI_2)*cos(fi));
+					c[q].normals[h].set(cos(fi + PI_2) * cos(fi), -cos(fi + PI_2) * sin(fi), -sin(fi + PI_2)*cos(fi));
 					qq1 = q1 == grainCount - 1 ? 0 : q1 + 1;
 					qq3 = q3 == 0 ? grainCount - 1 : q3 - 1;
 					y = 13;
@@ -512,7 +512,7 @@ namespace model
 				}
 				case 17://Низ от нас
 				{
-					C[q].normals[h].set(-cos(fi + PI_2) * cos(fi), -cos(fi + PI_2) * sin(fi), -sin(fi + PI_2)*cos(fi));
+					c[q].normals[h].set(-cos(fi + PI_2) * cos(fi), -cos(fi + PI_2) * sin(fi), -sin(fi + PI_2)*cos(fi));
 					qq1 = q1 == 0 ? grainCount - 1 : q1 - 1;
 					qq3 = q3 == 0 ? grainCount - 1 : q3 - 1;
 					y = 12;
@@ -521,7 +521,7 @@ namespace model
 				/**************      Вершины     *****************/
 				case 18://верх лево от нас
 				{
-					C[q].normals[h].set(-cos(fi) * cos(fi)*cos(PI_2)*cos(PI_2), -cos(fi)*cos(fi) * cos(PI_2)*cos(PI_2), cos(fi)*cos(fi)*cos(PI_2)*cos(PI_2));
+					c[q].normals[h].set(-cos(fi) * cos(fi)*cos(PI_2)*cos(PI_2), -cos(fi)*cos(fi) * cos(PI_2)*cos(PI_2), cos(fi)*cos(fi)*cos(PI_2)*cos(PI_2));
 					qq1 = q1 == 0 ? grainCount - 1 : q1 - 1;
 					qq2 = q2 == 0 ? grainCount - 1 : q2 - 1;
 					qq3 = q3 == grainCount - 1 ? 0 : q3 + 1;
@@ -530,7 +530,7 @@ namespace model
 				}
 				case 19://верх лево на нас
 				{
-					C[q].normals[h].set(cos(fi) * cos(fi)*cos(PI_2)*cos(PI_2), -cos(fi)*cos(fi) * cos(PI_2)*cos(PI_2), cos(fi)*cos(fi)*cos(PI_2)*cos(PI_2));
+					c[q].normals[h].set(cos(fi) * cos(fi)*cos(PI_2)*cos(PI_2), -cos(fi)*cos(fi) * cos(PI_2)*cos(PI_2), cos(fi)*cos(fi)*cos(PI_2)*cos(PI_2));
 					qq1 = q1 == grainCount - 1 ? 0 : q1 + 1;
 					qq2 = q2 == 0 ? grainCount - 1 : q2 - 1;
 					qq3 = q3 == grainCount - 1 ? 0 : q3 + 1;
@@ -539,7 +539,7 @@ namespace model
 				}
 				case 20://верх право от нас
 				{
-					C[q].normals[h].set(-cos(fi) * cos(fi)*cos(PI_2)*cos(PI_2), cos(fi)*cos(fi) * cos(PI_2)*cos(PI_2), cos(fi)*cos(fi)*cos(PI_2)*cos(PI_2));
+					c[q].normals[h].set(-cos(fi) * cos(fi)*cos(PI_2)*cos(PI_2), cos(fi)*cos(fi) * cos(PI_2)*cos(PI_2), cos(fi)*cos(fi)*cos(PI_2)*cos(PI_2));
 					qq1 = q1 == 0 ? grainCount - 1 : q1 - 1;
 					qq2 = q2 == grainCount - 1 ? 0 : q2 + 1;
 					qq3 = q3 == grainCount - 1 ? 0 : q3 + 1;
@@ -548,7 +548,7 @@ namespace model
 				}
 				case 21://верх право на нас
 				{
-					C[q].normals[h].set(cos(fi) * cos(fi)*cos(PI_2)*cos(PI_2), cos(fi)*cos(fi) * cos(PI_2)*cos(PI_2), cos(fi)*cos(fi)*cos(PI_2)*cos(PI_2));
+					c[q].normals[h].set(cos(fi) * cos(fi)*cos(PI_2)*cos(PI_2), cos(fi)*cos(fi) * cos(PI_2)*cos(PI_2), cos(fi)*cos(fi)*cos(PI_2)*cos(PI_2));
 					qq1 = q1 == grainCount - 1 ? 0 : q1 + 1;
 					qq2 = q2 == grainCount - 1 ? 0 : q2 + 1;
 					qq3 = q3 == grainCount - 1 ? 0 : q3 + 1;
@@ -557,7 +557,7 @@ namespace model
 				}
 				case 22://низ лево от нас
 				{
-					C[q].normals[h].set(-cos(fi) * cos(fi)*cos(PI_2)*cos(PI_2), -cos(fi)*cos(fi) * cos(PI_2)*cos(PI_2), -cos(fi)*cos(fi)*cos(PI_2)*cos(PI_2));
+					c[q].normals[h].set(-cos(fi) * cos(fi)*cos(PI_2)*cos(PI_2), -cos(fi)*cos(fi) * cos(PI_2)*cos(PI_2), -cos(fi)*cos(fi)*cos(PI_2)*cos(PI_2));
 					qq1 = q1 == 0 ? grainCount - 1 : q1 - 1;
 					qq2 = q2 == 0 ? grainCount - 1 : q2 - 1;
 					qq3 = q3 == 0 ? grainCount - 1 : q3 - 1;
@@ -566,7 +566,7 @@ namespace model
 				}
 				case 23://низ лево на нас
 				{
-					C[q].normals[h].set(cos(fi) * cos(fi)*cos(PI_2)*cos(PI_2), -cos(fi)*cos(fi) * cos(PI_2)*cos(PI_2), -cos(fi)*cos(fi)*cos(PI_2)*cos(PI_2));
+					c[q].normals[h].set(cos(fi) * cos(fi)*cos(PI_2)*cos(PI_2), -cos(fi)*cos(fi) * cos(PI_2)*cos(PI_2), -cos(fi)*cos(fi)*cos(PI_2)*cos(PI_2));
 					qq1 = q1 == grainCount - 1 ? 0 : q1 + 1;
 					qq2 = q2 == 0 ? grainCount - 1 : q2 - 1;
 					qq3 = q3 == 0 ? grainCount - 1 : q3 - 1;
@@ -575,7 +575,7 @@ namespace model
 				}
 				case 24://низ право от нас
 				{
-					C[q].normals[h].set(-cos(fi) * cos(fi)*cos(PI_2)*cos(PI_2), cos(fi)*cos(fi) * cos(PI_2)*cos(PI_2), -cos(fi)*cos(fi)*cos(PI_2)*cos(PI_2));
+					c[q].normals[h].set(-cos(fi) * cos(fi)*cos(PI_2)*cos(PI_2), cos(fi)*cos(fi) * cos(PI_2)*cos(PI_2), -cos(fi)*cos(fi)*cos(PI_2)*cos(PI_2));
 
 					qq1 = q1 == 0 ? grainCount - 1 : q1 - 1;
 					qq2 = q2 == grainCount - 1 ? 0 : q2 + 1;
@@ -585,7 +585,7 @@ namespace model
 				}
 				case 25://низ право на нас
 				{
-					C[q].normals[h].set(cos(fi) * cos(fi)*cos(PI_2)*cos(PI_2), cos(fi)*cos(fi) * cos(PI_2)*cos(PI_2), -cos(fi)*cos(fi)*cos(PI_2)*cos(PI_2));
+					c[q].normals[h].set(cos(fi) * cos(fi)*cos(PI_2)*cos(PI_2), cos(fi)*cos(fi) * cos(PI_2)*cos(PI_2), -cos(fi)*cos(fi)*cos(PI_2)*cos(PI_2));
 					qq1 = q1 == grainCount - 1 ? 0 : q1 + 1;
 					qq2 = q2 == grainCount - 1 ? 0 : q2 + 1;
 					qq3 = q3 == 0 ? grainCount - 1 : q3 - 1;
@@ -594,92 +594,92 @@ namespace model
 				}
 				}
 				int index = get1DPos(qq1, qq2, qq3);
-				C[q].surrounds[h] = C[index];//Здравствуй, сосед!
-				C[index].surrounds[y] = C[q];//Приятно познакомиться!
-				C[q].normals[h].normalize();
+				c[q].surrounds[h] = c[index];//Здравствуй, сосед!
+				c[index].surrounds[y] = c[q];//Приятно познакомиться!
+				c[q].normals[h].normalize();
 
 				for (int i = 0; i < DIM; i++)
 				{
-					C[index].normals[y].c[i] = -C[q].normals[h].c[i];//Поделись нормалью
+					c[index].normals[y].c[i] = -c[q].normals[h].c[i];//Поделись нормалью
 				}
 
-				if (h < 6) C[q].contact[h] = 1;		//Контакт на грани октаэдра
-				else if (h < 14) C[q].contact[h] = 3;	//Контакт на вершине октаэдра
-				else C[q].contact[h] = 2;				//Контакт на ребре
+				if (h < 6) c[q].contact[h] = 1;		//Контакт на грани октаэдра
+				else if (h < 14) c[q].contact[h] = 3;	//Контакт на вершине октаэдра
+				else c[q].contact[h] = 2;				//Контакт на ребре
 			}
 			if (prms::grainSurroundCount > 6)	//Уменьшение объёма из-за отсечений
 			{
-				double a = C[q].size * 0.1;			//Длина срезанной части вдоль ребра
-				double vol_edge = a * a*C[q].size / 2.0;	//Объём, срезанный рёбрами
+				double a = c[q].size * 0.1;			//Длина срезанной части вдоль ребра
+				double vol_edge = a * a*c[q].size / 2.0;	//Объём, срезанный рёбрами
 				double vol_vertex = a * a*a / SQRT3;				//Объём, срезанный вершинами
 				int cut_edge = 0;		//Кол-во срезанных рёбер
 				int cut_vertex = 0;		//Кол-во срезанных вершин
 				for (int h = 6; h < prms::grainSurroundCount; h++)
 				{
-					if (C[q].contact[h] != 0)
+					if (c[q].contact[h] != 0)
 					{
 						if (h < 14) cut_vertex++;
 						else cut_edge++;
 					}
 				}
-				C[q].volume -= (cut_edge*vol_edge + cut_vertex * vol_vertex);//Вычитание
+				c[q].volume -= (cut_edge*vol_edge + cut_vertex * vol_vertex);//Вычитание
 			}
 
 
 		}
 	}
 
-	void Polycrystall::SavePoleFig()
+	void Polycrystall::savePoleFigData()
 	{
 		for (int q = 0; q < totalGrainCount; q++)
 		{
-			GetPoleFig(&C[q]);
-			if (prms::usingStandardTriangleSaving) GetSST(&C[q]);
+			GetPoleFig(&c[q]);
+			if (prms::usingStandardTriangleSaving) GetSST(&c[q]);
 
 		}
 	}
 
-	void Polycrystall::SaveDbgInfo()
+	void Polycrystall::saveDebugData()
 	{
-		for (int i = 0; i < file_count; i++)//Визуальное разделение шагов 
+		for (int i = 0; i < fileCount; i++)//Визуальное разделение шагов 
 		{
-			dbgstream[i] << "#########################      STEP " << CURR_STEP << "      #########################" << std::endl << std::endl;
+			streamDebug[i] << "#########################      STEP " << CURR_STEP << "      #########################" << std::endl << std::endl;
 		}
 
 		//Запись тензоров каждого из зерен или фрагментов
 		for (int q = 0; q < totalGrainCount; q++)
 		{
 
-			writeDebugInfo(dbgstream[0], C[q].o.c);
-			writeDebugInfo(dbgstream[1], C[q].e.c);
-			writeDebugInfo(dbgstream[2], C[q].d.c);
-			writeDebugInfo(dbgstream[3], C[q].sgm.c);
-			writeDebugInfo(dbgstream[4], C[q].om.c);
-			writeDebugInfo(dbgstream[5], C[q].dsgm.c);
-			writeDebugInfo(dbgstream[6], C[q].d_in.c);
-			writeDebugInfo(dbgstream[7], C[q].w.c);
-			for (int f = 0; f < C[q].SS_count; f++)
+			writeDebugInfo(streamDebug[0], c[q].o.c);
+			writeDebugInfo(streamDebug[1], c[q].e.c);
+			writeDebugInfo(streamDebug[2], c[q].d.c);
+			writeDebugInfo(streamDebug[3], c[q].sgm.c);
+			writeDebugInfo(streamDebug[4], c[q].om.c);
+			writeDebugInfo(streamDebug[5], c[q].dsgm.c);
+			writeDebugInfo(streamDebug[6], c[q].d_in.c);
+			writeDebugInfo(streamDebug[7], c[q].w.c);
+			for (int f = 0; f < c[q].SS_count; f++)
 			{
-				dbgstream[8] << C[q].SS[f].dgm << " ";
+				streamDebug[8] << c[q].SS[f].dgm << " ";
 			}
-			dbgstream[8] << std::endl << std::endl;
-			for (int f = 0; f < C[q].SS_count; f++)
+			streamDebug[8] << std::endl << std::endl;
+			for (int f = 0; f < c[q].SS_count; f++)
 			{
-				dbgstream[9] << C[q].SS[f].t << " ";
+				streamDebug[9] << c[q].SS[f].t << " ";
 			}
-			dbgstream[9] << std::endl << std::endl;
-			dbgstream[15] << C[q].moment.c[0] << " " << C[q].moment.c[1] << " " << C[q].moment.c[2] << std::endl;
+			streamDebug[9] << std::endl << std::endl;
+			streamDebug[15] << c[q].moment.c[0] << " " << c[q].moment.c[1] << " " << c[q].moment.c[2] << std::endl;
 
 		}
 		//Запись тензоров представительного объема
-		writeDebugInfo(dbgstream[10], D.c);
-		writeDebugInfo(dbgstream[11], D_in.c);
-		writeDebugInfo(dbgstream[12], Sgm.c);
-		writeDebugInfo(dbgstream[13], dSgm.c);
-		writeDebugInfo(dbgstream[14], E.c);
+		writeDebugInfo(streamDebug[10], D.c);
+		writeDebugInfo(streamDebug[11], D_in.c);
+		writeDebugInfo(streamDebug[12], Sgm.c);
+		writeDebugInfo(streamDebug[13], dSgm.c);
+		writeDebugInfo(streamDebug[14], E.c);
 	}
 
-	void Polycrystall::Load(bool unload)
+	void Polycrystall::load(bool unload)
 	{
 		E += D * prms::dt;
 		/*Параметр unload включает разгрузку представительного объёма*/
@@ -690,37 +690,37 @@ namespace model
 			D_in.setZero();
 			for (int q = 0; q < totalGrainCount; q++)
 			{
-				D_in += C[q].d_in;
-				P += C[q].p.ToLSK(C[q].o);
+				D_in += c[q].d_in;
+				P += c[q].p.toLsk(c[q].o);
 			}
 
 			D_in /= (totalGrainCount);
 			P /= (totalGrainCount);
 
 			//Симметризация тензора упругих констант
-			P.Symmetrize();
+			P.symmetrize();
 
 			D = !unload ? TensionStrainCalc(P, D_in, D.c[0][0]) : UnloadingStrainCalc(P, D_in, Sgm, lam);
 
-			Strain = SQRT2_3 * sqrt(E.doubleScalMult(E));//Вычисление интенсивности деформаций
+			strain = SQRT2_3 * sqrt(E.doubleScalMult(E));//Вычисление интенсивности деформаций
 
 			dSgm = TensionStressCalc(P, D_in, D);
 			//dSgm *= prms::dt;				//Приращение напряжений на шаге
 			Sgm += dSgm * prms::dt;
-			Stress = SQRT3_2 * sqrt(Sgm.doubleScalMult(Sgm));//Вычисление интенсивности напряжений
+			stress = SQRT3_2 * sqrt(Sgm.doubleScalMult(Sgm));//Вычисление интенсивности напряжений
 		}
 		else
 		{
-			Stress = 0;		//Вычисление интенсивностей осреднением
-			Strain = 0;
+			stress = 0;		//Вычисление интенсивностей осреднением
+			strain = 0;
 			for (int q = 0; q < totalGrainCount; q++)
 			{
-				Strain += C[q].strain;
-				Stress += C[q].stress;
+				strain += c[q].strain;
+				stress += c[q].stress;
 
 			}
-			Strain /= totalGrainCount;
-			Stress /= totalGrainCount;
+			strain /= totalGrainCount;
+			stress /= totalGrainCount;
 		}
 
 #pragma omp parallel for
@@ -734,53 +734,53 @@ namespace model
 			************       Переходим в КСК       **********
 			**************************************************/
 
-			Tensor O = C[q].o;
+			Tensor O = c[q].o;
 			Tensor OT = O;
 			OT.transp();
-			C[q].d = O * D*OT;//Гипотеза Фойгта
-			C[q].w = O * W*OT /*- C[q].om*/;//Расширенная
+			c[q].d = O * D*OT;//Гипотеза Фойгта
+			c[q].w = O * W*OT /*- C[q].om*/;//Расширенная
 
-			C[q].sgm = O * C[q].sgm*OT;
-			C[q].d_in = O * C[q].d_in*OT;
+			c[q].sgm = O * c[q].sgm*OT;
+			c[q].d_in = O * c[q].d_in*OT;
 
 
 			/***************************************************
 			***********       Пересчитываем НДС      ***********
 			***************************************************/
 
-			C[q].NDScalc();
+			c[q].NDScalc();
 
 			if (prms::usingHardeningBase)			//Базовое упрочнение
 			{
-				Base_hardening(&C[q]);
+				Base_hardening(&c[q]);
 			}
 
 			if (prms::usingRotationsTaylor)		//Ротации по Тейлору
 			{
-				Taylor_rotations(&C[q]);
+				Taylor_rotations(&c[q]);
 			}
 
 			if (prms::usingRotationsTrusov && prms::usingRotationsHardening)	//Ротационное упрочнение
 			{
-				Rotation_hardening(&C[q]);
+				Rotation_hardening(&c[q]);
 			}
 
 			if (prms::usingHardeningBound)	//Зернограничное упрочнение
 			{
-				Boundary_hardening(&C[q]);
+				Boundary_hardening(&c[q]);
 			}
 
 			if (prms::usingRotationsTrusov)		//Ротации по Трусову
 			{
-				Trusov_rotations(&C[q]);
+				Trusov_rotations(&c[q]);
 			}
 			/**************************************************
 			************       Переходим в ЛСК       **********
 			**************************************************/
 
-			C[q].sgm = OT * C[q].sgm*O;
-			C[q].d_in = OT * C[q].d_in*O;
-			C[q].iter++;
+			c[q].sgm = OT * c[q].sgm*O;
+			c[q].d_in = OT * c[q].d_in*O;
+			c[q].iter++;
 
 		}
 
@@ -792,8 +792,8 @@ namespace model
 			for (int q = 0; q < totalGrainCount; q++)
 			{
 
-				Sgm += C[q].sgm;
-				D_in += C[q].d_in;
+				Sgm += c[q].sgm;
+				D_in += c[q].d_in;
 
 			}
 			Sgm /= totalGrainCount;
@@ -808,7 +808,7 @@ namespace model
 		double progress;
 		if (!unload)
 		{
-			progress = prms::trueUniaxial ? fabs(E.c[0][0]) : Strain;
+			progress = prms::trueUniaxial ? fabs(E.c[0][0]) : strain;
 			progress = progress / prms::maxStrainIntencity * 100.0;
 
 			if (!(prms::loadCycleCount == 1 || cycle == 0))	//Для многоцикловых нагружений
@@ -867,53 +867,53 @@ namespace model
 			{
 				if (prms::saveIntensity)
 				{
-					DataXStream[0].write((char *)&Strain, sizeof(double));
-					DataYStream[0].write((char *)&Stress, sizeof(double));
+					streamDataX[0].write((char *)&strain, sizeof(double));
+					streamDataY[0].write((char *)&stress, sizeof(double));
 				}
 				if (prms::save11)
 				{
-					DataXStream[1].write((char *)&E.c[0][0], sizeof(double));
-					DataYStream[1].write((char *)&Sgm.c[0][0], sizeof(double));
+					streamDataX[1].write((char *)&E.c[0][0], sizeof(double));
+					streamDataY[1].write((char *)&Sgm.c[0][0], sizeof(double));
 				}
 				if (prms::save12)
 				{
-					DataXStream[2].write((char *)&E.c[0][1], sizeof(double));
-					DataYStream[2].write((char *)&Sgm.c[0][1], sizeof(double));
+					streamDataX[2].write((char *)&E.c[0][1], sizeof(double));
+					streamDataY[2].write((char *)&Sgm.c[0][1], sizeof(double));
 				}
 				if (prms::save13)
 				{
-					DataXStream[3].write((char *)&E.c[0][2], sizeof(double));
-					DataYStream[3].write((char *)&Sgm.c[0][2], sizeof(double));
+					streamDataX[3].write((char *)&E.c[0][2], sizeof(double));
+					streamDataY[3].write((char *)&Sgm.c[0][2], sizeof(double));
 				}
 				if (prms::save21)
 				{
-					DataXStream[4].write((char *)&E.c[1][0], sizeof(double));
-					DataYStream[4].write((char *)&Sgm.c[1][0], sizeof(double));
+					streamDataX[4].write((char *)&E.c[1][0], sizeof(double));
+					streamDataY[4].write((char *)&Sgm.c[1][0], sizeof(double));
 				}
 				if (prms::save22)
 				{
-					DataXStream[5].write((char *)&E.c[1][1], sizeof(double));
-					DataYStream[5].write((char *)&Sgm.c[1][1], sizeof(double));
+					streamDataX[5].write((char *)&E.c[1][1], sizeof(double));
+					streamDataY[5].write((char *)&Sgm.c[1][1], sizeof(double));
 				}
 				if (prms::save23)
 				{
-					DataXStream[6].write((char *)&E.c[1][2], sizeof(double));
-					DataYStream[6].write((char *)&Sgm.c[1][2], sizeof(double));
+					streamDataX[6].write((char *)&E.c[1][2], sizeof(double));
+					streamDataY[6].write((char *)&Sgm.c[1][2], sizeof(double));
 				}
 				if (prms::save31)
 				{
-					DataXStream[7].write((char *)&E.c[2][0], sizeof(double));
-					DataYStream[7].write((char *)&Sgm.c[2][0], sizeof(double));
+					streamDataX[7].write((char *)&E.c[2][0], sizeof(double));
+					streamDataY[7].write((char *)&Sgm.c[2][0], sizeof(double));
 				}
 				if (prms::save32)
 				{
-					DataXStream[8].write((char *)&E.c[2][1], sizeof(double));
-					DataYStream[8].write((char *)&Sgm.c[2][1], sizeof(double));
+					streamDataX[8].write((char *)&E.c[2][1], sizeof(double));
+					streamDataY[8].write((char *)&Sgm.c[2][1], sizeof(double));
 				}
 				if (prms::save33)
 				{
-					DataXStream[9].write((char *)&E.c[2][2], sizeof(double));
-					DataYStream[9].write((char *)&Sgm.c[2][2], sizeof(double));
+					streamDataX[9].write((char *)&E.c[2][2], sizeof(double));
+					streamDataY[9].write((char *)&Sgm.c[2][2], sizeof(double));
 				}
 			}
 
@@ -924,53 +924,53 @@ namespace model
 
 					if (prms::saveIntensity)
 					{
-						DataXStream[10].write((char *)&C[q].strain, sizeof(double));
-						DataYStream[10].write((char *)&C[q].stress, sizeof(double));
+						streamDataX[10].write((char *)&c[q].strain, sizeof(double));
+						streamDataY[10].write((char *)&c[q].stress, sizeof(double));
 					}
 					if (prms::save11)
 					{
-						DataXStream[11].write((char *)&C[q].e.c[0][0], sizeof(double));
-						DataYStream[11].write((char *)&C[q].sgm.c[0][0], sizeof(double));
+						streamDataX[11].write((char *)&c[q].e.c[0][0], sizeof(double));
+						streamDataY[11].write((char *)&c[q].sgm.c[0][0], sizeof(double));
 					}
 					if (prms::save12)
 					{
-						DataXStream[12].write((char *)&C[q].e.c[0][1], sizeof(double));
-						DataYStream[12].write((char *)&C[q].sgm.c[0][1], sizeof(double));
+						streamDataX[12].write((char *)&c[q].e.c[0][1], sizeof(double));
+						streamDataY[12].write((char *)&c[q].sgm.c[0][1], sizeof(double));
 					}
 					if (prms::save13)
 					{
-						DataXStream[13].write((char *)&C[q].e.c[0][2], sizeof(double));
-						DataYStream[13].write((char *)&C[q].sgm.c[0][2], sizeof(double));
+						streamDataX[13].write((char *)&c[q].e.c[0][2], sizeof(double));
+						streamDataY[13].write((char *)&c[q].sgm.c[0][2], sizeof(double));
 					}
 					if (prms::save21)
 					{
-						DataXStream[14].write((char *)&C[q].e.c[1][0], sizeof(double));
-						DataYStream[14].write((char *)&C[q].sgm.c[1][0], sizeof(double));
+						streamDataX[14].write((char *)&c[q].e.c[1][0], sizeof(double));
+						streamDataY[14].write((char *)&c[q].sgm.c[1][0], sizeof(double));
 					}
 					if (prms::save22)
 					{
-						DataXStream[15].write((char *)&C[q].e.c[1][1], sizeof(double));
-						DataYStream[15].write((char *)&C[q].sgm.c[1][1], sizeof(double));
+						streamDataX[15].write((char *)&c[q].e.c[1][1], sizeof(double));
+						streamDataY[15].write((char *)&c[q].sgm.c[1][1], sizeof(double));
 					}
 					if (prms::save23)
 					{
-						DataXStream[16].write((char *)&C[q].e.c[1][2], sizeof(double));
-						DataYStream[16].write((char *)&C[q].sgm.c[1][2], sizeof(double));
+						streamDataX[16].write((char *)&c[q].e.c[1][2], sizeof(double));
+						streamDataY[16].write((char *)&c[q].sgm.c[1][2], sizeof(double));
 					}
 					if (prms::save31)
 					{
-						DataXStream[17].write((char *)&C[q].e.c[2][0], sizeof(double));
-						DataYStream[17].write((char *)&C[q].sgm.c[2][0], sizeof(double));
+						streamDataX[17].write((char *)&c[q].e.c[2][0], sizeof(double));
+						streamDataY[17].write((char *)&c[q].sgm.c[2][0], sizeof(double));
 					}
 					if (prms::save32)
 					{
-						DataXStream[18].write((char *)&C[q].e.c[2][1], sizeof(double));
-						DataYStream[18].write((char *)&C[q].sgm.c[2][1], sizeof(double));
+						streamDataX[18].write((char *)&c[q].e.c[2][1], sizeof(double));
+						streamDataY[18].write((char *)&c[q].sgm.c[2][1], sizeof(double));
 					}
 					if (prms::save33)
 					{
-						DataXStream[19].write((char *)&C[q].e.c[2][2], sizeof(double));
-						DataYStream[19].write((char *)&C[q].sgm.c[2][2], sizeof(double));
+						streamDataX[19].write((char *)&c[q].e.c[2][2], sizeof(double));
+						streamDataY[19].write((char *)&c[q].sgm.c[2][2], sizeof(double));
 					}
 
 				}
@@ -987,19 +987,19 @@ namespace model
 			double H = 0;
 			for (int q = 0; q < totalGrainCount; q++)
 			{
-				for (int i = 0; i < C[q].SS_count; i++)
+				for (int i = 0; i < c[q].SS_count; i++)
 				{
-					if (C[q].SS[i].dgm > EPS) ActiveSysCount++;//Подсчёт активных СС
+					if (c[q].SS[i].dgm > EPS) ActiveSysCount++;//Подсчёт активных СС
 				}
 
-				if (C[q].isRotate) RotCount++;		//Подсчёт вращающихся решёток
-				RotEnergy += C[q].rot_energy;		//Суммирование энергий вращения
-				RotSpeed += C[q].rot_speed;		//Суммирование скоростей вращения
-				norma += C[q].norm;
-				Mc += C[q].rot_Mc;
-				dmc += C[q].dmc;
-				angle += C[q].sum_angle;
-				H += C[q].rot_H;
+				if (c[q].isRotate) RotCount++;		//Подсчёт вращающихся решёток
+				RotEnergy += c[q].rot_energy;		//Суммирование энергий вращения
+				RotSpeed += c[q].rot_speed;		//Суммирование скоростей вращения
+				norma += c[q].norm;
+				Mc += c[q].rot_Mc;
+				dmc += c[q].dmc;
+				angle += c[q].sum_angle;
+				H += c[q].rot_H;
 			}
 			H /= totalGrainCount;
 			angle /= totalGrainCount;
@@ -1007,7 +1007,7 @@ namespace model
 			Mc /= totalGrainCount;
 			dmc /= totalGrainCount;
 			ActiveSysCount /= totalGrainCount;
-			if (prms::saveActiveSS) Datastream[0].write((char *)&ActiveSysCount, sizeof ActiveSysCount);//Запись кол-ва активных СС
+			if (prms::saveActiveSS) streamInternalVars[0].write((char *)&ActiveSysCount, sizeof ActiveSysCount);//Запись кол-ва активных СС
 			if (RotCount != 0)
 			{
 				RotSpeed /= RotCount;
@@ -1027,12 +1027,12 @@ namespace model
 
 			double StepEnergy = Sgm.doubleScalMult(D);	//Полная энергия на шаге
 			double StepEnergy_in = Sgm.doubleScalMult(D_in);	//Полная энергия на шаге
-			TestStream[0] << RotCount << std::endl;
-			TestStream[1] << RotSpeed << std::endl;
-			TestStream[2] << RotEnergy << std::endl;
-			TestStream[3] << StepEnergy << std::endl;
-			TestStream[4] << StepEnergy_in << std::endl;
-			TestStream[5] << norma << std::endl;
+			streamDataTest[0] << RotCount << std::endl;
+			streamDataTest[1] << RotSpeed << std::endl;
+			streamDataTest[2] << RotEnergy << std::endl;
+			streamDataTest[3] << StepEnergy << std::endl;
+			streamDataTest[4] << StepEnergy_in << std::endl;
+			streamDataTest[5] << norma << std::endl;
 
 			PLOT_STEP = progress;
 		}
@@ -1042,7 +1042,7 @@ namespace model
 		************************************************************/
 		if (progress - POLUS_STEP > prms::periodSavePolus && prms::periodSavePolus > 0)
 		{
-			SavePoleFig();
+			savePoleFigData();
 			POLUS_STEP = progress;
 		}
 
@@ -1052,7 +1052,7 @@ namespace model
 		if (CURR_STEP >= prms::saveVariablesStartStep && CURR_STEP <= prms::saveVariablesStopStep && DEBUG_STEP == prms::saveVariablesPeriodStep)
 		{
 			DEBUG_STEP = 0;
-			SaveDbgInfo();
+			saveDebugData();
 		}
 		CURR_STEP++;
 		PROC_STEP++;
@@ -1060,7 +1060,7 @@ namespace model
 
 	}
 
-	void Polycrystall::Deformate()
+	void Polycrystall::deformate()
 		/****************************************
 		*Функция деформирования представительного
 		*объема поликристала.
@@ -1090,13 +1090,13 @@ namespace model
 			}
 			printf("\n        00.00%");
 			double* counter;
-			counter = !prms::trueUniaxial ? &Strain : &E.c[0][0];
+			counter = !prms::trueUniaxial ? &strain : &E.c[0][0];
 			//Для циклических нагружений цикл ведется по значению растягивающей компоненты
 			//а для остальных - по значению интенсивности тензора деформации
 
 			while (fabs(*counter) < prms::maxStrainIntencity)	//Цикл по деформациям
 			{
-				Load(false);
+				load(false);
 				//if (prms::FRAGMENTATION) GrainRotate();
 			}
 			if (prms::loadCycleCount > 1)
@@ -1124,7 +1124,7 @@ namespace model
 				t1 = clock();		//Начальная отсечка времени
 				while (fabs(Sgm.c[0][0]) > final_stress) //Цикл по напряжениям
 				{
-					Load(true);
+					load(true);
 				}
 				t2 = clock();		//Конечная отсечка времени
 				printf("\b\b\b\b\b\bDone in %g sec", (t2 - t1) / 1000.0);

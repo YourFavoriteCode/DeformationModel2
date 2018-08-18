@@ -35,6 +35,13 @@ namespace model
 		c[2] = 0;
 	}
 
+	Vector::Vector(const double x, const double y, const double z)
+	{
+		c[0] = x;
+		c[1] = y;
+		c[2] = z;
+	}
+
 	void Vector::set(const double x, const double y, const double z)
 	{
 		c[0] = x;
@@ -49,10 +56,7 @@ namespace model
 		{
 			sum += c[i] * c[i];
 		}
-		double res;	
-		if (isNormalDouble(sum)) res = sqrt(sum);
-		else res = -1;//В случае ошибки вернёт -1
-		return res;
+		return isNormalDouble(sum) ? sqrt(sum) : -1;
 	}
 
 	int Vector::normalize()
@@ -214,21 +218,21 @@ namespace model
 			c[0][0] * c[1][2] * c[2][1] - c[2][2] * c[0][1] * c[1][0]);
 	}
 
-	void Tensor::set(double C00, double C01, double C02,
-		double C10, double C11, double C12,
-		double C20, double C21, double C22)
+	void Tensor::set(double c00, double c01, double c02,
+		double c10, double c11, double c12,
+		double c20, double c21, double c22)
 	{
-		c[0][0] = C00;
-		c[0][1] = C01;
-		c[0][2] = C02;
+		c[0][0] = c00;
+		c[0][1] = c01;
+		c[0][2] = c02;
 
-		c[1][0] = C10;
-		c[1][1] = C11;
-		c[1][2] = C12;
+		c[1][0] = c10;
+		c[1][1] = c11;
+		c[1][2] = c12;
 
-		c[2][0] = C20;
-		c[2][1] = C21;
-		c[2][2] = C22;
+		c[2][0] = c20;
+		c[2][1] = c21;
+		c[2][2] = c22;
 	}
 
 	void Tensor::setZero()
@@ -244,16 +248,12 @@ namespace model
 
 	Vector Tensor::getRow(const int n)
 	{
-		Vector res;
-		res.set(c[n][0], c[n][1], c[n][2]);
-		return res;
+		return Vector(c[n][0], c[n][1], c[n][2]);
 	}
 
 	Vector Tensor::getCol(const int n)
 	{
-		Vector res;
-		res.set(c[0][n], c[1][n], c[2][n]);
-		return res;
+		return Vector(c[0][n], c[1][n], c[2][n]);
 	}
 
 	void Tensor::setUnit()
@@ -569,7 +569,7 @@ namespace model
 				{
 					for (int l = 0; l < DIM; l++)
 					{
-						C[i][j][k][l] = 0;
+						c[i][j][k][l] = 0;
 					}
 				}
 			}
@@ -593,14 +593,14 @@ namespace model
 				{
 					for (int l = 0; l < DIM; l++)
 					{
-						C[i][j][k][l] = 0;
+						c[i][j][k][l] = 0;
 					}
 				}
 			}
 		}
 	}
 
-	void Tensor4::Symmetrize()
+	void Tensor4::symmetrize()
 	{
 		for (int i = 0; i < DIM; i++)
 		{
@@ -610,8 +610,8 @@ namespace model
 				{
 					for (int l = 0; l < DIM; l++)
 					{
-						double buf = (C[i][j][k][l] + C[j][i][k][l] + C[i][j][l][k] + C[j][i][l][k]) / 4.0;
-						C[i][j][k][l] = C[j][i][k][l] = C[i][j][l][k] = C[j][i][l][k] = buf;
+						double buf = (c[i][j][k][l] + c[j][i][k][l] + c[i][j][l][k] + c[j][i][l][k]) / 4.0;
+						c[i][j][k][l] = c[j][i][k][l] = c[i][j][l][k] = c[j][i][l][k] = buf;
 
 					}
 				}
@@ -619,7 +619,7 @@ namespace model
 		}
 	}
 	
-	Tensor4 Tensor4::ToLSK(Tensor O)
+	Tensor4 Tensor4::toLsk(Tensor O)
 	{
 		Tensor4 e;
 		for (int i = 0; i < DIM; i++)
@@ -638,7 +638,7 @@ namespace model
 								{
 									for (int l1 = 0; l1 < DIM; l1++)
 									{
-										e.C[i][j][k][l] += O.c[i][i1] * O.c[j][j1] * O.c[k][k1] * O.c[l][l1] * C[i1][j1][k1][l1];
+										e.c[i][j][k][l] += O.c[i][i1] * O.c[j][j1] * O.c[k][k1] * O.c[l][l1] * c[i1][j1][k1][l1];
 									}
 								}
 							}
@@ -660,7 +660,7 @@ namespace model
 				{
 					for (int l = 0; l < DIM; l++)
 					{
-						C[i][j][k][l] += e.C[i][j][k][l];
+						c[i][j][k][l] += e.c[i][j][k][l];
 					}
 				}
 			}
@@ -677,7 +677,7 @@ namespace model
 				{
 					for (int l = 0; l < DIM; l++)
 					{
-						C[i][j][k][l] -= e.C[i][j][k][l];
+						c[i][j][k][l] -= e.c[i][j][k][l];
 					}
 				}
 			}
@@ -694,7 +694,7 @@ namespace model
 				{
 					for (int l = 0; l < DIM; l++)
 					{
-						C[i][j][k][l] *= r;
+						c[i][j][k][l] *= r;
 					}
 				}
 			}
@@ -713,7 +713,7 @@ namespace model
 					{
 						for (int l = 0; l < DIM; l++)
 						{
-							C[i][j][k][l] /= r;
+							c[i][j][k][l] /= r;
 						}
 					}
 				}

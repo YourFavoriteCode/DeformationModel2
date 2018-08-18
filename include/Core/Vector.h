@@ -33,6 +33,7 @@ namespace model
 		int operator /= (double);		//Оператор деления вектора на число
 
 		Vector();
+		Vector(double, double, double);
 		~Vector();
 
 	private:

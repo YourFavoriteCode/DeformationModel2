@@ -83,7 +83,7 @@ namespace model
 				break;
 			}
 			}
-			B(i) = P.C[k][l][0][0] * (-tens_comp + D_in.c[0][0]);
+			B(i) = P.c[k][l][0][0] * (-tens_comp + D_in.c[0][0]);
 			for (int j = 0; j < 5; j++)
 			{
 				int y, z;
@@ -122,13 +122,13 @@ namespace model
 				}
 				if (y != z)
 				{
-					A(i, j) = P.C[k][l][y][z] + P.C[k][l][z][y];
-					B(i) += (P.C[k][l][y][z] + P.C[k][l][z][y])*D_in.c[y][z];
+					A(i, j) = P.c[k][l][y][z] + P.c[k][l][z][y];
+					B(i) += (P.c[k][l][y][z] + P.c[k][l][z][y])*D_in.c[y][z];
 				}
 				else
 				{
-					A(i, j) = P.C[k][l][y][z];
-					B(i) += P.C[k][l][y][z]*D_in.c[y][z];
+					A(i, j) = P.c[k][l][y][z];
+					B(i) += P.c[k][l][y][z]*D_in.c[y][z];
 				}
 			}
 		}
@@ -176,7 +176,7 @@ namespace model
 				{
 					for (int l = 0; l < 3; l++)
 					{
-						res.c[i][j] += P.C[i][j][k][l] * (D.c[l][k] - D_in.c[l][k]);
+						res.c[i][j] += P.c[i][j][k][l] * (D.c[l][k] - D_in.c[l][k]);
 					}
 				}
 			}
@@ -335,13 +335,13 @@ namespace model
 				}
 				if (y != z)
 				{
-					Ar(i, j) = P.C[k][l][y][z] + P.C[k][l][z][y];
-					Br(i) += (P.C[k][l][y][z] + P.C[k][l][z][y])*D_in.c[y][z];
+					Ar(i, j) = P.c[k][l][y][z] + P.c[k][l][z][y];
+					Br(i) += (P.c[k][l][y][z] + P.c[k][l][z][y])*D_in.c[y][z];
 				}
 				else
 				{
-					Ar(i, j) = P.C[k][l][y][z];
-					Br(i) += P.C[k][l][y][z] * D_in.c[y][z];
+					Ar(i, j) = P.c[k][l][y][z];
+					Br(i) += P.c[k][l][y][z] * D_in.c[y][z];
 				}
 			}
 		}
