@@ -12,7 +12,7 @@ namespace model
 	******************************************************/
 	bool isDirectoryExists(LPCWSTR);						// Проверка на существование директории
 	void writeDebugInfo(std::ofstream&, double [3][3]);		// Запись данных в файл
-	void truncPoleFigFiles();									// Очистка файлов полюсных фигур
+	void truncPoleFigFiles();								// Очистка файлов полюсных фигур
 	void truncSSTFiles();									// Очистка файлов стандартных треугольников
 
 	bool isNormalDouble(double);							// Проверка на валидность числа

@@ -9,9 +9,9 @@ namespace model
 	class Polycrystall
 	{
 	public:
-		Fragment ***C;				//Массив элементов поликристалла
-		int fragm_count;			//Кол-во фрагментов на ребре
-		int total_fragm_count;		//Общее кол-во фрагментов
+		Fragment *C;				//Массив элементов поликристалла
+		int grainCount;			//Кол-во фрагментов на ребре
+		int totalGrainCount;		//Общее кол-во фрагментов
 
 		Tensor D;					//Тензор деформации скорости
 		Tensor W;					//Тензор вихря
@@ -49,27 +49,22 @@ namespace model
 
 		void Init(int);				//Выделение памяти под зёрна
 		void MakeStruct();			//Распределение нормалей и фасеток всех фрагментов
-		void MakeGrains();			//Распределение ориентаций фрагментов, чтобы получились приемлемые зёрна
-		void MakeGrains2();			//Распределение зерен кубиками заданного размера
 		void setParams();			//Распределение параметров фрагментов
 		void Deformate();			//Деформирование поликристалла
-		
-		void Split();
 
-		void BoundsAnalize();
-		void GrainRotate();			//Процедура ротаций на уровне зерен
-		void Fragmentate();			//Процедура фрагментации
-		void Illustrate();			//Сохранение в файл структурного графа
 		void SavePoleFig();			//Сохранение ПФ
 		void SaveDbgInfo();			//Сохранение отладочных данных
 		void OpenFiles();			//Открытие всех файлов для записи
 		void CloseFiles();			//Закрытие всех файлов для записи
 
-		//int get1DPos(int, int, int);	//Возвращает уникальный номер фрагмента в общей структуре
-		//void get3DPos(int, int*, int*, int*);	//Возвращает позицию фрагмента в трёхмерном массиве 
 	private:
 		void Load(bool unload);		//Нагружение поликристалла
 	};
+
+	int get1DPos(int, int, int);			//Возвращает уникальный номер фрагмента в общей структуре
+	
+	void get3DPos(int, int*, int*, int*);	//Возвращает позицию фрагмента в трёхмерном массиве 
+
 }
 
 #endif __POLYCRYST_H

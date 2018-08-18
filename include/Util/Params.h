@@ -93,13 +93,6 @@ namespace prms
 	extern double hardeningParamBaseDelta;		//Парметр дельта
 	extern double hardeningParamBasePsi;		//Параметр пси
 	extern double hardeningParamBaseA;			//Парметр А
-	
-	/********************************************************
-	***********			Фрагментация		*****************
-	********************************************************/
-
-	extern bool usingFragmentation;
-	extern int grainPartsSizeLinear;
 
 	/********************************************************
 	***********			Выходные файлы		*****************

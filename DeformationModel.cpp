@@ -131,33 +131,26 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	polycrystall.setParams();					//Заполнение всех параметров поликристалла
 	polycrystall.MakeStruct();				//Формирование фрагментной структуры
-	if (prms::usingFragmentation) polycrystall.MakeGrains2();//Формирование зёренной структуры
-
 
 	if (prms::fixedOrientations == 2)	//Считывание записанных ориентаций
 	{
 		std::ifstream StreamO("DBG\\o.txt", std::ios_base::in);
 		std::ifstream StreamNorm("DBG\\Norm.txt", std::ios_base::in);
-		for (int q1 = 0; q1 < prms::grainCountLinear; q1++)
+		for (int q = 0; q < grainCountTotal; q++)
 		{
-			for (int q2 = 0; q2 < prms::grainCountLinear; q2++)
+
+			for (int i = 0; i < DIM; i++)	//Считываем значения ориентационных тензоров
 			{
-				for (int q3 = 0; q3 < prms::grainCountLinear; q3++)
+				for (int j = 0; j < DIM; j++)
 				{
-					for (int i = 0; i < DIM; i++)	//Считываем значения ориентационных тензоров
-					{
-						for (int j = 0; j < DIM; j++)
-						{
-							StreamO >> polycrystall.C[q1][q2][q3].o.c[i][j];
-						}
-					}
-					for (int h = 0; h < prms::grainSurroundCount; h++)//Считываем значения нормалей
-					{
-						for (int i = 0; i < DIM; i++)
-						{
-							StreamNorm >> polycrystall.C[q1][q2][q3].normals[h].c[i];
-						}
-					}
+					StreamO >> polycrystall.C[q].o.c[i][j];
+				}
+			}
+			for (int h = 0; h < prms::grainSurroundCount; h++)//Считываем значения нормалей
+			{
+				for (int i = 0; i < DIM; i++)
+				{
+					StreamNorm >> polycrystall.C[q].normals[h].c[i];
 				}
 			}
 		}
@@ -169,22 +162,17 @@ int _tmain(int argc, _TCHAR* argv[])
 	{
 		std::ofstream StreamO("DBG\\o.txt", std::ios_base::out | std::ios_base::trunc);
 		std::ofstream StreamNorm("DBG\\Norm.txt", std::ios_base::out | std::ios_base::trunc);
-		for (int q1 = 0; q1 < prms::grainCountLinear; q1++)
+		for (int q = 0; q < grainCountTotal; q++)
 		{
-			for (int q2 = 0; q2 < prms::grainCountLinear; q2++)
+			writeDebugInfo(StreamO, polycrystall.C[q].o.c);//Записываем значения тензоров ориентации
+			for (int h = 0; h < prms::grainSurroundCount; h++)//Записываем значения нормалей
 			{
-				for (int q3 = 0; q3 < prms::grainCountLinear; q3++)
+				for (int i = 0; i < DIM; i++)
 				{
-					writeDebugInfo(StreamO, polycrystall.C[q1][q2][q3].o.c);//Записываем значения тензоров ориентации
-					for (int h = 0; h < prms::grainSurroundCount; h++)//Записываем значения нормалей
-					{
-						for (int i = 0; i < DIM; i++)
-						{
-							StreamNorm << polycrystall.C[q1][q2][q3].normals[h].c[i] << " ";
-						}
-						StreamNorm << std::endl;
-					}
+					StreamNorm << polycrystall.C[q].normals[h].c[i] << " ";
 				}
+				StreamNorm << std::endl;
+
 			}
 		}
 		StreamO.close();
@@ -195,20 +183,13 @@ int _tmain(int argc, _TCHAR* argv[])
 	{
 		std::ifstream StreamSgm("DBG\\sgm.txt", std::ios_base::in);
 
-		for (int q1 = 0; q1 < prms::grainCountLinear; q1++)
+		for (int q = 0; q < grainCountTotal; q++)
 		{
-			for (int q2 = 0; q2 < prms::grainCountLinear; q2++)
+			for (int i = 0; i < DIM; i++)	//Считываем значения тензоров
 			{
-				for (int q3 = 0; q3 < prms::grainCountLinear; q3++)
+				for (int j = 0; j < DIM; j++)
 				{
-					for (int i = 0; i < DIM; i++)	//Считываем значения тензоров
-					{
-						for (int j = 0; j < DIM; j++)
-						{
-							StreamSgm >> polycrystall.C[q1][q2][q3].sgm.c[i][j];
-						}
-					}
-
+					StreamSgm >> polycrystall.C[q].sgm.c[i][j];
 				}
 			}
 		}
@@ -229,24 +210,16 @@ int _tmain(int argc, _TCHAR* argv[])
 		printf("%g sec\n", (t2 - t1) / 1000.0);
 	}
 
-	t1 = clock();		//Начальная отсечка времени
+	t1 = clock();					//Начальная отсечка времени
 	polycrystall.Deformate();		//Деформирование
-	t2 = clock();		//Финальная отсечка времени
+	t2 = clock();					//Финальная отсечка времени
 
 	if (prms::usingInititalStress)	//Сохранение остаточных напряжений
 	{
 		polycrystall.dbgstream[3].open("DBG\\sgm.txt", std::ios_base::out | std::ios_base::trunc);
-		for (int q1 = 0; q1 < prms::grainCountLinear; q1++)
+		for (int q = 0; q < grainCountTotal; q++)
 		{
-			for (int q2 = 0; q2 < prms::grainCountLinear; q2++)
-			{
-				for (int q3 = 0; q3 < prms::grainCountLinear; q3++)
-				{
-
-					writeDebugInfo(polycrystall.dbgstream[3], polycrystall.C[q1][q2][q3].sgm.c);
-
-				}
-			}
+			writeDebugInfo(polycrystall.dbgstream[3], polycrystall.C[q].sgm.c);
 		}
 		polycrystall.dbgstream[3].close();
 	}

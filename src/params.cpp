@@ -74,9 +74,6 @@ namespace prms
 	SurroundGrade grainSurroundGrade		= GRADE_BASE;
 	bool usingStandardTriangleSaving		= false;
 
-	bool usingFragmentation					= false;
-	int grainPartsSizeLinear				= 3;
-
 	bool saveIntensity						= true;
 	bool saveMacro							= true;
 	bool saveMeso							= false;
@@ -225,8 +222,6 @@ namespace prms
 		/*Экспериментальные параметры*/
 		getValue(rootnode, "ReadInitStress", &usingInititalStress);
 		getValue(rootnode, "SaveSST", &usingStandardTriangleSaving);
-		getValue(rootnode, "Fragmentation", &usingFragmentation);
-		getValue(rootnode, "GrainSize", &grainPartsSizeLinear);
 
 		getValue(rootnode, "ROT_HARD_K1", &rotationParamHardK1);
 		getValue(rootnode, "ROT_HARD_K2", &rotationParamHardK2);

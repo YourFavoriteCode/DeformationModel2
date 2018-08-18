@@ -196,7 +196,6 @@
     <ClInclude Include="include\Core\Tensor.h" />
     <ClInclude Include="include\Core\Tensor4.h" />
     <ClInclude Include="include\Core\Vector.h" />
-    <ClInclude Include="include\Features\Fragmentation.h" />
     <ClInclude Include="include\Features\Hardening.h" />
     <ClInclude Include="include\Features\Rotations.h" />
     <ClInclude Include="include\Features\Tension.h" />
@@ -214,7 +213,6 @@
     <ClCompile Include="dependency\TinyXML\tinyxml2.cpp" />
     <ClCompile Include="src\distributions.cpp" />
     <ClCompile Include="src\fragment.cpp" />
-    <ClCompile Include="src\fragmentation.cpp" />
     <ClCompile Include="src\functions.cpp" />
     <ClCompile Include="src\hardening.cpp" />
     <ClCompile Include="src\MathCore.cpp" />

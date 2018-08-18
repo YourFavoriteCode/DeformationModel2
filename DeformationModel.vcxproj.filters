@@ -63,9 +63,6 @@
     <ClInclude Include="include\Core\Vector.h">
       <Filter>Файлы заголовков\core</Filter>
     </ClInclude>
-    <ClInclude Include="include\Features\Fragmentation.h">
-      <Filter>Файлы заголовков\features</Filter>
-    </ClInclude>
     <ClInclude Include="include\Features\Hardening.h">
       <Filter>Файлы заголовков\features</Filter>
     </ClInclude>
@@ -103,9 +100,6 @@
     </ClCompile>
     <ClCompile Include="src\MathCore.cpp">
       <Filter>Исходные файлы\core</Filter>
-    </ClCompile>
-    <ClCompile Include="src\fragmentation.cpp">
-      <Filter>Исходные файлы\features</Filter>
     </ClCompile>
     <ClCompile Include="src\rotations.cpp">
       <Filter>Исходные файлы\features</Filter>

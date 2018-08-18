@@ -11,7 +11,6 @@
 
 #include "Polycrystall.h"
 #include "Params.h"
-#include "Fragmentation.h"
 #include "Distributions.h"
 #include "Tension.h"
 #include "Rotations.h"
@@ -42,14 +41,6 @@ namespace model
 
 	Polycrystall::~Polycrystall()
 	{
-		for (int i = 0; i < fragm_count; i++)
-		{
-			for (int j = 0; j < fragm_count; j++)
-			{
-				delete[] C[i][j];
-			}
-			delete[] C[i];
-		}
 		delete[] C;
 	}
 
@@ -225,448 +216,426 @@ namespace model
 
 	void Polycrystall::Init(int count)
 	{
-		fragm_count = count;
-		total_fragm_count = (int)pow(count, 3);
+		grainCount = count;
+		totalGrainCount = (int)pow(count, 3);
 
-		C = new Fragment**[count];		//Выделение памяти под массив
-		for (int i = 0; i < count; i++)
-		{
-			C[i] = new Fragment*[count];
-			for (int j = 0; j < count; j++)
-			{
-				C[i][j] = new Fragment[count];
-			}
-		}
+		C = new Fragment[totalGrainCount];		//Выделение памяти под массив
 	}
 
 	void Polycrystall::setParams()
 	{
-		for (int q1 = 0; q1 < fragm_count; q1++)
+		for (int q = 0; q < totalGrainCount; q++)
 		{
-			for (int q2 = 0; q2 < fragm_count; q2++)
+
+			//Задание материала 
+			int another_material;//Примесная фаза
+			another_material = (prms::materialType == 1) ? 0 : 1;
+
+			int a = (int)(((double)rand() / RAND_MAX) * 100);//На всё воля божья
+			if (a <= prms::mainPhasePercent)
 			{
-				for (int q3 = 0; q3 < fragm_count; q3++)
+				C[q].setMaterialParams(prms::materialType);
+			}
+			else
+			{
+				C[q].setMaterialParams(another_material);
+			}
+
+			C[q].rot_Mc = prms::rotationParamMc;	//Раздача начальных критических моментов
+			C[q].rot_A = prms::rotationParamA;	//и параметров модели ротаций
+			C[q].rot_H = prms::rotationParamH;
+			C[q].rot_L = prms::rotationParamL;
+			C[q].position = q;//Получение порядкового номера фрагмента
+
+			if (prms::orientationType == 0)
+			{
+				//Углами Эйлера
+				if (prms::randomOrientations)//Получение ориентационного тензора (случайный равномерный закон распределения)
 				{
-					//Задание материала 
-					int another_material;//Примесная фаза
-					another_material = (prms::materialType == 1) ? 0 : 1;
-
-					int a = (int)(((double)rand() / RAND_MAX) * 100);//На всё воля божья
-					if (a <= prms::mainPhasePercent)
-					{
-						C[q1][q2][q3].setMaterialParams(prms::materialType);
-					}
-					else
-					{
-						C[q1][q2][q3].setMaterialParams(another_material);
-					}
-
-					C[q1][q2][q3].rot_Mc = prms::rotationParamMc;	//Раздача начальных критических моментов
-					C[q1][q2][q3].rot_A = prms::rotationParamA;	//и параметров модели ротаций
-					C[q1][q2][q3].rot_H = prms::rotationParamH;
-					C[q1][q2][q3].rot_L = prms::rotationParamL;
-					C[q1][q2][q3].position = get1DPos(q1, q2, q3);//Получение порядкового номера фрагмента
-
-					if (prms::orientationType == 0)
-					{
-						//Углами Эйлера
-						if (prms::randomOrientations)//Получение ориентационного тензора (случайный равномерный закон распределения)
-						{
-							double a = ((double)rand() / RAND_MAX) * (PI);
-							double g = ((double)rand() / RAND_MAX) * (PI);
-							double y1 = ((double)rand() / RAND_MAX);
-							double y2 = ((double)rand() / RAND_MAX);
-							double cb = y1 > 0.5 ? y2 : -y2;
-							C[q1][q2][q3].Orientate(a, g, cb);
-						}
-						else//Получение ориентационного тензора (КСК=ЛСК)
-						{
-							C[q1][q2][q3].o.setUnit();
-						}
-					}
-					else if (prms::orientationType == 1)
-					{
-						//С помощью оси и угла
-						if (prms::randomOrientations)//Получение ориентационного тензора (случайный равномерный закон распределения)
-						{
-							double fi = ((double)rand() / RAND_MAX) * (PI);
-							double psi = ((double)rand() / RAND_MAX) * (PIx2);
-							double y1 = ((double)rand() / RAND_MAX);
-							double y2 = ((double)rand() / RAND_MAX);
-							//Равномерное распределение косинуса угла
-							double cf = y1 > 0.5 ? y2 : -y2;
-							//Переход из сферической в ортогональную СК
-							double x = sin(fi)*cos(psi);
-							double y = sin(fi)*sin(psi);
-							double z = cos(fi);
-							//Запись оси
-							Vector axis;
-							axis.set(x, y, z);
-							axis.normalize();
-							C[q1][q2][q3].OrientateAxis(cf, axis);
-						}
-						else//Получение ориентационного тензора (КСК=ЛСК)
-						{
-							C[q1][q2][q3].o.setUnit();
-						}
-					}
-					else if (prms::orientationType == 2)
-					{
-						//С помощью кватерниона
-						if (prms::randomOrientations)//Получение ориентационного тензора (случайный равномерный закон распределения)
-						{
-							double fi = ((double)rand() / RAND_MAX) * (PI);
-							double psi = ((double)rand() / RAND_MAX) * (PIx2);
-							//Равномерное распределение косинуса
-							double y1 = ((double)rand() / RAND_MAX);
-							double y2 = ((double)rand() / RAND_MAX);
-							double w = y1 > 0.5 ? y2 : -y2;
-							double buf = sqrt(1.0 - w * w);
-							double x = sin(fi)*cos(psi)*buf;
-							double y = sin(fi)*sin(psi)*buf;
-							double z = cos(fi)*buf;
-							C[q1][q2][q3].OrientateQuater(w, x, y, z);
-						}
-						else//Получение ориентационного тензора (КСК=ЛСК)
-						{
-							C[q1][q2][q3].o.setUnit();
-						}
-					}
-
-					//Задание размеров фрагментов
-					switch (prms::grainSizeDistribLaw)
-					{
-					case prms::DISTRIB_UNIFORM:
-					{
-						C[q1][q2][q3].size = UniformDistrib(prms::grainSizeDistribM, prms::grainSizeDistribD);
-						break;
-					}
-					case prms::DISTRIB_NORMAL:
-					{
-						C[q1][q2][q3].size = NormalDistrib(prms::grainSizeDistribM, prms::grainSizeDistribD);
-						break;
-					}
-					case prms::DISTRIB_LOGNORMAL:
-					{
-						C[q1][q2][q3].size = LogNormalDistrib(prms::grainSizeDistribM, prms::grainSizeDistribD);
-						break;
-					}
-					case prms::DISTRIB_EXPONENT:
-					{
-						C[q1][q2][q3].size = ExpDistrib(prms::grainSizeDistribM);//Только один параметр
-						break;
-					}
-					}
-					C[q1][q2][q3].volume = pow(C[q1][q2][q3].size, 3);	//Объём фрагмента
-
-					//Выделение памяти под массивы, необходимые для работы с окружением
-					C[q1][q2][q3].surrounds = new Fragment[prms::grainSurroundCount];
-					C[q1][q2][q3].normals = new Vector[prms::grainSurroundCount];
-					C[q1][q2][q3].contact = new int[prms::grainSurroundCount];
-
-					for (int h = 0; h < prms::grainSurroundCount; h++)
-					{
-						C[q1][q2][q3].contact[h] = -1;		//Изначально контакт не задан
-					}
+					double a = ((double)rand() / RAND_MAX) * (PI);
+					double g = ((double)rand() / RAND_MAX) * (PI);
+					double y1 = ((double)rand() / RAND_MAX);
+					double y2 = ((double)rand() / RAND_MAX);
+					double cb = y1 > 0.5 ? y2 : -y2;
+					C[q].Orientate(a, g, cb);
+				}
+				else//Получение ориентационного тензора (КСК=ЛСК)
+				{
+					C[q].o.setUnit();
 				}
 			}
+			else if (prms::orientationType == 1)
+			{
+				//С помощью оси и угла
+				if (prms::randomOrientations)//Получение ориентационного тензора (случайный равномерный закон распределения)
+				{
+					double fi = ((double)rand() / RAND_MAX) * (PI);
+					double psi = ((double)rand() / RAND_MAX) * (PIx2);
+					double y1 = ((double)rand() / RAND_MAX);
+					double y2 = ((double)rand() / RAND_MAX);
+					//Равномерное распределение косинуса угла
+					double cf = y1 > 0.5 ? y2 : -y2;
+					//Переход из сферической в ортогональную СК
+					double x = sin(fi)*cos(psi);
+					double y = sin(fi)*sin(psi);
+					double z = cos(fi);
+					//Запись оси
+					Vector axis;
+					axis.set(x, y, z);
+					axis.normalize();
+					C[q].OrientateAxis(cf, axis);
+				}
+				else//Получение ориентационного тензора (КСК=ЛСК)
+				{
+					C[q].o.setUnit();
+				}
+			}
+			else if (prms::orientationType == 2)
+			{
+				//С помощью кватерниона
+				if (prms::randomOrientations)//Получение ориентационного тензора (случайный равномерный закон распределения)
+				{
+					double fi = ((double)rand() / RAND_MAX) * (PI);
+					double psi = ((double)rand() / RAND_MAX) * (PIx2);
+					//Равномерное распределение косинуса
+					double y1 = ((double)rand() / RAND_MAX);
+					double y2 = ((double)rand() / RAND_MAX);
+					double w = y1 > 0.5 ? y2 : -y2;
+					double buf = sqrt(1.0 - w * w);
+					double x = sin(fi)*cos(psi)*buf;
+					double y = sin(fi)*sin(psi)*buf;
+					double z = cos(fi)*buf;
+					C[q].OrientateQuater(w, x, y, z);
+				}
+				else//Получение ориентационного тензора (КСК=ЛСК)
+				{
+					C[q].o.setUnit();
+				}
+			}
+
+			//Задание размеров фрагментов
+			switch (prms::grainSizeDistribLaw)
+			{
+			case prms::DISTRIB_UNIFORM:
+			{
+				C[q].size = UniformDistrib(prms::grainSizeDistribM, prms::grainSizeDistribD);
+				break;
+			}
+			case prms::DISTRIB_NORMAL:
+			{
+				C[q].size = NormalDistrib(prms::grainSizeDistribM, prms::grainSizeDistribD);
+				break;
+			}
+			case prms::DISTRIB_LOGNORMAL:
+			{
+				C[q].size = LogNormalDistrib(prms::grainSizeDistribM, prms::grainSizeDistribD);
+				break;
+			}
+			case prms::DISTRIB_EXPONENT:
+			{
+				C[q].size = ExpDistrib(prms::grainSizeDistribM);//Только один параметр
+				break;
+			}
+			}
+			C[q].volume = pow(C[q].size, 3);	//Объём фрагмента
+
+			//Выделение памяти под массивы, необходимые для работы с окружением
+			C[q].surrounds = new Fragment[prms::grainSurroundCount];
+			C[q].normals = new Vector[prms::grainSurroundCount];
+			C[q].contact = new int[prms::grainSurroundCount];
+
+			for (int h = 0; h < prms::grainSurroundCount; h++)
+			{
+				C[q].contact[h] = -1;		//Изначально контакт не задан
+			}
+
 		}
 	}
 
 	void Polycrystall::MakeStruct()
 	{
-		for (int q1 = 0; q1 < fragm_count; q1++)
+		for (int q = 0; q < totalGrainCount; q++)
 		{
-			for (int q2 = 0; q2 < fragm_count; q2++)
+			int q1, q2, q3, y;
+			get3DPos(q, &q1, &q2, &q3);
+			for (int h = 0; h < prms::grainSurroundCount; h++)
 			{
-				for (int q3 = 0; q3 < fragm_count; q3++)
+				//Если контакт уже был задан - пропускаем
+				if (C[q].contact[h] != -1) continue;
+				//Определяем, граничат ли фрагменты
+				//Первые 6, т.е. боковые грани, граничат всегда
+				double a = h < 6 ? 1 : ((double)rand() / RAND_MAX);//На всё воля божья
+				if (a < 0.5)
 				{
-
-					for (int h = 0; h < prms::grainSurroundCount; h++)
-					{
-						//Если контакт уже был задан - пропускаем
-						if (C[q1][q2][q3].contact[h] != -1) continue;
-						//Определяем, граничат ли фрагменты
-						//Первые 6, т.е. боковые грани, граничат всегда
-						double a = h < 6 ? 1 : ((double)rand() / RAND_MAX);//На всё воля божья
-						if (a < 0.5)
-						{
-							//Контакта нет - тоже пропускаем
-							C[q1][q2][q3].contact[h] = 0;
-							continue;
-						}
-
-						int qq1 = q1, qq2 = q2, qq3 = q3, y;
-						//qq1, qq2, qq3 - координаты зерна соседа
-						//y - номер нормали в соседнем зерне в направлении данного зерна
-						double fi = ((double)rand() / RAND_MAX) * (PI / 12);//Случайный угол отклонения нормали
-						//TODO: предвычислить наиболее распространенные слагаемые для удобства чтения
-						switch (h)
-						{
-						case 0://Вверх
-						{
-							C[q1][q2][q3].normals[h].set(-sin(fi), sin(fi) / cos(fi), 1 / cos(fi));
-							qq3 = q3 == fragm_count - 1 ? 0 : q3 + 1;
-							y = 5;
-							break;
-						}
-						case 1://От нас
-						{
-							C[q1][q2][q3].normals[h].set(-1 / cos(fi), sin(fi), sin(fi) / cos(fi));
-							qq1 = q1 == 0 ? fragm_count - 1 : q1 - 1;
-							y = 3;
-							break;
-						}
-						case 2://Вправо
-						{
-							C[q1][q2][q3].normals[h].set(sin(fi) / cos(fi), 1 / cos(fi), -sin(fi));
-							qq2 = q2 == fragm_count - 1 ? 0 : q2 + 1;
-							y = 4;
-							break;
-						}
-						case 3://На нас
-						{
-							C[q1][q2][q3].normals[h].set(1 / cos(fi), -sin(fi), sin(fi) / cos(fi));
-							qq1 = q1 == fragm_count - 1 ? 0 : q1 + 1;
-							y = 1;
-							break;
-						}
-						case 4://Влево
-						{
-							C[q1][q2][q3].normals[h].set(sin(fi), -1 / cos(fi), -sin(fi) / cos(fi));
-							qq2 = q2 == 0 ? fragm_count - 1 : q2 - 1;
-							y = 2;
-							break;
-						}
-						case 5://Вниз
-						{
-							C[q1][q2][q3].normals[h].set(sin(fi) / cos(fi), sin(fi), -1 / cos(fi));
-							qq3 = q3 == 0 ? fragm_count - 1 : q3 - 1;
-							y = 0;
-							break;
-						}
-						//Далее идут уже необязательные соседи
-						/**************           Рёбра куба          ***************************/
-						case 6://Лево от нас
-						{
-							C[q1][q2][q3].normals[h].set(-cos(fi + PI_2) * cos(fi)*cos(PI_2), -cos(fi + PI_2) * cos(fi)*cos(PI_2), cos(fi)*cos(fi)*cos(PI_2));
-							qq1 = q1 == 0 ? fragm_count - 1 : q1 - 1;
-							qq2 = q2 == 0 ? fragm_count - 1 : q2 - 1;
-							y = 9;
-							break;
-						}
-						case 7://Лево на нас
-						{
-							C[q1][q2][q3].normals[h].set(cos(fi + PI_2) * cos(fi)*cos(PI_2), -cos(fi + PI_2) * cos(fi)*cos(PI_2), cos(fi)*cos(fi)*cos(PI_2));
-							qq1 = q1 == fragm_count - 1 ? 0 : q1 + 1;
-							qq2 = q2 == 0 ? fragm_count - 1 : q2 - 1;
-							y = 8;
-							break;
-						}
-						case 8://право от нас
-						{
-							C[q1][q2][q3].normals[h].set(-cos(fi + PI_2) * cos(fi)*cos(PI_2), cos(fi + PI_2) * cos(fi)*cos(PI_2), cos(fi)*cos(fi)*cos(PI_2));
-							qq1 = q1 == 0 ? fragm_count - 1 : q1 - 1;
-							qq2 = q2 == fragm_count - 1 ? 0 : q2 + 1;
-							y = 7;
-							break;
-						}
-						case 9://Право на нас
-						{
-							C[q1][q2][q3].normals[h].set(cos(fi + PI_2) * cos(fi)*cos(PI_2), cos(fi + PI_2) * cos(fi)*cos(PI_2), cos(fi)*cos(fi)*cos(PI_2));
-							qq2 = q2 == fragm_count - 1 ? 0 : q2 + 1;
-							qq1 = q1 == fragm_count - 1 ? 0 : q1 + 1;
-							y = 6;
-							break;
-						}
-						case 10://Верх лево
-						{
-							C[q1][q2][q3].normals[h].set(cos(fi + PI_2) * sin(fi), -cos(fi + PI_2) * cos(fi), sin(fi + PI_2)*cos(fi));
-							qq3 = q3 == fragm_count - 1 ? 0 : q3 + 1;
-							qq2 = q2 == 0 ? fragm_count - 1 : q2 - 1;
-							y = 15;
-							break;
-						}
-						case 11://Верх право
-						{
-							C[q1][q2][q3].normals[h].set(cos(fi + PI_2) * sin(fi), cos(fi + PI_2) * cos(fi), sin(fi + PI_2)*cos(fi));
-							qq3 = q3 == fragm_count - 1 ? 0 : q3 + 1;
-							qq2 = q2 == fragm_count - 1 ? 0 : q2 + 1;
-							y = 14;
-							break;
-						}
-						case 12://Верх на нас
-						{
-							C[q1][q2][q3].normals[h].set(cos(fi + PI_2) * cos(fi), cos(fi + PI_2) * sin(fi), sin(fi + PI_2)*cos(fi));
-							qq3 = q3 == fragm_count - 1 ? 0 : q3 + 1;
-							qq1 = q1 == fragm_count - 1 ? 0 : q1 + 1;
-							y = 17;
-							break;
-						}
-						case 13://Верх от нас
-						{
-							C[q1][q2][q3].normals[h].set(-cos(fi + PI_2) * cos(fi), cos(fi + PI_2) * sin(fi), sin(fi + PI_2)*cos(fi));
-							qq3 = q3 == fragm_count - 1 ? 0 : q3 + 1;
-							qq1 = q1 == 0 ? fragm_count - 1 : q1 - 1;
-							y = 16;
-							break;
-						}
-						case 14://Низ лево
-						{
-							C[q1][q2][q3].normals[h].set(-cos(fi + PI_2) * sin(fi), -cos(fi + PI_2) * cos(fi), -sin(fi + PI_2)*cos(fi));
-							qq2 = q2 == 0 ? fragm_count - 1 : q2 - 1;
-							qq3 = q3 == 0 ? fragm_count - 1 : q3 - 1;
-							y = 11;
-							break;
-						}
-						case 15://Низ право
-						{
-							C[q1][q2][q3].normals[h].set(-cos(fi + PI_2) * sin(fi), cos(fi + PI_2) * cos(fi), -sin(fi + PI_2)*cos(fi));
-							qq2 = q2 == fragm_count - 1 ? 0 : q2 + 1;
-							qq3 = q3 == 0 ? fragm_count - 1 : q3 - 1;
-							y = 10;
-							break;
-						}
-						case 16://Низ на нас
-						{
-							C[q1][q2][q3].normals[h].set(cos(fi + PI_2) * cos(fi), -cos(fi + PI_2) * sin(fi), -sin(fi + PI_2)*cos(fi));
-							qq1 = q1 == fragm_count - 1 ? 0 : q1 + 1;
-							qq3 = q3 == 0 ? fragm_count - 1 : q3 - 1;
-							y = 13;
-							break;
-						}
-						case 17://Низ от нас
-						{
-							C[q1][q2][q3].normals[h].set(-cos(fi + PI_2) * cos(fi), -cos(fi + PI_2) * sin(fi), -sin(fi + PI_2)*cos(fi));
-							qq1 = q1 == 0 ? fragm_count - 1 : q1 - 1;
-							qq3 = q3 == 0 ? fragm_count - 1 : q3 - 1;
-							y = 12;
-							break;
-						}
-						/**************      Вершины     *****************/
-						case 18://верх лево от нас
-						{
-							C[q1][q2][q3].normals[h].set(-cos(fi) * cos(fi)*cos(PI_2)*cos(PI_2), -cos(fi)*cos(fi) * cos(PI_2)*cos(PI_2), cos(fi)*cos(fi)*cos(PI_2)*cos(PI_2));
-							qq1 = q1 == 0 ? fragm_count - 1 : q1 - 1;
-							qq2 = q2 == 0 ? fragm_count - 1 : q2 - 1;
-							qq3 = q3 == fragm_count - 1 ? 0 : q3 + 1;
-							y = 25;
-							break;
-						}
-						case 19://верх лево на нас
-						{
-							C[q1][q2][q3].normals[h].set(cos(fi) * cos(fi)*cos(PI_2)*cos(PI_2), -cos(fi)*cos(fi) * cos(PI_2)*cos(PI_2), cos(fi)*cos(fi)*cos(PI_2)*cos(PI_2));
-							qq1 = q1 == fragm_count - 1 ? 0 : q1 + 1;
-							qq2 = q2 == 0 ? fragm_count - 1 : q2 - 1;
-							qq3 = q3 == fragm_count - 1 ? 0 : q3 + 1;
-							y = 24;
-							break;
-						}
-						case 20://верх право от нас
-						{
-							C[q1][q2][q3].normals[h].set(-cos(fi) * cos(fi)*cos(PI_2)*cos(PI_2), cos(fi)*cos(fi) * cos(PI_2)*cos(PI_2), cos(fi)*cos(fi)*cos(PI_2)*cos(PI_2));
-							qq1 = q1 == 0 ? fragm_count - 1 : q1 - 1;
-							qq2 = q2 == fragm_count - 1 ? 0 : q2 + 1;
-							qq3 = q3 == fragm_count - 1 ? 0 : q3 + 1;
-							y = 23;
-							break;
-						}
-						case 21://верх право на нас
-						{
-							C[q1][q2][q3].normals[h].set(cos(fi) * cos(fi)*cos(PI_2)*cos(PI_2), cos(fi)*cos(fi) * cos(PI_2)*cos(PI_2), cos(fi)*cos(fi)*cos(PI_2)*cos(PI_2));
-							qq1 = q1 == fragm_count - 1 ? 0 : q1 + 1;
-							qq2 = q2 == fragm_count - 1 ? 0 : q2 + 1;
-							qq3 = q3 == fragm_count - 1 ? 0 : q3 + 1;
-							y = 22;
-							break;
-						}
-						case 22://низ лево от нас
-						{
-							C[q1][q2][q3].normals[h].set(-cos(fi) * cos(fi)*cos(PI_2)*cos(PI_2), -cos(fi)*cos(fi) * cos(PI_2)*cos(PI_2), -cos(fi)*cos(fi)*cos(PI_2)*cos(PI_2));
-							qq1 = q1 == 0 ? fragm_count - 1 : q1 - 1;
-							qq2 = q2 == 0 ? fragm_count - 1 : q2 - 1;
-							qq3 = q3 == 0 ? fragm_count - 1 : q3 - 1;
-							y = 21;
-							break;
-						}
-						case 23://низ лево на нас
-						{
-							C[q1][q2][q3].normals[h].set(cos(fi) * cos(fi)*cos(PI_2)*cos(PI_2), -cos(fi)*cos(fi) * cos(PI_2)*cos(PI_2), -cos(fi)*cos(fi)*cos(PI_2)*cos(PI_2));
-							qq1 = q1 == fragm_count - 1 ? 0 : q1 + 1;
-							qq2 = q2 == 0 ? fragm_count - 1 : q2 - 1;
-							qq3 = q3 == 0 ? fragm_count - 1 : q3 - 1;
-							y = 20;
-							break;
-						}
-						case 24://низ право от нас
-						{
-							C[q1][q2][q3].normals[h].set(-cos(fi) * cos(fi)*cos(PI_2)*cos(PI_2), cos(fi)*cos(fi) * cos(PI_2)*cos(PI_2), -cos(fi)*cos(fi)*cos(PI_2)*cos(PI_2));
-
-							qq1 = q1 == 0 ? fragm_count - 1 : q1 - 1;
-							qq2 = q2 == fragm_count - 1 ? 0 : q2 + 1;
-							qq3 = q3 == 0 ? fragm_count - 1 : q3 - 1;
-							y = 19;
-							break;
-						}
-						case 25://низ право на нас
-						{
-							C[q1][q2][q3].normals[h].set(cos(fi) * cos(fi)*cos(PI_2)*cos(PI_2), cos(fi)*cos(fi) * cos(PI_2)*cos(PI_2), -cos(fi)*cos(fi)*cos(PI_2)*cos(PI_2));
-							qq1 = q1 == fragm_count - 1 ? 0 : q1 + 1;
-							qq2 = q2 == fragm_count - 1 ? 0 : q2 + 1;
-							qq3 = q3 == 0 ? fragm_count - 1 : q3 - 1;
-							y = 18;
-							break;
-						}
-						}
-
-						C[q1][q2][q3].surrounds[h] = C[qq1][qq2][qq3];//Здравствуй, сосед!
-						C[qq1][qq2][qq3].surrounds[y] = C[q1][q2][q3];//Приятно познакомиться!
-						C[q1][q2][q3].normals[h].normalize();
-
-						for (int i = 0; i < DIM; i++)
-						{
-							C[qq1][qq2][qq3].normals[y].c[i] = -C[q1][q2][q3].normals[h].c[i];//Поделись нормалью
-						}
-
-						if (h < 6) C[q1][q2][q3].contact[h] = 1;		//Контакт на грани октаэдра
-						else if (h < 14) C[q1][q2][q3].contact[h] = 3;	//Контакт на вершине октаэдра
-						else C[q1][q2][q3].contact[h] = 2;				//Контакт на ребре
-					}
-					if (prms::grainSurroundCount > 6)	//Уменьшение объёма из-за отсечений
-					{
-						double a = C[q1][q2][q3].size * 0.1;			//Длина срезанной части вдоль ребра
-						double vol_edge = a*a*C[q1][q2][q3].size / 2.0;	//Объём, срезанный рёбрами
-						double vol_vertex = a*a*a / SQRT3;				//Объём, срезанный вершинами
-						int cut_edge = 0;		//Кол-во срезанных рёбер
-						int cut_vertex = 0;		//Кол-во срезанных вершин
-						for (int h = 6; h < prms::grainSurroundCount; h++)
-						{
-							if (C[q1][q2][q3].contact[h] != 0)
-							{
-								if (h < 14) cut_vertex++;
-								else cut_edge++;
-							}
-						}
-						C[q1][q2][q3].volume -= (cut_edge*vol_edge + cut_vertex*vol_vertex);//Вычитание
-					}
-
+					//Контакта нет - тоже пропускаем
+					C[q].contact[h] = 0;
+					continue;
 				}
+				int qq1 = q1, qq2 = q2, qq3 = q3;
+				//qq1, qq2, qq3 - координаты зерна соседа
+				//y - номер нормали в соседнем зерне в направлении данного зерна
+				double fi = ((double)rand() / RAND_MAX) * (PI / 12);//Случайный угол отклонения нормали
+				//TODO: предвычислить наиболее распространенные слагаемые для удобства чтения
+				switch (h)
+				{
+				case 0://Вверх
+				{
+					C[q].normals[h].set(-sin(fi), sin(fi) / cos(fi), 1 / cos(fi));
+					qq3 = q3 == grainCount - 1 ? 0 : q3 + 1;
+					y = 5;
+					break;
+				}
+				case 1://От нас
+				{
+					C[q].normals[h].set(-1 / cos(fi), sin(fi), sin(fi) / cos(fi));
+					qq1 = q1 == 0 ? grainCount - 1 : q1 - 1;
+					y = 3;
+					break;
+				}
+				case 2://Вправо
+				{
+					C[q].normals[h].set(sin(fi) / cos(fi), 1 / cos(fi), -sin(fi));
+					qq2 = q2 == grainCount - 1 ? 0 : q2 + 1;
+					y = 4;
+					break;
+				}
+				case 3://На нас
+				{
+					C[q].normals[h].set(1 / cos(fi), -sin(fi), sin(fi) / cos(fi));
+					qq1 = q1 == grainCount - 1 ? 0 : q1 + 1;
+					y = 1;
+					break;
+				}
+				case 4://Влево
+				{
+					C[q].normals[h].set(sin(fi), -1 / cos(fi), -sin(fi) / cos(fi));
+					qq2 = q2 == 0 ? grainCount - 1 : q2 - 1;
+					y = 2;
+					break;
+				}
+				case 5://Вниз
+				{
+					C[q].normals[h].set(sin(fi) / cos(fi), sin(fi), -1 / cos(fi));
+					qq3 = q3 == 0 ? grainCount - 1 : q3 - 1;
+					y = 0;
+					break;
+				}
+				//Далее идут уже необязательные соседи
+				/**************           Рёбра куба          ***************************/
+				case 6://Лево от нас
+				{
+					C[q].normals[h].set(-cos(fi + PI_2) * cos(fi)*cos(PI_2), -cos(fi + PI_2) * cos(fi)*cos(PI_2), cos(fi)*cos(fi)*cos(PI_2));
+					qq1 = q1 == 0 ? grainCount - 1 : q1 - 1;
+					qq2 = q2 == 0 ? grainCount - 1 : q2 - 1;
+					y = 9;
+					break;
+				}
+				case 7://Лево на нас
+				{
+					C[q].normals[h].set(cos(fi + PI_2) * cos(fi)*cos(PI_2), -cos(fi + PI_2) * cos(fi)*cos(PI_2), cos(fi)*cos(fi)*cos(PI_2));
+					qq1 = q1 == grainCount - 1 ? 0 : q1 + 1;
+					qq2 = q2 == 0 ? grainCount - 1 : q2 - 1;
+					y = 8;
+					break;
+				}
+				case 8://право от нас
+				{
+					C[q].normals[h].set(-cos(fi + PI_2) * cos(fi)*cos(PI_2), cos(fi + PI_2) * cos(fi)*cos(PI_2), cos(fi)*cos(fi)*cos(PI_2));
+					qq1 = q1 == 0 ? grainCount - 1 : q1 - 1;
+					qq2 = q2 == grainCount - 1 ? 0 : q2 + 1;
+					y = 7;
+					break;
+				}
+				case 9://Право на нас
+				{
+					C[q].normals[h].set(cos(fi + PI_2) * cos(fi)*cos(PI_2), cos(fi + PI_2) * cos(fi)*cos(PI_2), cos(fi)*cos(fi)*cos(PI_2));
+					qq2 = q2 == grainCount - 1 ? 0 : q2 + 1;
+					qq1 = q1 == grainCount - 1 ? 0 : q1 + 1;
+					y = 6;
+					break;
+				}
+				case 10://Верх лево
+				{
+					C[q].normals[h].set(cos(fi + PI_2) * sin(fi), -cos(fi + PI_2) * cos(fi), sin(fi + PI_2)*cos(fi));
+					qq3 = q3 == grainCount - 1 ? 0 : q3 + 1;
+					qq2 = q2 == 0 ? grainCount - 1 : q2 - 1;
+					y = 15;
+					break;
+				}
+				case 11://Верх право
+				{
+					C[q].normals[h].set(cos(fi + PI_2) * sin(fi), cos(fi + PI_2) * cos(fi), sin(fi + PI_2)*cos(fi));
+					qq3 = q3 == grainCount - 1 ? 0 : q3 + 1;
+					qq2 = q2 == grainCount - 1 ? 0 : q2 + 1;
+					y = 14;
+					break;
+				}
+				case 12://Верх на нас
+				{
+					C[q].normals[h].set(cos(fi + PI_2) * cos(fi), cos(fi + PI_2) * sin(fi), sin(fi + PI_2)*cos(fi));
+					qq3 = q3 == grainCount - 1 ? 0 : q3 + 1;
+					qq1 = q1 == grainCount - 1 ? 0 : q1 + 1;
+					y = 17;
+					break;
+				}
+				case 13://Верх от нас
+				{
+					C[q].normals[h].set(-cos(fi + PI_2) * cos(fi), cos(fi + PI_2) * sin(fi), sin(fi + PI_2)*cos(fi));
+					qq3 = q3 == grainCount - 1 ? 0 : q3 + 1;
+					qq1 = q1 == 0 ? grainCount - 1 : q1 - 1;
+					y = 16;
+					break;
+				}
+				case 14://Низ лево
+				{
+					C[q].normals[h].set(-cos(fi + PI_2) * sin(fi), -cos(fi + PI_2) * cos(fi), -sin(fi + PI_2)*cos(fi));
+					qq2 = q2 == 0 ? grainCount - 1 : q2 - 1;
+					qq3 = q3 == 0 ? grainCount - 1 : q3 - 1;
+					y = 11;
+					break;
+				}
+				case 15://Низ право
+				{
+					C[q].normals[h].set(-cos(fi + PI_2) * sin(fi), cos(fi + PI_2) * cos(fi), -sin(fi + PI_2)*cos(fi));
+					qq2 = q2 == grainCount - 1 ? 0 : q2 + 1;
+					qq3 = q3 == 0 ? grainCount - 1 : q3 - 1;
+					y = 10;
+					break;
+				}
+				case 16://Низ на нас
+				{
+					C[q].normals[h].set(cos(fi + PI_2) * cos(fi), -cos(fi + PI_2) * sin(fi), -sin(fi + PI_2)*cos(fi));
+					qq1 = q1 == grainCount - 1 ? 0 : q1 + 1;
+					qq3 = q3 == 0 ? grainCount - 1 : q3 - 1;
+					y = 13;
+					break;
+				}
+				case 17://Низ от нас
+				{
+					C[q].normals[h].set(-cos(fi + PI_2) * cos(fi), -cos(fi + PI_2) * sin(fi), -sin(fi + PI_2)*cos(fi));
+					qq1 = q1 == 0 ? grainCount - 1 : q1 - 1;
+					qq3 = q3 == 0 ? grainCount - 1 : q3 - 1;
+					y = 12;
+					break;
+				}
+				/**************      Вершины     *****************/
+				case 18://верх лево от нас
+				{
+					C[q].normals[h].set(-cos(fi) * cos(fi)*cos(PI_2)*cos(PI_2), -cos(fi)*cos(fi) * cos(PI_2)*cos(PI_2), cos(fi)*cos(fi)*cos(PI_2)*cos(PI_2));
+					qq1 = q1 == 0 ? grainCount - 1 : q1 - 1;
+					qq2 = q2 == 0 ? grainCount - 1 : q2 - 1;
+					qq3 = q3 == grainCount - 1 ? 0 : q3 + 1;
+					y = 25;
+					break;
+				}
+				case 19://верх лево на нас
+				{
+					C[q].normals[h].set(cos(fi) * cos(fi)*cos(PI_2)*cos(PI_2), -cos(fi)*cos(fi) * cos(PI_2)*cos(PI_2), cos(fi)*cos(fi)*cos(PI_2)*cos(PI_2));
+					qq1 = q1 == grainCount - 1 ? 0 : q1 + 1;
+					qq2 = q2 == 0 ? grainCount - 1 : q2 - 1;
+					qq3 = q3 == grainCount - 1 ? 0 : q3 + 1;
+					y = 24;
+					break;
+				}
+				case 20://верх право от нас
+				{
+					C[q].normals[h].set(-cos(fi) * cos(fi)*cos(PI_2)*cos(PI_2), cos(fi)*cos(fi) * cos(PI_2)*cos(PI_2), cos(fi)*cos(fi)*cos(PI_2)*cos(PI_2));
+					qq1 = q1 == 0 ? grainCount - 1 : q1 - 1;
+					qq2 = q2 == grainCount - 1 ? 0 : q2 + 1;
+					qq3 = q3 == grainCount - 1 ? 0 : q3 + 1;
+					y = 23;
+					break;
+				}
+				case 21://верх право на нас
+				{
+					C[q].normals[h].set(cos(fi) * cos(fi)*cos(PI_2)*cos(PI_2), cos(fi)*cos(fi) * cos(PI_2)*cos(PI_2), cos(fi)*cos(fi)*cos(PI_2)*cos(PI_2));
+					qq1 = q1 == grainCount - 1 ? 0 : q1 + 1;
+					qq2 = q2 == grainCount - 1 ? 0 : q2 + 1;
+					qq3 = q3 == grainCount - 1 ? 0 : q3 + 1;
+					y = 22;
+					break;
+				}
+				case 22://низ лево от нас
+				{
+					C[q].normals[h].set(-cos(fi) * cos(fi)*cos(PI_2)*cos(PI_2), -cos(fi)*cos(fi) * cos(PI_2)*cos(PI_2), -cos(fi)*cos(fi)*cos(PI_2)*cos(PI_2));
+					qq1 = q1 == 0 ? grainCount - 1 : q1 - 1;
+					qq2 = q2 == 0 ? grainCount - 1 : q2 - 1;
+					qq3 = q3 == 0 ? grainCount - 1 : q3 - 1;
+					y = 21;
+					break;
+				}
+				case 23://низ лево на нас
+				{
+					C[q].normals[h].set(cos(fi) * cos(fi)*cos(PI_2)*cos(PI_2), -cos(fi)*cos(fi) * cos(PI_2)*cos(PI_2), -cos(fi)*cos(fi)*cos(PI_2)*cos(PI_2));
+					qq1 = q1 == grainCount - 1 ? 0 : q1 + 1;
+					qq2 = q2 == 0 ? grainCount - 1 : q2 - 1;
+					qq3 = q3 == 0 ? grainCount - 1 : q3 - 1;
+					y = 20;
+					break;
+				}
+				case 24://низ право от нас
+				{
+					C[q].normals[h].set(-cos(fi) * cos(fi)*cos(PI_2)*cos(PI_2), cos(fi)*cos(fi) * cos(PI_2)*cos(PI_2), -cos(fi)*cos(fi)*cos(PI_2)*cos(PI_2));
+
+					qq1 = q1 == 0 ? grainCount - 1 : q1 - 1;
+					qq2 = q2 == grainCount - 1 ? 0 : q2 + 1;
+					qq3 = q3 == 0 ? grainCount - 1 : q3 - 1;
+					y = 19;
+					break;
+				}
+				case 25://низ право на нас
+				{
+					C[q].normals[h].set(cos(fi) * cos(fi)*cos(PI_2)*cos(PI_2), cos(fi)*cos(fi) * cos(PI_2)*cos(PI_2), -cos(fi)*cos(fi)*cos(PI_2)*cos(PI_2));
+					qq1 = q1 == grainCount - 1 ? 0 : q1 + 1;
+					qq2 = q2 == grainCount - 1 ? 0 : q2 + 1;
+					qq3 = q3 == 0 ? grainCount - 1 : q3 - 1;
+					y = 18;
+					break;
+				}
+				}
+				int index = get1DPos(qq1, qq2, qq3);
+				C[q].surrounds[h] = C[index];//Здравствуй, сосед!
+				C[index].surrounds[y] = C[q];//Приятно познакомиться!
+				C[q].normals[h].normalize();
+
+				for (int i = 0; i < DIM; i++)
+				{
+					C[index].normals[y].c[i] = -C[q].normals[h].c[i];//Поделись нормалью
+				}
+
+				if (h < 6) C[q].contact[h] = 1;		//Контакт на грани октаэдра
+				else if (h < 14) C[q].contact[h] = 3;	//Контакт на вершине октаэдра
+				else C[q].contact[h] = 2;				//Контакт на ребре
 			}
+			if (prms::grainSurroundCount > 6)	//Уменьшение объёма из-за отсечений
+			{
+				double a = C[q].size * 0.1;			//Длина срезанной части вдоль ребра
+				double vol_edge = a * a*C[q].size / 2.0;	//Объём, срезанный рёбрами
+				double vol_vertex = a * a*a / SQRT3;				//Объём, срезанный вершинами
+				int cut_edge = 0;		//Кол-во срезанных рёбер
+				int cut_vertex = 0;		//Кол-во срезанных вершин
+				for (int h = 6; h < prms::grainSurroundCount; h++)
+				{
+					if (C[q].contact[h] != 0)
+					{
+						if (h < 14) cut_vertex++;
+						else cut_edge++;
+					}
+				}
+				C[q].volume -= (cut_edge*vol_edge + cut_vertex * vol_vertex);//Вычитание
+			}
+
+
 		}
 	}
 
 	void Polycrystall::SavePoleFig()
 	{
-		for (int q1 = 0; q1 < fragm_count; q1++)
+		for (int q = 0; q < totalGrainCount; q++)
 		{
-			for (int q2 = 0; q2 < fragm_count; q2++)
-			{
-				for (int q3 = 0; q3 < fragm_count; q3++)
-				{
-					GetPoleFig(&C[q1][q2][q3]);
-					if (prms::usingStandardTriangleSaving) GetSST(&C[q1][q2][q3]);
-				}
-			}
+			GetPoleFig(&C[q]);
+			if (prms::usingStandardTriangleSaving) GetSST(&C[q]);
+
 		}
 	}
 
@@ -678,33 +647,29 @@ namespace model
 		}
 
 		//Запись тензоров каждого из зерен или фрагментов
-		for (int q1 = 0; q1 < fragm_count; q1++)
+		for (int q = 0; q < totalGrainCount; q++)
 		{
-			for (int q2 = 0; q2 < fragm_count; q2++)
+
+			writeDebugInfo(dbgstream[0], C[q].o.c);
+			writeDebugInfo(dbgstream[1], C[q].e.c);
+			writeDebugInfo(dbgstream[2], C[q].d.c);
+			writeDebugInfo(dbgstream[3], C[q].sgm.c);
+			writeDebugInfo(dbgstream[4], C[q].om.c);
+			writeDebugInfo(dbgstream[5], C[q].dsgm.c);
+			writeDebugInfo(dbgstream[6], C[q].d_in.c);
+			writeDebugInfo(dbgstream[7], C[q].w.c);
+			for (int f = 0; f < C[q].SS_count; f++)
 			{
-				for (int q3 = 0; q3 < fragm_count; q3++)
-				{
-					writeDebugInfo(dbgstream[0], C[q1][q2][q3].o.c);
-					writeDebugInfo(dbgstream[1], C[q1][q2][q3].e.c);
-					writeDebugInfo(dbgstream[2], C[q1][q2][q3].d.c);
-					writeDebugInfo(dbgstream[3], C[q1][q2][q3].sgm.c);
-					writeDebugInfo(dbgstream[4], C[q1][q2][q3].om.c);
-					writeDebugInfo(dbgstream[5], C[q1][q2][q3].dsgm.c);
-					writeDebugInfo(dbgstream[6], C[q1][q2][q3].d_in.c);
-					writeDebugInfo(dbgstream[7], C[q1][q2][q3].w.c);
-					for (int f = 0; f < C[q1][q2][q3].SS_count; f++)
-					{
-						dbgstream[8] << C[q1][q2][q3].SS[f].dgm << " ";
-					}
-					dbgstream[8] << std::endl << std::endl;
-					for (int f = 0; f < C[q1][q2][q3].SS_count; f++)
-					{
-						dbgstream[9] << C[q1][q2][q3].SS[f].t << " ";
-					}
-					dbgstream[9] << std::endl << std::endl;
-					dbgstream[15] << C[q1][q2][q3].moment.c[0] << " " << C[q1][q2][q3].moment.c[1] << " " << C[q1][q2][q3].moment.c[2] << std::endl;
-				}
+				dbgstream[8] << C[q].SS[f].dgm << " ";
 			}
+			dbgstream[8] << std::endl << std::endl;
+			for (int f = 0; f < C[q].SS_count; f++)
+			{
+				dbgstream[9] << C[q].SS[f].t << " ";
+			}
+			dbgstream[9] << std::endl << std::endl;
+			dbgstream[15] << C[q].moment.c[0] << " " << C[q].moment.c[1] << " " << C[q].moment.c[2] << std::endl;
+
 		}
 		//Запись тензоров представительного объема
 		writeDebugInfo(dbgstream[10], D.c);
@@ -716,123 +681,107 @@ namespace model
 
 	void Polycrystall::Load(bool unload)
 	{
-		E += D*prms::dt;
+		E += D * prms::dt;
 		/*Параметр unload включает разгрузку представительного объёма*/
 		if (prms::trueUniaxial || unload)	//Одноосное растяжение
 		{
 			//Осреднение
 			P.setZero();
 			D_in.setZero();
-			for (int q1 = 0; q1 < fragm_count; q1++)
+			for (int q = 0; q < totalGrainCount; q++)
 			{
-				for (int q2 = 0; q2 < fragm_count; q2++)
-				{
-					for (int q3 = 0; q3 < fragm_count; q3++)
-					{
-						D_in += C[q1][q2][q3].d_in;
-						P += C[q1][q2][q3].p.ToLSK(C[q1][q2][q3].o);
-					}
-				}
+				D_in += C[q].d_in;
+				P += C[q].p.ToLSK(C[q].o);
 			}
 
-			D_in /= (total_fragm_count);
-			P /= (total_fragm_count);
+			D_in /= (totalGrainCount);
+			P /= (totalGrainCount);
 
 			//Симметризация тензора упругих констант
 			P.Symmetrize();
 
 			D = !unload ? TensionStrainCalc(P, D_in, D.c[0][0]) : UnloadingStrainCalc(P, D_in, Sgm, lam);
 
-			Strain = SQRT2_3*sqrt(E.doubleScalMult(E));//Вычисление интенсивности деформаций
+			Strain = SQRT2_3 * sqrt(E.doubleScalMult(E));//Вычисление интенсивности деформаций
 
 			dSgm = TensionStressCalc(P, D_in, D);
 			//dSgm *= prms::dt;				//Приращение напряжений на шаге
-			Sgm += dSgm*prms::dt;
-			Stress = SQRT3_2*sqrt(Sgm.doubleScalMult(Sgm));//Вычисление интенсивности напряжений
+			Sgm += dSgm * prms::dt;
+			Stress = SQRT3_2 * sqrt(Sgm.doubleScalMult(Sgm));//Вычисление интенсивности напряжений
 		}
 		else
 		{
 			Stress = 0;		//Вычисление интенсивностей осреднением
 			Strain = 0;
-			for (int q1 = 0; q1 < fragm_count; q1++)
+			for (int q = 0; q < totalGrainCount; q++)
 			{
-				for (int q2 = 0; q2 < fragm_count; q2++)
-				{
-					for (int q3 = 0; q3 < fragm_count; q3++)
-					{
-						Strain += C[q1][q2][q3].strain;
-						Stress += C[q1][q2][q3].stress;
-					}
-				}
+				Strain += C[q].strain;
+				Stress += C[q].stress;
+
 			}
-			Strain /= total_fragm_count;
-			Stress /= total_fragm_count;
+			Strain /= totalGrainCount;
+			Stress /= totalGrainCount;
 		}
 
 #pragma omp parallel for
 		//Часть, которую можно паралелить
 		//Здесь необходимо гарантировать защиту данных каждого фрагмента
 		//от перезаписи другими фрагментами
-		for (int q1 = 0; q1 < fragm_count; q1++)
+		for (int q = 0; q < totalGrainCount; q++)
 		{
-			for (int q2 = 0; q2 < fragm_count; q2++)
+
+			/**************************************************
+			************       Переходим в КСК       **********
+			**************************************************/
+
+			Tensor O = C[q].o;
+			Tensor OT = O;
+			OT.transp();
+			C[q].d = O * D*OT;//Гипотеза Фойгта
+			C[q].w = O * W*OT /*- C[q].om*/;//Расширенная
+
+			C[q].sgm = O * C[q].sgm*OT;
+			C[q].d_in = O * C[q].d_in*OT;
+
+
+			/***************************************************
+			***********       Пересчитываем НДС      ***********
+			***************************************************/
+
+			C[q].NDScalc();
+
+			if (prms::usingHardeningBase)			//Базовое упрочнение
 			{
-				for (int q3 = 0; q3 < fragm_count; q3++)
-				{
-
-					/**************************************************
-					************       Переходим в КСК       **********
-					**************************************************/
-
-					Tensor O = C[q1][q2][q3].o;
-					Tensor OT = O;
-					OT.transp();
-					C[q1][q2][q3].d = O*D*OT;//Гипотеза Фойгта
-					C[q1][q2][q3].w = O*W*OT /*- C[q1][q2][q3].om*/;//Расширенная
-
-					C[q1][q2][q3].sgm = O*C[q1][q2][q3].sgm*OT;
-					C[q1][q2][q3].d_in = O*C[q1][q2][q3].d_in*OT;
-
-
-					/***************************************************
-					***********       Пересчитываем НДС      ***********
-					***************************************************/
-
-					C[q1][q2][q3].NDScalc();
-
-					if (prms::usingHardeningBase)			//Базовое упрочнение
-					{
-						Base_hardening(&C[q1][q2][q3]);
-					}
-
-					if (prms::usingRotationsTaylor)		//Ротации по Тейлору
-					{
-						Taylor_rotations(&C[q1][q2][q3]);
-					}
-
-					if (prms::usingRotationsTrusov && prms::usingRotationsHardening)	//Ротационное упрочнение
-					{
-						Rotation_hardening(&C[q1][q2][q3]);
-					}
-
-					if (prms::usingHardeningBound)	//Зернограничное упрочнение
-					{
-						Boundary_hardening(&C[q1][q2][q3]);
-					}
-
-					if (prms::usingRotationsTrusov)		//Ротации по Трусову
-					{
-						Trusov_rotations(&C[q1][q2][q3]);
-					}
-					/**************************************************
-					************       Переходим в ЛСК       **********
-					**************************************************/
-
-					C[q1][q2][q3].sgm = OT*C[q1][q2][q3].sgm*O;
-					C[q1][q2][q3].d_in = OT*C[q1][q2][q3].d_in*O;
-					C[q1][q2][q3].iter++;
-				}
+				Base_hardening(&C[q]);
 			}
+
+			if (prms::usingRotationsTaylor)		//Ротации по Тейлору
+			{
+				Taylor_rotations(&C[q]);
+			}
+
+			if (prms::usingRotationsTrusov && prms::usingRotationsHardening)	//Ротационное упрочнение
+			{
+				Rotation_hardening(&C[q]);
+			}
+
+			if (prms::usingHardeningBound)	//Зернограничное упрочнение
+			{
+				Boundary_hardening(&C[q]);
+			}
+
+			if (prms::usingRotationsTrusov)		//Ротации по Трусову
+			{
+				Trusov_rotations(&C[q]);
+			}
+			/**************************************************
+			************       Переходим в ЛСК       **********
+			**************************************************/
+
+			C[q].sgm = OT * C[q].sgm*O;
+			C[q].d_in = OT * C[q].d_in*O;
+			C[q].iter++;
+
 		}
 
 
@@ -840,19 +789,15 @@ namespace model
 		{
 			Sgm.setZero();
 			D_in.setZero();
-			for (int q1 = 0; q1 < fragm_count; q1++)
+			for (int q = 0; q < totalGrainCount; q++)
 			{
-				for (int q2 = 0; q2 < fragm_count; q2++)
-				{
-					for (int q3 = 0; q3 < fragm_count; q3++)
-					{
-						Sgm += C[q1][q2][q3].sgm;
-						D_in += C[q1][q2][q3].d_in;
-					}
-				}
+
+				Sgm += C[q].sgm;
+				D_in += C[q].d_in;
+
 			}
-			Sgm /= total_fragm_count;
-			D_in /= total_fragm_count;
+			Sgm /= totalGrainCount;
+			D_in /= totalGrainCount;
 		}
 
 
@@ -917,7 +862,6 @@ namespace model
 
 		if ((progress - PLOT_STEP > prms::periodSavePlot || unload) && prms::periodSavePlot > 0)
 		{
-			BoundsAnalize();		//Подсчет доли большеугловых границ
 
 			if (prms::saveMacro)	//Запись компонент тензоров макроуровня
 			{
@@ -975,66 +919,60 @@ namespace model
 
 			if (prms::saveMeso)	//Запись компонент тензоров мезоуровня
 			{
-				for (int q1 = 0; q1 < fragm_count; q1++)
+				for (int q = 0; q < totalGrainCount; q++)
 				{
-					for (int q2 = 0; q2 < fragm_count; q2++)
+
+					if (prms::saveIntensity)
 					{
-						for (int q3 = 0; q3 < fragm_count; q3++)
-						{
-
-							if (prms::saveIntensity)
-							{
-								DataXStream[10].write((char *)&C[q1][q2][q3].strain, sizeof(double));
-								DataYStream[10].write((char *)&C[q1][q2][q3].stress, sizeof(double));
-							}
-							if (prms::save11)
-							{
-								DataXStream[11].write((char *)&C[q1][q2][q3].e.c[0][0], sizeof(double));
-								DataYStream[11].write((char *)&C[q1][q2][q3].sgm.c[0][0], sizeof(double));
-							}
-							if (prms::save12)
-							{
-								DataXStream[12].write((char *)&C[q1][q2][q3].e.c[0][1], sizeof(double));
-								DataYStream[12].write((char *)&C[q1][q2][q3].sgm.c[0][1], sizeof(double));
-							}
-							if (prms::save13)
-							{
-								DataXStream[13].write((char *)&C[q1][q2][q3].e.c[0][2], sizeof(double));
-								DataYStream[13].write((char *)&C[q1][q2][q3].sgm.c[0][2], sizeof(double));
-							}
-							if (prms::save21)
-							{
-								DataXStream[14].write((char *)&C[q1][q2][q3].e.c[1][0], sizeof(double));
-								DataYStream[14].write((char *)&C[q1][q2][q3].sgm.c[1][0], sizeof(double));
-							}
-							if (prms::save22)
-							{
-								DataXStream[15].write((char *)&C[q1][q2][q3].e.c[1][1], sizeof(double));
-								DataYStream[15].write((char *)&C[q1][q2][q3].sgm.c[1][1], sizeof(double));
-							}
-							if (prms::save23)
-							{
-								DataXStream[16].write((char *)&C[q1][q2][q3].e.c[1][2], sizeof(double));
-								DataYStream[16].write((char *)&C[q1][q2][q3].sgm.c[1][2], sizeof(double));
-							}
-							if (prms::save31)
-							{
-								DataXStream[17].write((char *)&C[q1][q2][q3].e.c[2][0], sizeof(double));
-								DataYStream[17].write((char *)&C[q1][q2][q3].sgm.c[2][0], sizeof(double));
-							}
-							if (prms::save32)
-							{
-								DataXStream[18].write((char *)&C[q1][q2][q3].e.c[2][1], sizeof(double));
-								DataYStream[18].write((char *)&C[q1][q2][q3].sgm.c[2][1], sizeof(double));
-							}
-							if (prms::save33)
-							{
-								DataXStream[19].write((char *)&C[q1][q2][q3].e.c[2][2], sizeof(double));
-								DataYStream[19].write((char *)&C[q1][q2][q3].sgm.c[2][2], sizeof(double));
-							}
-
-						}
+						DataXStream[10].write((char *)&C[q].strain, sizeof(double));
+						DataYStream[10].write((char *)&C[q].stress, sizeof(double));
 					}
+					if (prms::save11)
+					{
+						DataXStream[11].write((char *)&C[q].e.c[0][0], sizeof(double));
+						DataYStream[11].write((char *)&C[q].sgm.c[0][0], sizeof(double));
+					}
+					if (prms::save12)
+					{
+						DataXStream[12].write((char *)&C[q].e.c[0][1], sizeof(double));
+						DataYStream[12].write((char *)&C[q].sgm.c[0][1], sizeof(double));
+					}
+					if (prms::save13)
+					{
+						DataXStream[13].write((char *)&C[q].e.c[0][2], sizeof(double));
+						DataYStream[13].write((char *)&C[q].sgm.c[0][2], sizeof(double));
+					}
+					if (prms::save21)
+					{
+						DataXStream[14].write((char *)&C[q].e.c[1][0], sizeof(double));
+						DataYStream[14].write((char *)&C[q].sgm.c[1][0], sizeof(double));
+					}
+					if (prms::save22)
+					{
+						DataXStream[15].write((char *)&C[q].e.c[1][1], sizeof(double));
+						DataYStream[15].write((char *)&C[q].sgm.c[1][1], sizeof(double));
+					}
+					if (prms::save23)
+					{
+						DataXStream[16].write((char *)&C[q].e.c[1][2], sizeof(double));
+						DataYStream[16].write((char *)&C[q].sgm.c[1][2], sizeof(double));
+					}
+					if (prms::save31)
+					{
+						DataXStream[17].write((char *)&C[q].e.c[2][0], sizeof(double));
+						DataYStream[17].write((char *)&C[q].sgm.c[2][0], sizeof(double));
+					}
+					if (prms::save32)
+					{
+						DataXStream[18].write((char *)&C[q].e.c[2][1], sizeof(double));
+						DataYStream[18].write((char *)&C[q].sgm.c[2][1], sizeof(double));
+					}
+					if (prms::save33)
+					{
+						DataXStream[19].write((char *)&C[q].e.c[2][2], sizeof(double));
+						DataYStream[19].write((char *)&C[q].sgm.c[2][2], sizeof(double));
+					}
+
 				}
 			}
 
@@ -1047,34 +985,28 @@ namespace model
 			double dmc = 0;
 			double angle = 0;
 			double H = 0;
-			for (int q1 = 0; q1 < fragm_count; q1++)
+			for (int q = 0; q < totalGrainCount; q++)
 			{
-				for (int q2 = 0; q2 < fragm_count; q2++)
+				for (int i = 0; i < C[q].SS_count; i++)
 				{
-					for (int q3 = 0; q3 < fragm_count; q3++)
-					{
-						for (int i = 0; i < C[q1][q2][q3].SS_count; i++)
-						{
-							if (C[q1][q2][q3].SS[i].dgm > EPS) ActiveSysCount++;//Подсчёт активных СС
-						}
-
-						if (C[q1][q2][q3].isRotate) RotCount++;		//Подсчёт вращающихся решёток
-						RotEnergy += C[q1][q2][q3].rot_energy;		//Суммирование энергий вращения
-						RotSpeed += C[q1][q2][q3].rot_speed;		//Суммирование скоростей вращения
-						norma += C[q1][q2][q3].norm;
-						Mc += C[q1][q2][q3].rot_Mc;
-						dmc += C[q1][q2][q3].dmc;
-						angle += C[q1][q2][q3].sum_angle;
-						H += C[q1][q2][q3].rot_H;
-					}
+					if (C[q].SS[i].dgm > EPS) ActiveSysCount++;//Подсчёт активных СС
 				}
+
+				if (C[q].isRotate) RotCount++;		//Подсчёт вращающихся решёток
+				RotEnergy += C[q].rot_energy;		//Суммирование энергий вращения
+				RotSpeed += C[q].rot_speed;		//Суммирование скоростей вращения
+				norma += C[q].norm;
+				Mc += C[q].rot_Mc;
+				dmc += C[q].dmc;
+				angle += C[q].sum_angle;
+				H += C[q].rot_H;
 			}
-			H /= total_fragm_count;
-			angle /= total_fragm_count;
-			norma /= total_fragm_count;
-			Mc /= total_fragm_count;
-			dmc /= total_fragm_count;
-			ActiveSysCount /= total_fragm_count;
+			H /= totalGrainCount;
+			angle /= totalGrainCount;
+			norma /= totalGrainCount;
+			Mc /= totalGrainCount;
+			dmc /= totalGrainCount;
+			ActiveSysCount /= totalGrainCount;
 			if (prms::saveActiveSS) Datastream[0].write((char *)&ActiveSysCount, sizeof ActiveSysCount);//Запись кол-ва активных СС
 			if (RotCount != 0)
 			{
@@ -1204,8 +1136,29 @@ namespace model
 				prms::maxStrainIntencity += prms::maxStrainIntencity * addition_strain;	//Повышаем предел интенсивности
 			}
 
-			if (prms::usingFragmentation) Fragmentate();
-
 		}
 	}
+
+	int get1DPos(int q1, int q2, int q3)
+	{
+		//По трём координатам в объёме поликристалла возвращает уникальный номер фрагмента
+		int res = q1 * prms::grainCountLinear*prms::grainCountLinear + q2 * prms::grainCountLinear + q3;
+		return res;
+	}
+
+	void get3DPos(int pos, int* q1, int* q2, int* q3)
+	{
+		//Восстанавливает пространственные координаты поликристалла по уникальному номеру
+		int C2d = prms::grainCountLinear*prms::grainCountLinear;
+		int C3d = C2d * prms::grainCountLinear;
+
+		int qq1 = pos / C2d;
+		int qq2 = (pos - qq1 * C2d) / prms::grainCountLinear;
+		int qq3 = (pos - qq1 * C2d) % prms::grainCountLinear;
+
+		*q1 = qq1;
+		*q2 = qq2;
+		*q3 = qq3;
+	}
+
 }
