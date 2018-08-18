@@ -43,7 +43,6 @@ namespace model
 
 		Tensor buf = dO*f->o;
 		f->o = buf;
-
 	}
 	
 	void Taylor_rotations(Fragment *f)
@@ -90,7 +89,6 @@ namespace model
 		if (f->sum_angle > 100*EPS)
 		{
 			double dmc = prms::rotationParamHardK1 + prms::rotationParamHardK2*f->sum_angle / f->volume;
-			f->dmc = dmc;
 			f->rot_Mc += dmc*prms::dt;//Приращение критического момента
 		}
 	}
@@ -138,7 +136,6 @@ namespace model
 		Vector M = f->moment + dM*prms::dt;
 		f->moment = M;
 		double norm = M.getNorm();
-		f->norm = norm;
 		if (norm > f->rot_Mc || norm == -1)
 		{
 			norm = f->rot_Mc;

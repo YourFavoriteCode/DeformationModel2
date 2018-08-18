@@ -200,6 +200,7 @@
     <ClInclude Include="include\Features\Rotations.h" />
     <ClInclude Include="include\Features\Tension.h" />
     <ClInclude Include="include\Model\Fragment.h" />
+    <ClInclude Include="include\Model\Loading.h" />
     <ClInclude Include="include\Model\Polycrystall.h" />
     <ClInclude Include="include\Util\Distributions.h" />
     <ClInclude Include="include\Util\Functions.h" />
@@ -215,6 +216,7 @@
     <ClCompile Include="src\fragment.cpp" />
     <ClCompile Include="src\functions.cpp" />
     <ClCompile Include="src\hardening.cpp" />
+    <ClCompile Include="src\loading.cpp" />
     <ClCompile Include="src\MathCore.cpp" />
     <ClCompile Include="src\params.cpp" />
     <ClCompile Include="src\polycrystall.cpp" />

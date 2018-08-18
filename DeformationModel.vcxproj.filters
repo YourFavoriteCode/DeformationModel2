@@ -90,6 +90,9 @@
     <ClInclude Include="include\Util\Params.h">
       <Filter>Файлы заголовков\util</Filter>
     </ClInclude>
+    <ClInclude Include="include\Model\Loading.h">
+      <Filter>Файлы заголовков\model</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -127,6 +130,9 @@
     </ClCompile>
     <ClCompile Include="dependency\TinyXML\tinyxml2.cpp">
       <Filter>Исходные файлы\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\loading.cpp">
+      <Filter>Исходные файлы\model</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

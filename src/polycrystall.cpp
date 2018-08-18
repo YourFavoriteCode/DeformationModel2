@@ -23,20 +23,12 @@ namespace model
 	{
 		strain = 0;
 		stress = 0;
-
-		cycle = 0;
-		CURR_STEP = 0;
-		PROC_STEP = 0;
-		POLUS_STEP = 0;
-		PLOT_STEP = 0;
-		DEBUG_STEP = 0;
-		proc_period = 400;
+		stepShowProgress = 0;
+		stepSavePoleFig = 0;
+		stepSavePlot = 0;
+		stepSaveInternalData = 0;
+		periodShowProgress = 400;
 		fileCount = 16;
-
-		tension_component = 0;
-		final_stress = 1e4;
-		lam = 2.5;
-		addition_strain = 1e-5;
 	}
 
 	Polycrystall::~Polycrystall()
@@ -183,13 +175,12 @@ namespace model
 			streamDebug[15].open("DBG\\VOL_M.txt", std::ios_base::out | std::ios_base::trunc);
 		}
 
-		streamDataTest = new std::ofstream[6];
+		streamDataTest = new std::ofstream[5];
 		streamDataTest[0].open("Test0.txt", std::ios_base::out | std::ios_base::trunc);
 		streamDataTest[1].open("Test1.txt", std::ios_base::out | std::ios_base::trunc);
 		streamDataTest[2].open("Test2.txt", std::ios_base::out | std::ios_base::trunc);
 		streamDataTest[3].open("Test3.txt", std::ios_base::out | std::ios_base::trunc);
 		streamDataTest[4].open("Test4.txt", std::ios_base::out | std::ios_base::trunc);
-		streamDataTest[5].open("Test5.txt", std::ios_base::out | std::ios_base::trunc);
 	}
 
 	void Polycrystall::closeAllFiles()
@@ -200,7 +191,7 @@ namespace model
 			streamDataY[i].close();
 		}
 		streamInternalVars[0].close();
-		for (int i = 0; i < 6; i++)
+		for (int i = 0; i < 5; i++)
 		{
 			streamDataTest[i].close();
 		}
@@ -643,7 +634,7 @@ namespace model
 	{
 		for (int i = 0; i < fileCount; i++)//Визуальное разделение шагов 
 		{
-			streamDebug[i] << "#########################      STEP " << CURR_STEP << "      #########################" << std::endl << std::endl;
+			streamDebug[i] << "#########################      STEP " << loading.currentStep << "      #########################" << std::endl << std::endl;
 		}
 
 		//Запись тензоров каждого из зерен или фрагментов
@@ -700,7 +691,7 @@ namespace model
 			//Симметризация тензора упругих констант
 			P.symmetrize();
 
-			D = !unload ? TensionStrainCalc(P, D_in, D.c[0][0]) : UnloadingStrainCalc(P, D_in, Sgm, lam);
+			D = !unload ? TensionStrainCalc(P, D_in, D.c[0][0]) : UnloadingStrainCalc(P, D_in, Sgm, loading.paramLambda);
 
 			strain = SQRT2_3 * sqrt(E.doubleScalMult(E));//Вычисление интенсивности деформаций
 
@@ -783,8 +774,7 @@ namespace model
 			c[q].iter++;
 
 		}
-
-
+		
 		if (!prms::trueUniaxial && !unload)		//Этот блок нужен исключительно для работы с энергией!
 		{
 			Sgm.setZero();
@@ -799,8 +789,7 @@ namespace model
 			Sgm /= totalGrainCount;
 			D_in /= totalGrainCount;
 		}
-
-
+		
 		/************************************************************
 		***********	        Прогресс выполнения 	      ***********
 		************************************************************/
@@ -811,7 +800,7 @@ namespace model
 			progress = prms::trueUniaxial ? fabs(E.c[0][0]) : strain;
 			progress = progress / prms::maxStrainIntencity * 100.0;
 
-			if (!(prms::loadCycleCount == 1 || cycle == 0))	//Для многоцикловых нагружений
+			if (!(prms::loadCycleCount == 1 || loading.cycle == 0))	//Для многоцикловых нагружений
 			{
 				progress /= 2.0;
 				/************************************************
@@ -844,14 +833,14 @@ namespace model
 		}
 		else
 		{
-			progress = final_stress / fabs(Sgm.c[0][0]) * 100.0;	//Индикация прогресса при разгрузке
+			progress = loading.maxStress / fabs(Sgm.c[0][0]) * 100.0;	//Индикация прогресса при разгрузке
 		}
 
-		int period = unload ? proc_period / 40 : proc_period;
+		int period = unload ? periodShowProgress / 40 : periodShowProgress;
 
-		if (PROC_STEP == period)
+		if (stepShowProgress == period)
 		{
-			PROC_STEP = 0;
+			stepShowProgress = 0;
 			//Курсор двигается на 6 символов влево, записывается новое значение с точностью 5.2 и знак %
 			printf("\b\b\b\b\b\b%0*.*f%%", 5, 2, progress);
 		}
@@ -860,7 +849,7 @@ namespace model
 		***********	    Запись данных для графиков НДС    ***********
 		************************************************************/
 
-		if ((progress - PLOT_STEP > prms::periodSavePlot || unload) && prms::periodSavePlot > 0)
+		if ((progress - stepSavePlot > prms::periodSavePlot || unload) && prms::periodSavePlot > 0)
 		{
 
 			if (prms::saveMacro)	//Запись компонент тензоров макроуровня
@@ -980,9 +969,8 @@ namespace model
 			double RotEnergy = 0;				//Энергия ротаций на шаге
 			double RotSpeed = 0;				//Средняя скорость вращения на шаге
 			int RotCount = 0;					//Кол-во вращающихся фрагментов
-			double norma = 0;
 			double Mc = 0;
-			double dmc = 0;
+
 			double angle = 0;
 			double H = 0;
 			for (int q = 0; q < totalGrainCount; q++)
@@ -995,17 +983,13 @@ namespace model
 				if (c[q].isRotate) RotCount++;		//Подсчёт вращающихся решёток
 				RotEnergy += c[q].rot_energy;		//Суммирование энергий вращения
 				RotSpeed += c[q].rot_speed;		//Суммирование скоростей вращения
-				norma += c[q].norm;
 				Mc += c[q].rot_Mc;
-				dmc += c[q].dmc;
 				angle += c[q].sum_angle;
 				H += c[q].rot_H;
 			}
 			H /= totalGrainCount;
 			angle /= totalGrainCount;
-			norma /= totalGrainCount;
 			Mc /= totalGrainCount;
-			dmc /= totalGrainCount;
 			ActiveSysCount /= totalGrainCount;
 			if (prms::saveActiveSS) streamInternalVars[0].write((char *)&ActiveSysCount, sizeof ActiveSysCount);//Запись кол-ва активных СС
 			if (RotCount != 0)
@@ -1032,40 +1016,45 @@ namespace model
 			streamDataTest[2] << RotEnergy << std::endl;
 			streamDataTest[3] << StepEnergy << std::endl;
 			streamDataTest[4] << StepEnergy_in << std::endl;
-			streamDataTest[5] << norma << std::endl;
 
-			PLOT_STEP = progress;
+			stepSavePlot = progress;
 		}
 
 		/************************************************************
 		***********	      Сохранение полюсных фигур	      ***********
 		************************************************************/
-		if (progress - POLUS_STEP > prms::periodSavePolus && prms::periodSavePolus > 0)
+		if (progress - stepSavePoleFig > prms::periodSavePolus && prms::periodSavePolus > 0)
 		{
 			savePoleFigData();
-			POLUS_STEP = progress;
+			stepSavePoleFig = progress;
 		}
 
 		/************************************************************
 		***********	       Запись пошаговых данных	      ***********
 		************************************************************/
-		if (CURR_STEP >= prms::saveVariablesStartStep && CURR_STEP <= prms::saveVariablesStopStep && DEBUG_STEP == prms::saveVariablesPeriodStep)
+		if (loading.currentStep >= prms::saveVariablesStartStep && loading.currentStep <= prms::saveVariablesStopStep && stepSaveInternalData == prms::saveVariablesPeriodStep)
 		{
-			DEBUG_STEP = 0;
+			stepSaveInternalData = 0;
 			saveDebugData();
 		}
-		CURR_STEP++;
-		PROC_STEP++;
-		if (CURR_STEP >= prms::saveVariablesStartStep && CURR_STEP <= prms::saveVariablesStopStep) DEBUG_STEP++;
-
+		loading.currentStep++;
+		stepShowProgress++;
+		if (loading.currentStep >= prms::saveVariablesStartStep && loading.currentStep <= prms::saveVariablesStopStep)
+		{
+			stepSaveInternalData++;
+		}
 	}
 
-	void Polycrystall::deformate()
-		/****************************************
-		*Функция деформирования представительного
-		*объема поликристала.
-		*****************************************/
+	void Polycrystall::deformate(Loading newLoading)
 	{
+		/****************************************
+		Функция деформирования представительного
+		объема поликристала
+		*****************************************/
+		this->loading = newLoading;
+		D = loading.gradV.getSymmetryPart();
+		W = loading.gradV.getAntiSymmetryPart();
+
 		omp_set_num_threads(prms::ompThreadCount);	//Кол-во используемых потоков
 
 		if (prms::trueUniaxial)
@@ -1074,18 +1063,18 @@ namespace model
 			*Выбор растягивающей компоненты тензора D.
 			*Относительно неё на каждом шаге будет решаться СЛАУ
 			***************************************************/
-			tension_component = D.c[0][0];
+			loading.tensionComponent = D.c[0][0];
 		}
-		for (cycle = 0; cycle < prms::loadCycleCount; cycle++)
+		for (loading.cycle = 0; loading.cycle < prms::loadCycleCount; loading.cycle++)
 		{
 			unsigned long t1, t2;
 
-			PLOT_STEP = 0;		//Обнуление счетчиков для периодического вывода данных в файлы
-			POLUS_STEP = 0;
-			PROC_STEP = 0;
+			stepSavePlot = 0;		//Обнуление счетчиков для периодического вывода данных в файлы
+			stepSavePoleFig = 0;
+			stepShowProgress = 0;
 			if (prms::loadCycleCount > 1)
 			{
-				printf("\n Loading #%d", cycle + 1);
+				printf("\n Loading #%d", loading.cycle + 1);
 				t1 = clock();		//Начальная отсечка времени
 			}
 			printf("\n        00.00%");
@@ -1097,32 +1086,20 @@ namespace model
 			while (fabs(*counter) < prms::maxStrainIntencity)	//Цикл по деформациям
 			{
 				load(false);
-				//if (prms::FRAGMENTATION) GrainRotate();
 			}
 			if (prms::loadCycleCount > 1)
 			{
 				t2 = clock();		//Конечная отсечка времени
 				printf("\b\b\b\b\b\bDone in %g sec", (t2 - t1) / 1000.0);
 			}
-			//		printf("\n START 2! \n");
-			//	D.set(0, 0.003, 0, 0.003, 0, 0, 0, 0, 0);//Простой сдвиг
-			//	W.setZero();
-			//	D.set(-0.003, 0.003, 0, -0.003, 0.003, 0, 0, 0, 0);//РКУП
-			/*	D.set(0.003, 0, 0, 0, -0.0015, 0, 0, 0, -0.0015);//Одноосье
-				prms::strain_max += prms::strain_max;
-
-				while (fabs(*counter) < prms::strain_max)
-				{
-				Load(false);
-				}
-				*/
+			//Если нужнен второй этап нагружения (не циклика), то его нужно добавлять здесь
 
 			if (prms::withUnloading)	//Упругая разгрузка
 			{
-				printf("\n Unloading #%d", cycle + 1);
+				printf("\n Unloading #%d", loading.cycle + 1);
 				printf("\n        00.00%");
 				t1 = clock();		//Начальная отсечка времени
-				while (fabs(Sgm.c[0][0]) > final_stress) //Цикл по напряжениям
+				while (fabs(Sgm.c[0][0]) > loading.maxStress) //Цикл по напряжениям
 				{
 					load(true);
 				}
@@ -1132,8 +1109,8 @@ namespace model
 
 			if (prms::loadCycleCount > 1)	//Цикоическое знакопеременное нагружение
 			{
-				D.c[0][0] = pow(-1, cycle + 1) * tension_component;	//Меняем знак растягивающей компоненты
-				prms::maxStrainIntencity += prms::maxStrainIntencity * addition_strain;	//Повышаем предел интенсивности
+				D.c[0][0] = pow(-1, loading.cycle + 1) * loading.tensionComponent;	//Меняем знак растягивающей компоненты
+				prms::maxStrainIntencity += prms::maxStrainIntencity * loading.additionalStrain;	//Повышаем предел интенсивности
 			}
 
 		}

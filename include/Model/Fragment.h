@@ -31,9 +31,6 @@ namespace model
 		double stress;					//Интенсивность напряжений
 		double strain;					//Интенсивность деформаций
 		
-		double norm;//СОТРИ ЭТО ДЕРЬМО
-		double dmc;	//И это наверное
-
 		Fragment *surrounds;			//Ссылки на граничащие фрагменты
 		Vector *normals;				//Вектора нормали к граничащим фрагментам
 		Vector moment;				

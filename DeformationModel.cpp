@@ -11,6 +11,7 @@
 #include "Params.h"
 #include "Functions.h"
 #include "Polycrystall.h"
+#include "Loading.h"
 
 using namespace model;
 
@@ -103,8 +104,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	printf(" Initializing all fragments... ");
 	t1 = clock();
 
-	polycrystall.D = prms::gradV.getSymmetryPart();
-	polycrystall.W = prms::gradV.getAntiSymmetryPart();
+
 
 	std::srand(time(NULL));
 
@@ -207,12 +207,14 @@ int _tmain(int argc, _TCHAR* argv[])
 		t2 = clock();
 		printf("%g sec\n", (t2 - t1) / 1000.0);
 	}
+	Loading loading;						//Нагружение
+	loading.setLoad(prms::gradV);
 
-	t1 = clock();					//Начальная отсечка времени
-	polycrystall.deformate();		//Деформирование
-	t2 = clock();					//Финальная отсечка времени
+	t1 = clock();							//Начальная отсечка времени
+	polycrystall.deformate(loading);		//Деформирование
+	t2 = clock();							//Финальная отсечка времени
 
-	if (prms::usingInititalStress)	//Сохранение остаточных напряжений
+	if (prms::usingInititalStress)			//Сохранение остаточных напряжений
 	{
 		polycrystall.streamDebug[3].open("DBG\\sgm.txt", std::ios_base::out | std::ios_base::trunc);
 		for (int q = 0; q < grainCountTotal; q++)
@@ -233,7 +235,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	else printf("\b\b\b\b\b\b\b\b\b\b\b\b\b\b Done    \n");
 	printf(" ==================================================\n");
 	printf(" Processing time: %g sec\n", (t2 - t1) / 1000.0);
-	printf(" Number of steps: %d\n", polycrystall.CURR_STEP);
+	printf(" Number of steps: %d\n", loading.currentStep);
 	if (!isNormalDouble(polycrystall.strain))//Если не зафиксированы ошибки - закрытие
 	{
 		printf(" ==================================================\n");
@@ -251,7 +253,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	hwnd = ::FindWindow(NULL, (LPCTSTR)"Панель управления моделью");
 	if (hwnd != NULL)
 	{
-		::SendMessage(hwnd, WM_USER + 1, polycrystall.CURR_STEP, (t2 - t1));
+		::SendMessage(hwnd, WM_USER + 1, loading.currentStep, (t2 - t1));
 		//Аргумент 1 - количество шагов
 		//Аргумент 2 - затраченное время (мс)
 	}
