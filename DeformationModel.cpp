@@ -37,9 +37,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	********     Интерфейс ввода/вывода параметров модели     ********
 	*****************************************************************/
 	printf(" Build date %s, %s\n", __DATE__, __TIME__);
-	std::string paramFileName;
-	//wcstombs(param_file, argv[1], 256);//Получили имя файла с параметрами
-	paramFileName = argv[1];
+	std::string paramFileName = argv[1];
 	printf(" Parameters file: %s\n", paramFileName.c_str());
 	if (prms::ReadParams(paramFileName.c_str()) == 1) printf(" Error in file!\n");		//Считали параметры из файла
 	printf(" ==========================================\n");
