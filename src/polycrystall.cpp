@@ -55,8 +55,8 @@ namespace model
 
 	void Polycrystall::OpenFiles()
 	{
-		TruncPoleFiles();				//Очистка всех файлов полюсных фигур
-		TruncSSTFiles();
+		truncPoleFigFiles();				//Очистка всех файлов полюсных фигур
+		truncSSTFiles();
 
 		DataXStream = new std::ofstream[20];//Открытие файлов для записи кривых НДС
 		DataYStream = new std::ofstream[20];
@@ -684,14 +684,14 @@ namespace model
 			{
 				for (int q3 = 0; q3 < fragm_count; q3++)
 				{
-					WriteDebugInfo(dbgstream[0], C[q1][q2][q3].o.c);
-					WriteDebugInfo(dbgstream[1], C[q1][q2][q3].e.c);
-					WriteDebugInfo(dbgstream[2], C[q1][q2][q3].d.c);
-					WriteDebugInfo(dbgstream[3], C[q1][q2][q3].sgm.c);
-					WriteDebugInfo(dbgstream[4], C[q1][q2][q3].om.c);
-					WriteDebugInfo(dbgstream[5], C[q1][q2][q3].dsgm.c);
-					WriteDebugInfo(dbgstream[6], C[q1][q2][q3].d_in.c);
-					WriteDebugInfo(dbgstream[7], C[q1][q2][q3].w.c);
+					writeDebugInfo(dbgstream[0], C[q1][q2][q3].o.c);
+					writeDebugInfo(dbgstream[1], C[q1][q2][q3].e.c);
+					writeDebugInfo(dbgstream[2], C[q1][q2][q3].d.c);
+					writeDebugInfo(dbgstream[3], C[q1][q2][q3].sgm.c);
+					writeDebugInfo(dbgstream[4], C[q1][q2][q3].om.c);
+					writeDebugInfo(dbgstream[5], C[q1][q2][q3].dsgm.c);
+					writeDebugInfo(dbgstream[6], C[q1][q2][q3].d_in.c);
+					writeDebugInfo(dbgstream[7], C[q1][q2][q3].w.c);
 					for (int f = 0; f < C[q1][q2][q3].SS_count; f++)
 					{
 						dbgstream[8] << C[q1][q2][q3].SS[f].dgm << " ";
@@ -707,11 +707,11 @@ namespace model
 			}
 		}
 		//Запись тензоров представительного объема
-		WriteDebugInfo(dbgstream[10], D.c);
-		WriteDebugInfo(dbgstream[11], D_in.c);
-		WriteDebugInfo(dbgstream[12], Sgm.c);
-		WriteDebugInfo(dbgstream[13], dSgm.c);
-		WriteDebugInfo(dbgstream[14], E.c);
+		writeDebugInfo(dbgstream[10], D.c);
+		writeDebugInfo(dbgstream[11], D_in.c);
+		writeDebugInfo(dbgstream[12], Sgm.c);
+		writeDebugInfo(dbgstream[13], dSgm.c);
+		writeDebugInfo(dbgstream[14], E.c);
 	}
 
 	void Polycrystall::Load(bool unload)

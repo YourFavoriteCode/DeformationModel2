@@ -37,12 +37,11 @@ int _tmain(int argc, _TCHAR* argv[])
 	********     Интерфейс ввода/вывода параметров модели     ********
 	*****************************************************************/
 	printf(" Build date %s, %s\n", __DATE__, __TIME__);
-	char* paramFileName = new char[256];
+	std::string paramFileName;
 	//wcstombs(param_file, argv[1], 256);//Получили имя файла с параметрами
 	paramFileName = argv[1];
-	printf(" Parameters file: %s\n", paramFileName);
-	if (prms::ReadParams(paramFileName) == 1) printf(" Error in file!\n");		//Считали параметры из файла
-	delete[] paramFileName;//Больше не нужен
+	printf(" Parameters file: %s\n", paramFileName.c_str());
+	if (prms::ReadParams(paramFileName.c_str()) == 1) printf(" Error in file!\n");		//Считали параметры из файла
 	printf(" ==========================================\n");
 	const int grainCountTotal = (int)pow(prms::grainCountLinear, 3);	//Общее кол-во фрагментов
 	printf(" Fragments count: %d\n", grainCountTotal);
@@ -176,7 +175,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			{
 				for (int q3 = 0; q3 < prms::grainCountLinear; q3++)
 				{
-					WriteDebugInfo(StreamO, polycrystall.C[q1][q2][q3].o.c);//Записываем значения тензоров ориентации
+					writeDebugInfo(StreamO, polycrystall.C[q1][q2][q3].o.c);//Записываем значения тензоров ориентации
 					for (int h = 0; h < prms::grainSurroundCount; h++)//Записываем значения нормалей
 					{
 						for (int i = 0; i < DIM; i++)
@@ -244,7 +243,7 @@ int _tmain(int argc, _TCHAR* argv[])
 				for (int q3 = 0; q3 < prms::grainCountLinear; q3++)
 				{
 
-					WriteDebugInfo(polycrystall.dbgstream[3], polycrystall.C[q1][q2][q3].sgm.c);
+					writeDebugInfo(polycrystall.dbgstream[3], polycrystall.C[q1][q2][q3].sgm.c);
 
 				}
 			}
@@ -259,12 +258,12 @@ int _tmain(int argc, _TCHAR* argv[])
 	*********		если она была запущена из неё		********
 	***********************************************************/
 
-	if (!isnormal(polycrystall.Strain)) printf("\n Calculation ERROR!\n");
+	if (!isNormalDouble(polycrystall.Strain)) printf("\n Calculation ERROR!\n");
 	else printf("\b\b\b\b\b\b\b\b\b\b\b\b\b\b Done    \n");
 	printf(" ==================================================\n");
 	printf(" Processing time: %g sec\n", (t2 - t1) / 1000.0);
 	printf(" Number of steps: %d\n", polycrystall.CURR_STEP);
-	if (!isnormal(polycrystall.Strain))//Если не зафиксированы ошибки - закрытие
+	if (!isNormalDouble(polycrystall.Strain))//Если не зафиксированы ошибки - закрытие
 	{
 		printf(" ==================================================\n");
 		//printf(" Press any key or STOP button to exit...");

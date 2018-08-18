@@ -10,6 +10,7 @@
 #include "Tensor.h"
 #include "Tensor4.h"
 #include "SlipSystem.h"
+#include "Functions.h"
 #include "Eigen/Eigen"
 
 namespace model
@@ -49,7 +50,7 @@ namespace model
 			sum += c[i] * c[i];
 		}
 		double res;	
-		if (isnormal(sum)) res = sqrt(sum); 
+		if (isNormalDouble(sum)) res = sqrt(sum);
 		else res = -1;//В случае ошибки вернёт -1
 		return res;
 	}

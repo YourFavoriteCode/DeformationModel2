@@ -19,7 +19,7 @@ namespace model
 		return dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
 	}
 
-	void WriteDebugInfo(std::ofstream& Stream, double Matrix[3][3])
+	void writeDebugInfo(std::ofstream& Stream, double Matrix[3][3])
 	{
 		for (int i = 0; i < 3; i++)
 		{
@@ -27,7 +27,7 @@ namespace model
 		}
 		Stream << std::endl;
 	}
-	void TruncSSTFiles()
+	void truncSSTFiles()
 	{
 		std::ofstream of1;
 		of1.open("Polus\\SST001.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
@@ -38,7 +38,7 @@ namespace model
 		of1.close();
 	}
 
-	void TruncPoleFiles()
+	void truncPoleFigFiles()
 	{
 		std::ofstream of;
 		of.open("Polus\\S001.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
@@ -69,6 +69,11 @@ namespace model
 		of.close();
 		of.open("Polus\\S111.dat", std::ios::out | std::ios_base::trunc | std::ios::binary);
 		of.close();
+	}
+
+	bool isNormalDouble(double x) {
+		unsigned long long u = *((unsigned long long*)&x);
+		return u < 0x7ff0000000000000ull && u > 0x000fffffffffffffull;
 	}
 
 }
