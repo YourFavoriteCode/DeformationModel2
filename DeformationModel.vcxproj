@@ -107,7 +107,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Program Files (x86)\Intel\Composer XE\compiler\include;$(IncludePath);$(SolutionDir)\include\Core;$(SolutionDir)\include\Features;$(SolutionDir)\include\Model;$(SolutionDir)\include\Util;$(SolutionDir)\dependency\Eigen\;$(SolutionDir)\dependency\TinyXML;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files (x86)\Intel\Composer XE\compiler\include;$(IncludePath);$(SolutionDir)\include\;$(SolutionDir)\include\Core;$(SolutionDir)\include\Features;$(SolutionDir)\include\Model;$(SolutionDir)\include\Util;$(SolutionDir)\dependency\Eigen\;$(SolutionDir)\dependency\TinyXML;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <InterproceduralOptimization>MultiFile</InterproceduralOptimization>
       <OptimizeForWindowsApplication>true</OptimizeForWindowsApplication>
       <EnableMatrixMultiplyLibraryCall>Yes</EnableMatrixMultiplyLibraryCall>
@@ -128,7 +128,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Program Files (x86)\Intel\Composer XE\compiler\include;$(IncludePath);$(SolutionDir)\include\Core;$(SolutionDir)\include\Features;$(SolutionDir)\include\Model;$(SolutionDir)\include\Util;$(SolutionDir)\dependency\Eigen\;$(SolutionDir)\dependency\TinyXML;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files (x86)\Intel\Composer XE\compiler\include;$(IncludePath);$(SolutionDir)\include\;$(SolutionDir)\include\Core;$(SolutionDir)\include\Features;$(SolutionDir)\include\Model;$(SolutionDir)\include\Util;$(SolutionDir)\dependency\Eigen\;$(SolutionDir)\dependency\TinyXML;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <InterproceduralOptimization>MultiFile</InterproceduralOptimization>
       <OptimizeForWindowsApplication>true</OptimizeForWindowsApplication>
       <EnableMatrixMultiplyLibraryCall>Yes</EnableMatrixMultiplyLibraryCall>
@@ -151,7 +151,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Program Files (x86)\Intel\Composer XE\compiler\include;$(IncludePath);$(SolutionDir)\include\Core;$(SolutionDir)\include\Features;$(SolutionDir)\include\Model;$(SolutionDir)\include\Util;$(SolutionDir)\dependency\Eigen\;$(SolutionDir)\dependency\TinyXML;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files (x86)\Intel\Composer XE\compiler\include;$(IncludePath);$(SolutionDir)\include\;$(SolutionDir)\include\Core;$(SolutionDir)\include\Features;$(SolutionDir)\include\Model;$(SolutionDir)\include\Util;$(SolutionDir)\dependency\Eigen\;$(SolutionDir)\dependency\TinyXML;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OpenMP>GenerateParallelCode</OpenMP>
       <OptimizeForWindowsApplication>true</OptimizeForWindowsApplication>
       <EnableMatrixMultiplyLibraryCall>Yes</EnableMatrixMultiplyLibraryCall>
@@ -175,7 +175,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Program Files (x86)\Intel\Composer XE\compiler\include;$(IncludePath);$(SolutionDir)\include\Core;$(SolutionDir)\include\Features;$(SolutionDir)\include\Model;$(SolutionDir)\include\Util;$(SolutionDir)\dependency\Eigen\;$(SolutionDir)\dependency\TinyXML;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files (x86)\Intel\Composer XE\compiler\include;$(IncludePath);$(SolutionDir)\include\;$(SolutionDir)\include\Core;$(SolutionDir)\include\Features;$(SolutionDir)\include\Model;$(SolutionDir)\include\Util;$(SolutionDir)\dependency\Eigen\;$(SolutionDir)\dependency\TinyXML;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OptimizeForWindowsApplication>true</OptimizeForWindowsApplication>
       <EnableMatrixMultiplyLibraryCall>Yes</EnableMatrixMultiplyLibraryCall>
       <Parallelization>true</Parallelization>
@@ -191,7 +191,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\CommonCore.h" />
-    <ClInclude Include="include\Core\CoreFuctions.h" />
     <ClInclude Include="include\Core\SlipSystem.h" />
     <ClInclude Include="include\Core\Tensor.h" />
     <ClInclude Include="include\Core\Tensor4.h" />
@@ -202,32 +201,41 @@
     <ClInclude Include="include\Model\Fragment.h" />
     <ClInclude Include="include\Model\Loading.h" />
     <ClInclude Include="include\Model\Polycrystall.h" />
+    <ClInclude Include="include\stdafx.h" />
+    <ClInclude Include="include\targetver.h" />
     <ClInclude Include="include\Util\Distributions.h" />
     <ClInclude Include="include\Util\Functions.h" />
     <ClInclude Include="include\Util\Materials.h" />
     <ClInclude Include="include\Util\Params.h" />
-    <ClInclude Include="stdafx.h" />
-    <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="DeformationModel.cpp" />
     <ClCompile Include="dependency\TinyXML\tinyxml2.cpp" />
+    <ClCompile Include="src\Core\CommonCore.cpp" />
+    <ClCompile Include="src\Core\SlipSystem.cpp">
+      <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</MultiProcessorCompilation>
+      <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</MultiProcessorCompilation>
+      <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</MultiProcessorCompilation>
+      <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</MultiProcessorCompilation>
+    </ClCompile>
+    <ClCompile Include="src\Core\Tensor.cpp" />
+    <ClCompile Include="src\Core\Tensor4.cpp" />
+    <ClCompile Include="src\Core\Vector.cpp" />
+    <ClCompile Include="src\DeformationModel.cpp" />
     <ClCompile Include="src\distributions.cpp" />
     <ClCompile Include="src\fragment.cpp" />
     <ClCompile Include="src\functions.cpp" />
     <ClCompile Include="src\hardening.cpp" />
     <ClCompile Include="src\loading.cpp" />
-    <ClCompile Include="src\MathCore.cpp" />
     <ClCompile Include="src\params.cpp" />
     <ClCompile Include="src\polycrystall.cpp" />
     <ClCompile Include="src\rotations.cpp" />
-    <ClCompile Include="src\tension.cpp" />
-    <ClCompile Include="stdafx.cpp">
+    <ClCompile Include="src\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\tension.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

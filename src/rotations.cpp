@@ -10,9 +10,6 @@
 #include "Fragment.h"
 #include "Distributions.h"
 
-#include "CoreFuctions.h"
-
-
 namespace model
 {
 	void Rotate(Fragment* f, double dFi, const Vector a)

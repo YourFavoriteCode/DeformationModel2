@@ -39,16 +39,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stdafx.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="targetver.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
     <ClInclude Include="include\Core\CommonCore.h">
-      <Filter>Файлы заголовков\core</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Core\CoreFuctions.h">
       <Filter>Файлы заголовков\core</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\SlipSystem.h">
@@ -93,17 +84,14 @@
     <ClInclude Include="include\Model\Loading.h">
       <Filter>Файлы заголовков\model</Filter>
     </ClInclude>
+    <ClInclude Include="include\stdafx.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="include\targetver.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="stdafx.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="DeformationModel.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\MathCore.cpp">
-      <Filter>Исходные файлы\core</Filter>
-    </ClCompile>
     <ClCompile Include="src\rotations.cpp">
       <Filter>Исходные файлы\features</Filter>
     </ClCompile>
@@ -133,6 +121,27 @@
     </ClCompile>
     <ClCompile Include="src\loading.cpp">
       <Filter>Исходные файлы\model</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DeformationModel.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdafx.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\SlipSystem.cpp">
+      <Filter>Исходные файлы\core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Tensor.cpp">
+      <Filter>Исходные файлы\core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Vector.cpp">
+      <Filter>Исходные файлы\core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Tensor4.cpp">
+      <Filter>Исходные файлы\core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\CommonCore.cpp">
+      <Filter>Исходные файлы\core</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

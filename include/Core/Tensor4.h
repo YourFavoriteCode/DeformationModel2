@@ -2,7 +2,6 @@
 #ifndef CORE_TENSOR4_H
 #define CORE_TENSOR4_H
 
-#include "CommonCore.h"
 #include "Tensor.h"
 
 /***********************************************************************

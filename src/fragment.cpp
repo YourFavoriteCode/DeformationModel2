@@ -8,7 +8,6 @@
 #include "Fragment.h"
 #include "Params.h"
 #include "Materials.h"
-#include "CoreFuctions.h"
 
 namespace model
 {

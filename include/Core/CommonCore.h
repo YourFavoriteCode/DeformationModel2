@@ -19,6 +19,10 @@ namespace model
 	const double EPS = 1e-10;					//Малая величина
 
 	const int DIM = 3;	//Размерность пространства
+
+
+	int LeviCivit(int i, int j, int k);	//Псевдо-тензор Леви-Чивита
+
 }
 
 #endif

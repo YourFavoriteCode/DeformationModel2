@@ -15,39 +15,39 @@ namespace model
 	class Tensor
 	{
 	public:
-		double c[DIM][DIM];					//Компоненты тензора
+		double c[DIM][DIM];							//Компоненты тензора
 
-		double getDet();					//Возвращает определитель матрицы компонент
+		double getDet();							//Возвращает определитель матрицы компонент
 		void set(double, double, double,
 			double, double, double,
-			double, double, double);		//Задание всех компонент тензора
-		void setZero();						//Зануляет компоненты тензора
-		void setUnit();						//Делает матрицу компонент тензора единичной
-		void transp();						//Транспонирует матрицу компонент тензора
-		double doubleScalMult(Tensor);		//Свёртка (двойное скалярное произведение тензоров)
-		void rotationMatrix(double, Vector);//Ортогональный тензор поворота вокруг заданной оси на заданный угол
-		void getAxisAngle(double*, Vector*);//Возвращает ось и угол поворота, по которым был образован тензор
+			double, double, double);				//Задание всех компонент тензора
+		void setZero();								//Зануляет компоненты тензора
+		void setUnit();								//Делает матрицу компонент тензора единичной
+		void transp();								//Транспонирует матрицу компонент тензора
+		double doubleScalMult(Tensor);				//Свёртка (двойное скалярное произведение тензоров)
+		void rotationMatrix(double, Vector);		//Ортогональный тензор поворота вокруг заданной оси на заданный угол
+		void getAxisAngle(double*, Vector*);		//Возвращает ось и угол поворота, по которым был образован тензор
 
-		Tensor getSymmetryPart();			//Возвращает симметричную часть тензора
-		Tensor getAntiSymmetryPart();		//Возвращает антисимметричную часть тензора
-		Vector getRow(int);					//Вектор из компонент заданной строки
-		Vector getCol(int);					//Вектор из компонент заданного стобца
+		Tensor getSymmetryPart();					//Возвращает симметричную часть тензора
+		Tensor getAntiSymmetryPart();				//Возвращает антисимметричную часть тензора
+		Vector getRow(int);							//Вектор из компонент заданной строки
+		Vector getCol(int);							//Вектор из компонент заданного стобца
 
-		double getL(int n);					//Возвращает собственное число с номером n
+		double getL(int n);							//Возвращает собственное число с номером n
 
-		Tensor operator + (Tensor);			//Оператор сложения тензоров
-		Tensor operator - (Tensor);			//Оператор вычитания тензоров
-		Tensor operator - ();				//Унарный минус
-		Tensor operator * (Tensor);			//Оператор умножения тензоров
+		Tensor operator + (Tensor);					//Оператор сложения тензоров
+		Tensor operator - (Tensor);					//Оператор вычитания тензоров
+		Tensor operator - ();						//Унарный минус
+		Tensor operator * (Tensor);					//Оператор умножения тензоров
 
-		friend Tensor operator * (Tensor&, double);		//Оператор умножения на число
-		friend Tensor operator * (double, Tensor&);		//Коммутативный
+		friend Tensor operator * (Tensor&, double);	//Оператор умножения на число
+		friend Tensor operator * (double, Tensor&);	//Коммутативный
 
-		void operator += (Tensor);			//Оператор прибавления тензора
-		void operator -= (Tensor);			//Оператор убавления тензора
-		void operator *= (Tensor);			//Оператор домножения на тензор
-		void operator *= (double);			//Оператор умножения тензора на число
-		int operator /= (double);			//Оператор деления тензора на число
+		void operator += (Tensor);					//Оператор прибавления тензора
+		void operator -= (Tensor);					//Оператор убавления тензора
+		void operator *= (Tensor);					//Оператор домножения на тензор
+		void operator *= (double);					//Оператор умножения тензора на число
+		int operator /= (double);					//Оператор деления тензора на число
 
 		Tensor();
 		~Tensor();
@@ -55,6 +55,13 @@ namespace model
 	private:
 
 	};
+
+	Tensor VectMult(Vector, Tensor);				//Векторное произведение вектора на тензор
+	Tensor VectMult(Tensor, Vector);				//Векторное произведение тензора на вектор
+	Vector ScalMult(Vector, Tensor);				//Скалярное произведение вектора на тензор
+	Vector ScalMult(Tensor, Vector);				//Скалярное произведение тензора на вектор
+
+	Tensor Transp(Tensor);							//Возвращает транспонированный аргумент
 }
 
 #endif

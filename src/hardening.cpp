@@ -8,7 +8,6 @@
 #include "Params.h"
 #include "Materials.h"
 #include "Hardening.h"
-#include "CoreFuctions.h"
 
 namespace model
 {
