@@ -4,14 +4,17 @@
 
 #include "Fragment.h"
 #include "Loading.h"
+#include "vector"
 
 namespace model
 {
 	class Polycrystall
 	{
 	public:
-		Fragment *c;						// Массив элементов поликристалла
+	//	Fragment *c;						// Массив элементов поликристалла
 		
+		std::vector<Fragment> c;
+
 		Loading *loading;					// Нагружение
 
 		int grainCount;						// Кол-во фрагментов на ребре

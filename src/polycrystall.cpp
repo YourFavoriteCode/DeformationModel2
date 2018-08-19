@@ -8,6 +8,7 @@
 #include <ctime>
 #include <omp.h>
 #include <fstream>
+#include "vector"
 
 #include "Polycrystall.h"
 #include "Params.h"
@@ -33,7 +34,7 @@ namespace model
 
 	Polycrystall::~Polycrystall()
 	{
-		delete[] c;
+		//delete[] c;
 	}
 
 	void Polycrystall::openAllFiles()
@@ -209,8 +210,8 @@ namespace model
 	{
 		grainCount = count;
 		totalGrainCount = (int)pow(count, 3);
-
-		c = new Fragment[totalGrainCount];		//Выделение памяти под массив
+		c = std::vector<Fragment>(totalGrainCount);
+		//c = new Fragment[totalGrainCount];		//Выделение памяти под массив
 	}
 
 	void Polycrystall::setParams()
