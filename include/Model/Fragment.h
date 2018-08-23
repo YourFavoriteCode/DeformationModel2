@@ -2,6 +2,8 @@
 #ifndef __FRAGMENT_H 
 #define __FRAGMENT_H
 
+#include "vector"
+
 #include "Tensor.h"
 #include "Tensor4.h"
 #include "SlipSystem.h"
@@ -31,7 +33,7 @@ namespace model
 		double stress;					//Интенсивность напряжений
 		double strain;					//Интенсивность деформаций
 		
-		Fragment *surrounds;			//Ссылки на граничащие фрагменты
+		std::vector<Fragment*> surrounds;//Ссылки на граничащие фрагменты
 		Vector *normals;				//Вектора нормали к граничащим фрагментам
 		Vector moment;				
 		int *contact;					

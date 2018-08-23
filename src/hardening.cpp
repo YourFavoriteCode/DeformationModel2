@@ -109,9 +109,9 @@ namespace model
 				//double zguk = prms::HARD_BOUND_K * f->SS[k].dgm * f->SS[k].gmm / f->size;
 				double min = 1.0;//Минимум
 				//min = f->DisorientMeasure(h);
-				for (int p = 0; p < f->surrounds[h].SS_count; p++)	//Цикл по системам соседнего зерна
+				for (int p = 0; p < f->surrounds[h]->SS_count; p++)	//Цикл по системам соседнего зерна
 				{
-					Vector b2 = ScalMult(f->surrounds[h].o, f->surrounds[h].SS[p].b);//Перевели вектор b p-ой СС соседнего зерна в ЛСК
+					Vector b2 = ScalMult(f->surrounds[h]->o, f->surrounds[h]->SS[p].b);//Перевели вектор b p-ой СС соседнего зерна в ЛСК
 					Vector diff = b1 - b2;
 					diff.normalize();
 					double M = fabs(diff.scalMult(f->normals[h]));

@@ -107,10 +107,10 @@ namespace model
 						if (f->SS[k].b.scalMult(f->normals[h]) < 0) continue; //Скольжение от границы - вклад не вносится
 						d_in1.c[i][j] += f->SS[k].dgm * (f->SS[k].n.c[i] * f->SS[k].b.c[j]);
 					}
-					for (int k = 0; k < f->surrounds[h].SS_count; k++)
+					for (int k = 0; k < f->surrounds[h]->SS_count; k++)
 					{
 						//if (f->SS[k].b.ScalMult(f->normals[h]) < 0) continue; //Скольжение от границы - вклад не вносится
-						d_in2.c[i][j] += f->surrounds[h].SS[k].dgm * (f->surrounds[h].SS[k].n.c[i] * f->surrounds[h].SS[k].b.c[j]);
+						d_in2.c[i][j] += f->surrounds[h]->SS[k].dgm * (f->surrounds[h]->SS[k].n.c[i] * f->surrounds[h]->SS[k].b.c[j]);
 					}
 				}
 			}

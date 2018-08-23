@@ -596,7 +596,7 @@ namespace model
 			e.normalize();
 
 			Vector e1 = ScalMult(e, o);//Перевод вектора в ЛСК
-			Vector e2 = ScalMult(e, surrounds[h].o);
+			Vector e2 = ScalMult(e, surrounds[h]->o);
 			e1.normalize();
 			e2.normalize();
 			//Теперь нужно отразить оба эти вектора в одну четверть сферы (x>0,y>0,z>0)

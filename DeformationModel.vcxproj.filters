@@ -143,5 +143,8 @@
     <ClCompile Include="src\Core\CommonCore.cpp">
       <Filter>Исходные файлы\core</Filter>
     </ClCompile>
+    <ClCompile Include="src\Features\BaseStructure.cpp">
+      <Filter>Исходные файлы\features</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

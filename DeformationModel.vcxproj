@@ -222,6 +222,7 @@
     <ClCompile Include="src\Core\Vector.cpp" />
     <ClCompile Include="src\DeformationModel.cpp" />
     <ClCompile Include="src\distributions.cpp" />
+    <ClCompile Include="src\Features\BaseStructure.cpp" />
     <ClCompile Include="src\fragment.cpp" />
     <ClCompile Include="src\functions.cpp" />
     <ClCompile Include="src\hardening.cpp" />
