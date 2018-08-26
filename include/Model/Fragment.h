@@ -37,7 +37,7 @@ namespace model
 		std::vector<Vector> normals;		//Вектора нормали к граничащим фрагментам
 		std::vector<double> areas;			//Площади фасеток
 		Vector moment;				
-		int *contact;					
+		//int *contact;					
 
 		int position;						//Порядковый номер данного элемента в поликристалле
 		/*

@@ -15,13 +15,6 @@ namespace prms
 		DISTRIB_EXPONENT	// Показательное
 	};
 
-	// Степень учета окружения
-	enum SurroundGrade {
-		GRADE_BASE,				// Базовая
-		GRADE_DETAILED,			// Повышенная
-		GRADE_MOST_DETAILED		// Самая высокая
-	};
-
 	/********************************************************
 	**********   Различные параметры нагружения   ***********
 	********************************************************/
@@ -50,7 +43,6 @@ namespace prms
 	**********		Параметры поликристалла	     ************
 	********************************************************/
 	extern int materialType;					//Используемый материал
-	extern SurroundGrade grainSurroundGrade;	//Степень учёта соседних элементов
 	extern int grainSurroundCount;				//Кол-во учитываемых соседей
 	extern int grainCountLinear;				//Кол-во фрагментов
 	extern int mainPhasePercent;				//Процент основной фазы в материале

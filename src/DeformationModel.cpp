@@ -104,28 +104,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	printf(" Initializing all fragments... ");
 	t1 = clock();
 
-
-
 	std::srand(time(NULL));
-
-	switch (prms::grainSurroundGrade)			//Степень учёта соседних элементов
-	{
-	case prms::GRADE_BASE:
-	{
-		prms::grainSurroundCount = 6;			//Обычный уровень
-		break;
-	}
-	case prms::GRADE_DETAILED:
-	{
-		prms::grainSurroundCount = 18;		//Повышенный уровень
-		break;
-	}
-	case prms::GRADE_MOST_DETAILED:
-	{
-		prms::grainSurroundCount = 26;		//Самый высокий уровень
-		break;
-	}
-	}
 
 	polycrystall.setParams();					//Заполнение всех параметров поликристалла
 	polycrystall.makeGrainStruct(STRUCTURE_CUBIC);				//Формирование фрагментной структуры

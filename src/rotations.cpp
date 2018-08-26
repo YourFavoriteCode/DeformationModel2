@@ -96,7 +96,6 @@ namespace model
 		double S = f->size*f->size;		//Площадь фасетки (полная)
 		for (int h = 0; h < prms::grainSurroundCount; h++)//Пробегаем по всем соседям фрагмента
 		{
-			if (f->contact[h] == 0) continue;//Если нет контакта - пропускаем
 			Tensor d_in1, d_in2;
 			for (int i = 0; i < DIM; i++)
 			{
@@ -124,8 +123,6 @@ namespace model
 			dm = dm + b1 - b2;
 			double c;		//Определяет площадь контакта (в долях от полной площади стороны куба)
 			if (h < 6) c = UniformDistrib(0.93, 0.07);
-			else if (h < 14) c =  UniformDistrib(0.1, 0.05);
-			else c = UniformDistrib(0.01, 0.005);
 			dM += dm*S*c;
 		}
 		dM /= f->volume;

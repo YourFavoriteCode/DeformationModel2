@@ -65,7 +65,6 @@ namespace model
 			double zgu = 0;
 			for (int h = 0; h < prms::surround_count; h++)	//Цикл по фасеткам			
 			{
-				if (f->contact[h] == 0) continue;//Если нет контакта - пропускаем
 				if (f->SS[k].b.ScalMult(f->normals[h]) < 0) continue; //Скольжение от границы - пропускаем
 				double zguk = prms::HARD_BOUND_K * f->SS[k].dgm * f->SS[k].gmm / f->size;
 				double min = 1.0;//Минимум
@@ -104,7 +103,6 @@ namespace model
 			double tbs=0;
 			for (int h = 0; h < prms::grainSurroundCount; h++)	//Цикл по фасеткам			
 			{
-				if (f->contact[h] == 0) continue;//Если нет контакта - пропускаем
 				if (f->SS[k].b.scalMult(f->normals[h]) < 0) continue; //Скольжение от границы - пропускаем
 				//double zguk = prms::HARD_BOUND_K * f->SS[k].dgm * f->SS[k].gmm / f->size;
 				double min = 1.0;//Минимум

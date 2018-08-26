@@ -71,7 +71,6 @@ namespace prms
 	double hardeningParamBasePsi			= 0;
 	double hardeningParamBaseA				= 0;
 
-	SurroundGrade grainSurroundGrade		= GRADE_BASE;
 	bool usingStandardTriangleSaving		= false;
 
 	bool saveIntensity						= true;
@@ -173,8 +172,6 @@ namespace prms
 
 		getValue(rootnode, "CycleCount", &loadCycleCount);
 		getValue(rootnode, "Unloading", &withUnloading);
-		getValue(rootnode, "SurroundsDegree", &buf);
-		grainSurroundGrade = SurroundGrade(buf);
 		getValue(rootnode, "RotationHardening", &usingRotationsHardening);
 		getValue(rootnode, "MaterialPurity", &mainPhasePercent);
 		getValue(rootnode, "PlotPeriod", &periodSavePlot);

@@ -333,12 +333,6 @@ namespace model
 			//Выделение памяти под массивы, необходимые для работы с окружением
 			c[q].neighbors = std::vector<Fragment*>(prms::grainSurroundCount);
 			c[q].normals = std::vector<Vector>(prms::grainSurroundCount);
-			c[q].contact = new int[prms::grainSurroundCount];
-
-			for (int h = 0; h < prms::grainSurroundCount; h++)
-			{
-				c[q].contact[h] = -1;		//Изначально контакт не задан
-			}
 
 		}
 	}
