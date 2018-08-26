@@ -331,8 +331,8 @@ namespace model
 			c[q].volume = pow(c[q].size, 3);	//Объём фрагмента
 
 			//Выделение памяти под массивы, необходимые для работы с окружением
-			c[q].surrounds = std::vector<Fragment*>(prms::grainSurroundCount);
-			c[q].normals = new Vector[prms::grainSurroundCount];
+			c[q].neighbors = std::vector<Fragment*>(prms::grainSurroundCount);
+			c[q].normals = std::vector<Vector>(prms::grainSurroundCount);
 			c[q].contact = new int[prms::grainSurroundCount];
 
 			for (int h = 0; h < prms::grainSurroundCount; h++)
@@ -350,7 +350,7 @@ namespace model
 		switch (structType)
 		{
 		case model::STRUCTURE_CUBIC:
-			structure.makeCubicStruct(this);
+			structure.makeCubicStructure(this);
 			break;
 		case model::STRUCTURE_VORONOI:
 			structure.makeVoronoiStructure(this);

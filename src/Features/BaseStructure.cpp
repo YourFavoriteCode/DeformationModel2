@@ -14,7 +14,7 @@ namespace model
 	// нормалей и с периодическими граничными условиями. В зависимости от параметра prms::grainSurroundCount
 	// учитываются 6, 14 или 26 близлежащих зерен с различными площадями фасеток контакта.
 
-	void GrainStructure::makeCubicStruct(Polycrystall* poly)
+	void GrainStructure::makeCubicStructure(Polycrystall* poly)
 	{
 		for (int q = 0; q < poly->totalGrainCount; q++)
 		{
@@ -256,8 +256,8 @@ namespace model
 				}
 				}
 				int index = get1DPos(qq1, qq2, qq3);
-				poly->c[q].surrounds[h] = &poly->c[index];					// Устанавливаем ссылки на соседние зерна
-				poly->c[index].surrounds[y] = &poly->c[q];					// И в обратную сторону
+				poly->c[q].neighbors[h] = &poly->c[index];					// Устанавливаем ссылки на соседние зерна
+				poly->c[index].neighbors[y] = &poly->c[q];					// И в обратную сторону
 				poly->c[q].normals[h].normalize();
 
 				for (int i = 0; i < DIM; i++)

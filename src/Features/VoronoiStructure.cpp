@@ -34,6 +34,7 @@ namespace model
 		// И выделяющий память под 8 частиц в ккаждом блоке
 		container con(x_min, x_max, y_min, y_max, z_min, z_max, n_x, n_y, n_z,
 			true, true, true, 8);
+		centerPos.clear();
 		// Добавление случайно сгенерированных частиц в контейнер
 		double x, y, z;
 		for (int i = 0; i < particles; i++) {
@@ -41,22 +42,37 @@ namespace model
 			y = y_min + rnd()*(y_max - y_min);
 			z = z_min + rnd()*(z_max - z_min);
 			con.put(i, x, y, z);
+			centerPos.push_back(Vector(x, y, z));
 		}
 		// Ячейка, к которой будем обращаться в цикле
 		voronoicell cell;
 		// Вспомогательный объект, обходящий все элементы контейнера
 		c_loop_all loop(con);
 		// Основной цикл обхода контейнера
+		int q = 0;
 		if (loop.start()) do if (con.compute_cell(cell, loop))
 		{
-			std::vector<double> normals;
-			std::vector<int> neighbors;
+			std::vector<double> normals;	// Нормали к каждой фасетке
+			std::vector<int> neighbors;		// ID соседнего к каждой фасетке зерна
 			cell.neighbors(neighbors);
-			cell.normals(normals);//Нормали
+			cell.normals(normals);
+			int neighborCount = neighbors.size();
+			for (int i = 0; i < neighborCount; i++)
+			{
+				int curr = i * 3;
+				Vector normal(normals[curr], normals[curr + 1], normals[curr + 2]);
+				poly->c[q].normals[i] = normal;
+				poly->c[q].neighbors[i] = &poly->c[neighbors[i]];
+			}
+			// Начальный объем каждого зерна
+			poly->c[q].volume = cell.volume();
+
+			q++;
 		} while (loop.inc());
 	}
 
-	void outputStructure(container con) {
+	void outputStructure(container con)
+	{
 		
 		// Легенда:
 		// %i - ID ячейки
