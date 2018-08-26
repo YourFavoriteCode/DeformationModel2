@@ -17,6 +17,7 @@
 #include "Rotations.h"
 #include "Hardening.h"
 #include "Functions.h"
+#include "GrainStructure.h"
 
 namespace model
 {
@@ -342,6 +343,23 @@ namespace model
 		}
 	}
 	
+	void Polycrystall::makeGrainStruct(GrainStruct structType) {
+	
+		GrainStructure structure = GrainStructure();
+		
+		switch (structType)
+		{
+		case model::STRUCTURE_CUBIC:
+			structure.makeCubicStruct(this);
+			break;
+		case model::STRUCTURE_VORONOI:
+			structure.makeVoronoiStructure(this);
+			break;
+		default:
+			break;
+		}
+	}
+
 	//TODO: Перенос работы с файлами в отдельный класс
 
 	void Polycrystall::savePoleFigData()

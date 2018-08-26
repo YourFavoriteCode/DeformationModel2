@@ -90,6 +90,9 @@
     <ClInclude Include="include\targetver.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
+    <ClInclude Include="include\Model\GrainStructure.h">
+      <Filter>Файлы заголовков\model</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\rotations.cpp">
@@ -146,5 +149,11 @@
     <ClCompile Include="src\Features\BaseStructure.cpp">
       <Filter>Исходные файлы\features</Filter>
     </ClCompile>
+    <ClCompile Include="src\Features\VoronoiStructure.cpp">
+      <Filter>Исходные файлы\features</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

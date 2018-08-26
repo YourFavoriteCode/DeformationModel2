@@ -128,7 +128,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	}
 
 	polycrystall.setParams();					//Заполнение всех параметров поликристалла
-	polycrystall.makeGrainStruct();				//Формирование фрагментной структуры
+	polycrystall.makeGrainStruct(STRUCTURE_CUBIC);				//Формирование фрагментной структуры
 
 	if (prms::fixedOrientations == 2)	//Считывание записанных ориентаций
 	{

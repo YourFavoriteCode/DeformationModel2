@@ -199,6 +199,7 @@
     <ClInclude Include="include\Features\Rotations.h" />
     <ClInclude Include="include\Features\Tension.h" />
     <ClInclude Include="include\Model\Fragment.h" />
+    <ClInclude Include="include\Model\GrainStructure.h" />
     <ClInclude Include="include\Model\Loading.h" />
     <ClInclude Include="include\Model\Polycrystall.h" />
     <ClInclude Include="include\stdafx.h" />
@@ -223,6 +224,7 @@
     <ClCompile Include="src\DeformationModel.cpp" />
     <ClCompile Include="src\distributions.cpp" />
     <ClCompile Include="src\Features\BaseStructure.cpp" />
+    <ClCompile Include="src\Features\VoronoiStructure.cpp" />
     <ClCompile Include="src\fragment.cpp" />
     <ClCompile Include="src\functions.cpp" />
     <ClCompile Include="src\hardening.cpp" />
@@ -238,7 +240,17 @@
     </ClCompile>
     <ClCompile Include="src\tension.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="packages\voroplusplus.0.4.6.1\build\native\voroplusplus.targets" Condition="Exists('packages\voroplusplus.0.4.6.1\build\native\voroplusplus.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>Данный проект ссылается на пакеты NuGet, отсутствующие на этом компьютере. Используйте восстановление пакетов NuGet, чтобы скачать их.  Дополнительную информацию см. по адресу: http://go.microsoft.com/fwlink/?LinkID=322105. Отсутствует следующий файл: {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\voroplusplus.0.4.6.1\build\native\voroplusplus.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\voroplusplus.0.4.6.1\build\native\voroplusplus.targets'))" />
+  </Target>
 </Project>

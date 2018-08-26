@@ -2,18 +2,24 @@
 #ifndef __POLYCRYST_H 
 #define __POLYCRYST_H
 
+#include "vector"
+
 #include "Fragment.h"
 #include "Loading.h"
-#include "vector"
 
 namespace model
 {
+	// Тип зеренной структуры
+	enum GrainStruct {
+		STRUCTURE_CUBIC,					// Кубическая трехмерная укладка
+		STRUCTURE_VORONOI					// Разбиение области на многогранники Вороного
+	};
+
 	class Polycrystall
 	{
 	public:
-	//	Fragment *c;						// Массив элементов поликристалла
 		
-		std::vector<Fragment> c;
+		std::vector<Fragment> c;			// Массив элементов поликристалла
 
 		Loading *loading;					// Нагружение
 
@@ -48,7 +54,7 @@ namespace model
 		~Polycrystall();
 
 		void init(int);						// Выделение памяти под зёрна
-		void makeGrainStruct();				// Распределение нормалей и фасеток всех фрагментов
+		void makeGrainStruct(GrainStruct);	// Распределение нормалей и фасеток всех фрагментов
 		void setParams();					// Распределение параметров фрагментов
 		void deformate(Loading*);			// Деформирование поликристалла
 
