@@ -6,15 +6,10 @@
 
 #include "Fragment.h"
 #include "Loading.h"
+#include "Params.h"
 
 namespace model
 {
-	// Тип зеренной структуры
-	enum GrainStruct {
-		STRUCTURE_CUBIC,					// Кубическая трехмерная укладка
-		STRUCTURE_VORONOI					// Разбиение области на многогранники Вороного
-	};
-
 	class Polycrystall
 	{
 	public:
@@ -54,7 +49,7 @@ namespace model
 		~Polycrystall();
 
 		void init(int);						// Выделение памяти под зёрна
-		void makeGrainStruct(GrainStruct);	// Распределение нормалей и фасеток всех фрагментов
+		void makeGrainStruct(prms::GrainStruct);	// Распределение нормалей и фасеток всех фрагментов
 		void setParams();					// Распределение параметров фрагментов
 		void deformate(Loading*);			// Деформирование поликристалла
 

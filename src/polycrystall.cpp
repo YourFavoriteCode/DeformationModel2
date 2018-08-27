@@ -328,25 +328,22 @@ namespace model
 				break;
 			}
 			}
-			c[q].volume = pow(c[q].size, 3);	//Объём фрагмента
-
-			//Выделение памяти под массивы, необходимые для работы с окружением
-			c[q].neighbors = std::vector<Fragment*>(prms::grainSurroundCount);
-			c[q].normals = std::vector<Vector>(prms::grainSurroundCount);
+			
+			
 
 		}
 	}
 	
-	void Polycrystall::makeGrainStruct(GrainStruct structType) {
+	void Polycrystall::makeGrainStruct(prms::GrainStruct structType) {
 	
 		GrainStructure structure = GrainStructure();
 		
 		switch (structType)
 		{
-		case model::STRUCTURE_CUBIC:
+		case prms::STRUCTURE_CUBIC:
 			structure.makeCubicStructure(this);
 			break;
-		case model::STRUCTURE_VORONOI:
+		case prms::STRUCTURE_VORONOI:
 			structure.makeVoronoiStructure(this);
 			break;
 		default:
@@ -706,7 +703,6 @@ namespace model
 			double RotSpeed = 0;				//Средняя скорость вращения на шаге
 			int RotCount = 0;					//Кол-во вращающихся фрагментов
 			double Mc = 0;
-
 			double angle = 0;
 			double H = 0;
 			for (int q = 0; q < totalGrainCount; q++)

@@ -93,8 +93,9 @@ namespace model
 	void Trusov_rotations(Fragment *f)
 	{
 		Vector dM;						//Производная вектор-момента
-		double S = f->size*f->size;		//Площадь фасетки (полная)
-		for (int h = 0; h < prms::grainSurroundCount; h++)//Пробегаем по всем соседям фрагмента
+		double S = f->size*f->size;		//Площадь фасетки
+		// Цикл по всем фасеткам данного зерна
+		for (int h = 0; h < prms::grainSurroundCount; h++)
 		{
 			Tensor d_in1, d_in2;
 			for (int i = 0; i < DIM; i++)
@@ -113,17 +114,17 @@ namespace model
 					}
 				}
 			}
-			Tensor Lp = d_in1 - d_in2;
-			Lp.transp();
+			// Скачок тензора пластической деформации на границе зерен
+			Tensor Lp = Transp(d_in1 - d_in2);
 			Tensor buf = VectMult(f->normals[h], Lp);
-			Vector dm = ScalMult(buf, f->normals[h]);//Поверхностный вектор-момент
+			// Поверхностный вектор-момент, действующий на фасетку
+			Vector dm = ScalMult(buf, f->normals[h]);
 			dm *= f->rot_L;
-			Vector b1 = ScalMult(f->om, dm);//(коротационная производная)
+			// Слагаемые для коротационной производной
+			Vector b1 = ScalMult(f->om, dm);
 			Vector b2 = ScalMult(dm, f->om);
 			dm = dm + b1 - b2;
-			double c;		//Определяет площадь контакта (в долях от полной площади стороны куба)
-			if (h < 6) c = UniformDistrib(0.93, 0.07);
-			dM += dm*S*c;
+			dM += dm*S;
 		}
 		dM /= f->volume;
 		double dMnorm = dM.getNorm();
@@ -135,31 +136,25 @@ namespace model
 			norm = f->rot_Mc;
 		}
 	
-	
 		double pr = M.scalMult(dM);
-	
-		double dFi = 0;		//Скорость вращения
-		if (norm == f->rot_Mc && pr >= 0)	//Пластические и упругие развороты
+		//Вычисление скорости вращения
+		double dFi = f->rot_A * dMnorm;		// Только упругая составляющая разворотов				
+		if (norm == f->rot_Mc && pr >= 0)	
 		{
-			dFi = f->rot_A * dMnorm + f->rot_H * norm;
-		}
-		else
-		{
-			dFi = f->rot_A * dMnorm;		//Только упругие развороты
+			dFi += f->rot_H * norm;			// Пластическая составляющая
 		}
 		
 		f->isRotate = (dFi > EPS*1e4);
 		if (f->isRotate)
 		{
-			Vector e = M;					//Ось вращения решётки сонаправлена с вектором момента
+			Vector e = M;					// Ось вращения решётки сонаправлена с вектором момента
 			e.normalize();
 			f->rot_speed = dFi;
 			dFi *= prms::dt;
-			f->sum_angle += dFi;		//Накопленный угол вращения увеличивается
-			Rotate(f, dFi, e);			//Вращение решётки
-			f->rot_energy = norm*dFi;	//Считаем энергию ротаций
-
-			f->om.setZero();			//Спин решётки
+			f->sum_angle += dFi;			// Накопленный угол вращения увеличивается
+			Rotate(f, dFi, e);				// Вращение решетки
+			f->rot_energy = norm*dFi;		// Энергия ротаций
+			f->om.setZero();				// Спин решётки
 			for (int i = 0; i < DIM; i++)
 			{
 				for (int j = 0; j < DIM; j++)
@@ -175,7 +170,7 @@ namespace model
 		else
 		{
 			f->om.setZero();
-			f->rot_speed = 0;		//Решётка не вращается
+			f->rot_speed = 0;		//Решетка не вращается
 			f->rot_energy = 0;		//Энергия вращения равна нулю
 		}
 	}
@@ -253,9 +248,12 @@ namespace model
 		Of.close();
 	}
 
+	// Сохраняет в файл проекции кристаллографических направлений
+	// на стандартный стереографический треугольник (ССТ)
 	void GetSST(Fragment *f)
 	{
-		for (double fi = 0; fi < 2 * PI; fi += PI_2)//Ось четвёртого порядка
+		// Ось четвёртого порядка
+		for (double fi = 0; fi < 2 * PI; fi += PI_2)
 		{
 			GetSSTPoint(f->o, fi, "Polus\\SST001.dat", 0, 0, 1);
 			GetSSTPoint(f->o, fi, "Polus\\SST001.dat", 0, 1, 0);
@@ -264,7 +262,8 @@ namespace model
 			GetSSTPoint(f->o, fi, "Polus\\SST001.dat", 0, -1, 0);
 			GetSSTPoint(f->o, fi, "Polus\\SST001.dat", -1, 0, 0);
 		}
-		for (double fi = 0; fi < 2 * PI; fi += PI)//Ось второго порядка
+		// Ось второго порядка
+		for (double fi = 0; fi < 2 * PI; fi += PI)
 		{
 			GetSSTPoint(f->o, fi, "Polus\\SST011.dat", 0, 1, 1);
 			GetSSTPoint(f->o, fi, "Polus\\SST011.dat", 0, 1, -1);
@@ -279,7 +278,8 @@ namespace model
 			GetSSTPoint(f->o, fi, "Polus\\SST011.dat", -1, -1, 0);
 			GetSSTPoint(f->o, fi, "Polus\\SST011.dat", 0, -1, -1);
 		}
-		for (double fi = 0; fi < 2 * PI; fi += 2.0 * PI / 3.0)//Ось третьего порядка
+		// Ось третьего порядка
+		for (double fi = 0; fi < 2 * PI; fi += 2.0 * PI / 3.0)
 		{
 			GetSSTPoint(f->o, fi, "Polus\\SST111.dat", 1, 1, 1);
 			GetSSTPoint(f->o, fi, "Polus\\SST111.dat", 1, 1, -1);

@@ -13,12 +13,11 @@ using namespace voro;
 
 namespace model
 {
+		
+	double rnd() { return double(rand()) / RAND_MAX; }
 
 	// Укладка зерен в виде многогранников Вороного. Разбиение моделируемого объема среды
 	// на ячейки без пустот и наложений. Используется пакет voro++
-	
-	double rnd() { return double(rand()) / RAND_MAX; }
-
 	void GrainStructure::makeVoronoiStructure(Polycrystall* poly)
 	{
 		// Геометрия контейнера для расчетной области
@@ -45,7 +44,7 @@ namespace model
 			centerPos.push_back(Vector(x, y, z));
 		}
 		// Ячейка, к которой будем обращаться в цикле
-		voronoicell cell;
+		voronoicell_neighbor cell;
 		// Вспомогательный объект, обходящий все элементы контейнера
 		c_loop_all loop(con);
 		// Основной цикл обхода контейнера
@@ -57,21 +56,24 @@ namespace model
 			cell.neighbors(neighbors);
 			cell.normals(normals);
 			int neighborCount = neighbors.size();
+			poly->c[q].neighbors = std::vector<Fragment*>(neighborCount);
+			poly->c[q].normals = std::vector<Vector>(neighborCount);
 			for (int i = 0; i < neighborCount; i++)
 			{
 				int curr = i * 3;
 				Vector normal(normals[curr], normals[curr + 1], normals[curr + 2]);
+				// Нормали уже отнормированы
 				poly->c[q].normals[i] = normal;
 				poly->c[q].neighbors[i] = &poly->c[neighbors[i]];
 			}
 			// Начальный объем каждого зерна
-			poly->c[q].volume = cell.volume();
+			poly->c[q].volume = pow(poly->c[q].size, 3) * cell.volume();
 
 			q++;
 		} while (loop.inc());
 	}
 
-	void outputStructure(container con)
+	void printStructureInfo(container con)
 	{
 		
 		// Легенда:

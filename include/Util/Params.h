@@ -15,6 +15,12 @@ namespace prms
 		DISTRIB_EXPONENT	// Показательное
 	};
 
+	// Тип зеренной структуры
+	enum GrainStruct {
+		STRUCTURE_CUBIC,	// Кубическая трехмерная укладка
+		STRUCTURE_VORONOI	// Разбиение области на многогранники Вороного
+	};
+
 	/********************************************************
 	**********   Различные параметры нагружения   ***********
 	********************************************************/
@@ -46,7 +52,7 @@ namespace prms
 	extern int grainSurroundCount;				//Кол-во учитываемых соседей
 	extern int grainCountLinear;				//Кол-во фрагментов
 	extern int mainPhasePercent;				//Процент основной фазы в материале
-	
+	extern GrainStruct structType;				//Тип генерируемой зеренной структуры
 	extern DistributionType grainSizeDistribLaw;//Закон распределения размеров фрагментов
 	extern double grainSizeDistribM;			//Мат.ожидание размера зерна
 	extern double grainSizeDistribD;			//Дисперсия размера зерна
@@ -96,7 +102,10 @@ namespace prms
 	extern bool saveMacro;					//Сохранение данных макроуровня
 	extern bool saveMeso;					//Сохранение данных мехоуровня
 	extern bool saveActiveSS;				//Сохранение активных СС	
-	extern bool save11;						//Покомпонентное сохранение тензоров
+	
+	//Покомпонентное сохранение тензоров
+
+	extern bool save11;						
 	extern bool save12;
 	extern bool save13;
 	extern bool save21;
@@ -106,7 +115,8 @@ namespace prms
 	extern bool save32;
 	extern bool save33;
 
-	int ReadParams(const char *);			//Считывание параметров из файла
+	//Считывание параметров из файла
+	int ReadParams(const char *);			
 
 }
 

@@ -38,7 +38,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	********     Интерфейс ввода/вывода параметров модели     ********
 	*****************************************************************/
 	printf(" Build date %s, %s\n", __DATE__, __TIME__);
-	std::string paramFileName = argv[1];
+	std::string paramFileName = argv[1]; //"Default.xml";//
 	printf(" Parameters file: %s\n", paramFileName.c_str());
 	if (prms::ReadParams(paramFileName.c_str()) == 1) printf(" Error in file!\n");		//Считали параметры из файла
 	printf(" ==========================================\n");
@@ -107,7 +107,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	std::srand(time(NULL));
 
 	polycrystall.setParams();					//Заполнение всех параметров поликристалла
-	polycrystall.makeGrainStruct(STRUCTURE_CUBIC);				//Формирование фрагментной структуры
+	polycrystall.makeGrainStruct(prms::structType);	//Формирование фрагментной структуры
 
 	if (prms::fixedOrientations == 2)	//Считывание записанных ориентаций
 	{
@@ -177,7 +177,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	printf("%g sec\n", (t2 - t1) / 1000.0);
 
 	polycrystall.openAllFiles();				//Открытие и очистка файлов для вывода
-								//Сохранение начальных полюсных фигур и ССТ
+	//Сохранение начальных полюсных фигур и ССТ
 	if (prms::periodSavePolus > 0)
 	{
 		printf(" Saving pole figures... ");
