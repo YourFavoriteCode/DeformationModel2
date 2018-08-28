@@ -38,10 +38,10 @@ namespace model
 		dO.c[2][1] = COS * a.c[1] * a.c[2] + SinFiX;
 		dO.c[2][2] = CosFi + COS * a.c[2] * a.c[2];
 
-		Tensor buf = dO*f->o;
+		Tensor buf = dO * f->o;
 		f->o = buf;
 	}
-	
+
 	void Taylor_rotations(Fragment *f)
 	{
 		f->om.setZero();
@@ -58,13 +58,13 @@ namespace model
 		}
 		f->om /= 2.0;
 		f->om += f->w;
-		
+
 		Vector e;				//Ось вращения решётки
 		e.set(f->om.c[1][2], f->om.c[2][0], f->om.c[0][1]);
-		
-		
+
+
 		double dFi = e.getNorm();
-		f->isRotate = dFi > EPS*1000;
+		f->isRotate = dFi > EPS * 1000;
 		if (f->isRotate)
 		{
 			f->rot_speed = dFi;
@@ -72,28 +72,28 @@ namespace model
 			f->sum_angle += dFi;
 			e.normalize();
 			Rotate(f, dFi, e);
-	
+
 		}
 		else
 		{
 			f->rot_speed = 0;
-		
+
 		}
 	}
 
 	void Rotation_hardening(Fragment *f)
 	{
-		if (f->sum_angle > 100*EPS)
+		if (f->sum_angle > 100 * EPS)
 		{
 			double dmc = prms::rotationParamHardK1 + prms::rotationParamHardK2*f->sum_angle / f->volume;
-			f->rot_Mc += dmc*prms::dt;//Приращение критического момента
+			f->rot_Mc += dmc * prms::dt;//Приращение критического момента
 		}
 	}
 
 	void Trusov_rotations(Fragment *f)
 	{
 		Vector dM;						//Производная вектор-момента
-		double S = f->size*f->size;		//Площадь фасетки
+
 		// Цикл по всем фасеткам данного зерна
 		for (int h = 0; h < prms::grainSurroundCount; h++)
 		{
@@ -124,26 +124,26 @@ namespace model
 			Vector b1 = ScalMult(f->om, dm);
 			Vector b2 = ScalMult(dm, f->om);
 			dm = dm + b1 - b2;
-			dM += dm*S;
+			dM += dm * f->areas[h];
 		}
 		dM /= f->volume;
 		double dMnorm = dM.getNorm();
-		Vector M = f->moment + dM*prms::dt;
+		Vector M = f->moment + dM * prms::dt;
 		f->moment = M;
 		double norm = M.getNorm();
 		if (norm > f->rot_Mc || norm == -1)
 		{
 			norm = f->rot_Mc;
 		}
-	
+
 		double pr = M.scalMult(dM);
 		//Вычисление скорости вращения
 		double dFi = f->rot_A * dMnorm;		// Только упругая составляющая разворотов				
-		if (norm == f->rot_Mc && pr >= 0)	
+		if (norm == f->rot_Mc && pr >= 0)
 		{
 			dFi += f->rot_H * norm;			// Пластическая составляющая
 		}
-		
+
 		f->isRotate = (dFi > EPS*1e4);
 		if (f->isRotate)
 		{
@@ -153,7 +153,7 @@ namespace model
 			dFi *= prms::dt;
 			f->sum_angle += dFi;			// Накопленный угол вращения увеличивается
 			Rotate(f, dFi, e);				// Вращение решетки
-			f->rot_energy = norm*dFi;		// Энергия ротаций
+			f->rot_energy = norm * dFi;		// Энергия ротаций
 			f->om.setZero();				// Спин решётки
 			for (int i = 0; i < DIM; i++)
 			{
@@ -165,7 +165,7 @@ namespace model
 					}
 				}
 			}
-			
+
 		}
 		else
 		{
@@ -234,11 +234,11 @@ namespace model
 		dO.c[2][0] = COS * a.c[0] * a.c[2] - SinFiY;
 		dO.c[2][1] = COS * a.c[1] * a.c[2] + SinFiX;
 		dO.c[2][2] = CosFi + COS * a.c[2] * a.c[2];
-		
+
 		Tensor R = dO * O;
 		Vector v = ScalMult(a, R);
 		v.normalize();
-	
+
 		std::ofstream Of;
 		Of.open(FileName, std::ios::out | std::ios_base::app | std::ios::binary);
 		//Запись координат в формате [xyz] подряд для всех зёрен 

@@ -52,12 +52,18 @@ namespace model
 		if (loop.start()) do if (con.compute_cell(cell, loop))
 		{
 			std::vector<double> normals;	// Нормали к каждой фасетке
+			std::vector<double> areas;		// Плаощади фасеток
 			std::vector<int> neighbors;		// ID соседнего к каждой фасетке зерна
 			cell.neighbors(neighbors);
 			cell.normals(normals);
+			cell.face_areas(areas);
 			int neighborCount = neighbors.size();
+
+			// Выделение памяти для всех топологических параметров структуры
 			poly->c[q].neighbors = std::vector<Fragment*>(neighborCount);
 			poly->c[q].normals = std::vector<Vector>(neighborCount);
+			poly->c[q].areas = std::vector<double>(neighborCount);
+
 			for (int i = 0; i < neighborCount; i++)
 			{
 				int curr = i * 3;
@@ -65,6 +71,7 @@ namespace model
 				// Нормали уже отнормированы
 				poly->c[q].normals[i] = normal;
 				poly->c[q].neighbors[i] = &poly->c[neighbors[i]];
+				poly->c[q].areas[i] = areas[i];
 			}
 			// Начальный объем каждого зерна
 			poly->c[q].volume = pow(poly->c[q].size, 3) * cell.volume();

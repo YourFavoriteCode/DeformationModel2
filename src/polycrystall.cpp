@@ -35,7 +35,7 @@ namespace model
 
 	Polycrystall::~Polycrystall()
 	{
-		//delete[] c;
+
 	}
 
 	void Polycrystall::openAllFiles()
@@ -177,12 +177,13 @@ namespace model
 			streamDebug[15].open("DBG\\VOL_M.txt", std::ios_base::out | std::ios_base::trunc);
 		}
 
-		streamDataTest = new std::ofstream[5];
+		streamDataTest = new std::ofstream[6];
 		streamDataTest[0].open("Test0.txt", std::ios_base::out | std::ios_base::trunc);
 		streamDataTest[1].open("Test1.txt", std::ios_base::out | std::ios_base::trunc);
 		streamDataTest[2].open("Test2.txt", std::ios_base::out | std::ios_base::trunc);
 		streamDataTest[3].open("Test3.txt", std::ios_base::out | std::ios_base::trunc);
 		streamDataTest[4].open("Test4.txt", std::ios_base::out | std::ios_base::trunc);
+		streamDataTest[5].open("Test5.txt", std::ios_base::out | std::ios_base::trunc);
 	}
 
 	void Polycrystall::closeAllFiles()
@@ -193,7 +194,7 @@ namespace model
 			streamDataY[i].close();
 		}
 		streamInternalVars[0].close();
-		for (int i = 0; i < 5; i++)
+		for (int i = 0; i < 6; i++)
 		{
 			streamDataTest[i].close();
 		}
@@ -705,6 +706,7 @@ namespace model
 			double Mc = 0;
 			double angle = 0;
 			double H = 0;
+			Vector M;
 			for (int q = 0; q < totalGrainCount; q++)
 			{
 				for (int i = 0; i < c[q].SS_count; i++)
@@ -718,7 +720,9 @@ namespace model
 				Mc += c[q].rot_Mc;
 				angle += c[q].sum_angle;
 				H += c[q].rot_H;
+				M += c[q].moment;
 			}
+			M /= totalGrainCount;
 			H /= totalGrainCount;
 			angle /= totalGrainCount;
 			Mc /= totalGrainCount;
@@ -748,7 +752,7 @@ namespace model
 			streamDataTest[2] << RotEnergy << std::endl;
 			streamDataTest[3] << StepEnergy << std::endl;
 			streamDataTest[4] << StepEnergy_in << std::endl;
-
+			streamDataTest[5] << M.getNorm() << std::endl;
 			stepSavePlot = progress;
 		}
 

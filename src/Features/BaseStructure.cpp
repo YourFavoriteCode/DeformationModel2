@@ -26,6 +26,8 @@ namespace model
 		{
 			int q1, q2, q3, y;
 			get3DPos(q, &q1, &q2, &q3);
+			double area = pow(poly->c[q].size, 2);		// Площадь фасетки
+			double volume = pow(poly->c[q].size, 3);	// Объем зерна
 			for (int h = 0; h < prms::grainSurroundCount; h++)
 			{
 				int qq1 = q1, qq2 = q2, qq3 = q3;
@@ -84,8 +86,9 @@ namespace model
 				poly->c[index].neighbors[y] = &poly->c[q];					// И в обратную сторону
 				poly->c[q].normals[h].normalize();
 				poly->c[index].normals[y] = -poly->c[q].normals[h];			// Сохранение нормалей граничащих фасеток
+				poly->c[q].areas[h] = area;
 			}
-			poly->c[q].volume = pow(poly->c[q].size, 3);					// Объём зерна
+			poly->c[q].volume = pow(poly->c[q].size, 3);//*volume					// Объём зерна
 		}
 	}
 }
