@@ -15,9 +15,10 @@ namespace model
 	class Tensor
 	{
 	public:
-		double c[DIM][DIM];							//Компоненты тензора
-
-		double getDet();							//Возвращает определитель матрицы компонент
+		double c[DIM][DIM];							// Компоненты тензора
+		
+													//Возвращает определитель матрицы компонент
+		double getDet();							
 		void set(double, double, double,
 			double, double, double,
 			double, double, double);				//Задание всех компонент тензора
@@ -56,12 +57,19 @@ namespace model
 
 	};
 
-	Tensor VectMult(Vector, Tensor);				//Векторное произведение вектора на тензор
-	Tensor VectMult(Tensor, Vector);				//Векторное произведение тензора на вектор
-	Vector ScalMult(Vector, Tensor);				//Скалярное произведение вектора на тензор
-	Vector ScalMult(Tensor, Vector);				//Скалярное произведение тензора на вектор
+	// Диадное произведение векторов
+	Tensor diadMult(Vector, Vector);
+	// Векторное произведение вектора на тензор
+	Tensor vectMult(Vector, Tensor);
+	// Векторное произведение тензора на вектор
+	Tensor vectMult(Tensor, Vector);
+	// Скалярное произведение вектора на тензор
+	Vector scalMult(Vector, Tensor);
+	// Скалярное произведение тензора на вектор
+	Vector scalMult(Tensor, Vector);
 
-	Tensor Transp(Tensor);							//Возвращает транспонированный аргумент
+	// Возвращает транспонированный аргумент
+	Tensor Transp(Tensor);
 }
 
 #endif

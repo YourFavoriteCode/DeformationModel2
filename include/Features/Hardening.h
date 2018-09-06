@@ -2,15 +2,15 @@
 #ifndef __HARDENING_H 
 #define __HARDENING_H
 
-#include "Fragment.h"
+#include "Grain.h"
 /*
 *Механизмы упрочнения
 */
 namespace model
 {
 
-	void Base_hardening(Fragment*);			//Базовое слагаемое упрочнения
-	void Boundary_hardening(Fragment*);		//Зернограничное упрочнение
+	void Base_hardening(Grain*);			//Базовое слагаемое упрочнения
+	void Boundary_hardening(Grain*);		//Зернограничное упрочнение
 	
 }
 #endif __HARDENING_H

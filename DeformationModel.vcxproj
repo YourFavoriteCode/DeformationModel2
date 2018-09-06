@@ -228,7 +228,7 @@
     <ClInclude Include="include\Features\Hardening.h" />
     <ClInclude Include="include\Features\Rotations.h" />
     <ClInclude Include="include\Features\Tension.h" />
-    <ClInclude Include="include\Model\Fragment.h" />
+    <ClInclude Include="include\Model\Grain.h" />
     <ClInclude Include="include\Model\GrainStructure.h" />
     <ClInclude Include="include\Model\Loading.h" />
     <ClInclude Include="include\Model\Polycrystall.h" />
@@ -255,7 +255,7 @@
     <ClCompile Include="src\distributions.cpp" />
     <ClCompile Include="src\Features\BaseStructure.cpp" />
     <ClCompile Include="src\Features\VoronoiStructure.cpp" />
-    <ClCompile Include="src\fragment.cpp" />
+    <ClCompile Include="src\Grain.cpp" />
     <ClCompile Include="src\functions.cpp" />
     <ClCompile Include="src\hardening.cpp" />
     <ClCompile Include="src\loading.cpp" />

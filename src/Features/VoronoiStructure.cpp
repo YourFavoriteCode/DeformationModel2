@@ -60,7 +60,7 @@ namespace model
 			int neighborCount = neighbors.size();
 
 			// Выделение памяти для всех топологических параметров структуры
-			poly->c[q].neighbors = std::vector<Fragment*>(neighborCount);
+			poly->c[q].neighbors = std::vector<Grain*>(neighborCount);
 			poly->c[q].normals = std::vector<Vector>(neighborCount);
 			poly->c[q].areas = std::vector<double>(neighborCount);
 

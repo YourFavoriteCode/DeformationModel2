@@ -14,17 +14,18 @@ namespace model
 	class SlipSystem
 	{
 	public:
-		Vector n;						//Вектор нормали
-		Vector b;						//Вектор Бюргерса
-		double t;						//Действующее касательное напряжение
-		double tc;						//Критическое касательное напряжение
-		double dgm;						//Скорость сдвига
-		double gmm;						//Накопленный сдвиг
-		double tbs;						//Обратные касательные напряжения
-		void Initialize(int, int, int,
-			int, int, int);	//Инициализация значений
-		void Initialize(int, int, int, int,
-			int, int, int, int, int);
+		Vector n;						// Вектор нормали
+		Vector b;						// Вектор Бюргерса
+		double t;						// Действующее касательное напряжение
+		double tc;						// Критическое касательное напряжение
+		double dgm;						// Скорость сдвига
+		double gmm;						// Накопленный сдвиг
+		double tbs;						// Обратные касательные напряжения
+		
+		//Инициализация значений ГЦК/ОЦК
+		void Initialize(int, int, int, int, int, int);	
+		//Инициализация значений ГПУ
+		void Initialize(int, int, int, int,	int, int, int, int, int);
 
 		SlipSystem();
 		~SlipSystem();

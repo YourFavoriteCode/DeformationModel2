@@ -7,12 +7,12 @@
 
 #include "Rotations.h"
 #include "Params.h"
-#include "Fragment.h"
+#include "Grain.h"
 #include "Distributions.h"
 
 namespace model
 {
-	void Rotate(Fragment* f, double dFi, const Vector a)
+	void Rotate(Grain* f, double dFi, const Vector a)
 	{
 		/*
 		* Поворот решётки фрагмента вокруг
@@ -42,7 +42,7 @@ namespace model
 		f->o = buf;
 	}
 
-	void Taylor_rotations(Fragment *f)
+	void Taylor_rotations(Grain *f)
 	{
 		f->om.setZero();
 		//f->om = f->w - f->d_in.getAntiSymmetryPart();
@@ -50,9 +50,9 @@ namespace model
 		{
 			for (int j = 0; j < DIM; j++)
 			{
-				for (int k = 0; k < f->SS_count; k++)
+				for (int k = 0; k < f->ssCount; k++)
 				{
-					f->om.c[i][j] -= f->SS[k].dgm * (f->SS[k].n.c[i] * f->SS[k].b.c[j] - f->SS[k].b.c[i] * f->SS[k].n.c[j]);
+					f->om.c[i][j] -= f->ss[k].dgm * (f->ss[k].n.c[i] * f->ss[k].b.c[j] - f->ss[k].b.c[i] * f->ss[k].n.c[j]);
 				}
 			}
 		}
@@ -67,30 +67,30 @@ namespace model
 		f->isRotate = dFi > EPS * 1000;
 		if (f->isRotate)
 		{
-			f->rot_speed = dFi;
+			f->rotationSpeed = dFi;
 			dFi *= prms::dt;			//Получаем угол поворота
-			f->sum_angle += dFi;
+			f->rotationTotalAngle += dFi;
 			e.normalize();
 			Rotate(f, dFi, e);
 
 		}
 		else
 		{
-			f->rot_speed = 0;
+			f->rotationSpeed = 0;
 
 		}
 	}
 
-	void Rotation_hardening(Fragment *f)
+	void Rotation_hardening(Grain *f)
 	{
-		if (f->sum_angle > 100 * EPS)
+		if (f->rotationTotalAngle > 100 * EPS)
 		{
-			double dmc = prms::rotationParamHardK1 + prms::rotationParamHardK2*f->sum_angle / f->volume;
-			f->rot_Mc += dmc * prms::dt;//Приращение критического момента
+			double dmc = prms::rotationParamHardK1 + prms::rotationParamHardK2*f->rotationTotalAngle / f->volume;
+			f->rotationParamMc += dmc * prms::dt;//Приращение критического момента
 		}
 	}
 
-	void Trusov_rotations(Fragment *f)
+	void Trusov_rotations(Grain *f)
 	{
 		Vector dM;						//Производная вектор-момента
 
@@ -102,27 +102,27 @@ namespace model
 			{
 				for (int j = 0; j < DIM; j++)
 				{
-					for (int k = 0; k < f->SS_count; k++)
+					for (int k = 0; k < f->ssCount; k++)
 					{
-						if (f->SS[k].b.scalMult(f->normals[h]) < 0) continue; //Скольжение от границы - вклад не вносится
-						d_in1.c[i][j] += f->SS[k].dgm * (f->SS[k].n.c[i] * f->SS[k].b.c[j]);
+						if (f->ss[k].b.scalMult(f->normals[h]) < 0) continue; //Скольжение от границы - вклад не вносится
+						d_in1.c[i][j] += f->ss[k].dgm * (f->ss[k].n.c[i] * f->ss[k].b.c[j]);
 					}
-					for (int k = 0; k < f->neighbors[h]->SS_count; k++)
+					for (int k = 0; k < f->neighbors[h]->ssCount; k++)
 					{
-						//if (f->SS[k].b.ScalMult(f->normals[h]) < 0) continue; //Скольжение от границы - вклад не вносится
-						d_in2.c[i][j] += f->neighbors[h]->SS[k].dgm * (f->neighbors[h]->SS[k].n.c[i] * f->neighbors[h]->SS[k].b.c[j]);
+						//if (f->ss[k].b.scalMult(f->normals[h]) < 0) continue; //Скольжение от границы - вклад не вносится
+						d_in2.c[i][j] += f->neighbors[h]->ss[k].dgm * (f->neighbors[h]->ss[k].n.c[i] * f->neighbors[h]->ss[k].b.c[j]);
 					}
 				}
 			}
 			// Скачок тензора пластической деформации на границе зерен
 			Tensor Lp = Transp(d_in1 - d_in2);
-			Tensor buf = VectMult(f->normals[h], Lp);
+			Tensor buf = vectMult(f->normals[h], Lp);
 			// Поверхностный вектор-момент, действующий на фасетку
-			Vector dm = ScalMult(buf, f->normals[h]);
-			dm *= f->rot_L;
+			Vector dm = scalMult(buf, f->normals[h]);
+			dm *= f->rotationParamL;
 			// Слагаемые для коротационной производной
-			Vector b1 = ScalMult(f->om, dm);
-			Vector b2 = ScalMult(dm, f->om);
+			Vector b1 = scalMult(f->om, dm);
+			Vector b2 = scalMult(dm, f->om);
 			dm = dm + b1 - b2;
 			dM += dm * f->areas[h];
 		}
@@ -131,17 +131,17 @@ namespace model
 		Vector M = f->moment + dM * prms::dt;
 		f->moment = M;
 		double norm = M.getNorm();
-		if (norm > f->rot_Mc || norm == -1)
+		if (norm > f->rotationParamMc || norm == -1)
 		{
-			norm = f->rot_Mc;
+			norm = f->rotationParamMc;
 		}
 
 		double pr = M.scalMult(dM);
 		//Вычисление скорости вращения
-		double dFi = f->rot_A * dMnorm;		// Только упругая составляющая разворотов				
-		if (norm == f->rot_Mc && pr >= 0)
+		double dFi = f->rotationParamA * dMnorm;		// Только упругая составляющая разворотов				
+		if (norm == f->rotationParamMc && pr >= 0)
 		{
-			dFi += f->rot_H * norm;			// Пластическая составляющая
+			dFi += f->rotationParamH * norm;			// Пластическая составляющая
 		}
 
 		f->isRotate = (dFi > EPS*1e4);
@@ -149,11 +149,11 @@ namespace model
 		{
 			Vector e = M;					// Ось вращения решётки сонаправлена с вектором момента
 			e.normalize();
-			f->rot_speed = dFi;
+			f->rotationSpeed = dFi;
 			dFi *= prms::dt;
-			f->sum_angle += dFi;			// Накопленный угол вращения увеличивается
+			f->rotationTotalAngle += dFi;			// Накопленный угол вращения увеличивается
 			Rotate(f, dFi, e);				// Вращение решетки
-			f->rot_energy = norm * dFi;		// Энергия ротаций
+			f->rotationEnergy = norm * dFi;		// Энергия ротаций
 			f->om.setZero();				// Спин решётки
 			for (int i = 0; i < DIM; i++)
 			{
@@ -161,7 +161,7 @@ namespace model
 				{
 					for (int k = 0; k < DIM; k++)
 					{
-						f->om.c[i][j] -= LeviCivit(i, j, k) * e.c[k] * f->rot_speed;
+						f->om.c[i][j] -= LeviCivit(i, j, k) * e.c[k] * f->rotationSpeed;
 					}
 				}
 			}
@@ -170,8 +170,8 @@ namespace model
 		else
 		{
 			f->om.setZero();
-			f->rot_speed = 0;		//Решетка не вращается
-			f->rot_energy = 0;		//Энергия вращения равна нулю
+			f->rotationSpeed = 0;		//Решетка не вращается
+			f->rotationEnergy = 0;		//Энергия вращения равна нулю
 		}
 	}
 
@@ -180,7 +180,7 @@ namespace model
 		Vector e;
 		e.set(i, j, k);
 		e.normalize();
-		Vector e1 = ScalMult(e, O);//Перевод в ЛСК
+		Vector e1 = scalMult(e, O);//Перевод в ЛСК
 		e1.normalize();
 		std::ofstream of;
 		of.open(file, std::ios::out | std::ios_base::app | std::ios::binary);
@@ -191,7 +191,7 @@ namespace model
 		of.close();
 	}
 
-	void GetPoleFig(Fragment *f)
+	void GetPoleFig(Grain *f)
 	{
 		/*---Семейство направлений [001]---*/
 		SavePoints(f->o, "Polus\\S001.dat", 0, 0, 1);
@@ -236,7 +236,7 @@ namespace model
 		dO.c[2][2] = CosFi + COS * a.c[2] * a.c[2];
 
 		Tensor R = dO * O;
-		Vector v = ScalMult(a, R);
+		Vector v = scalMult(a, R);
 		v.normalize();
 
 		std::ofstream Of;
@@ -250,7 +250,7 @@ namespace model
 
 	// Сохраняет в файл проекции кристаллографических направлений
 	// на стандартный стереографический треугольник (ССТ)
-	void GetSST(Fragment *f)
+	void GetSST(Grain *f)
 	{
 		// Ось четвёртого порядка
 		for (double fi = 0; fi < 2 * PI; fi += PI_2)

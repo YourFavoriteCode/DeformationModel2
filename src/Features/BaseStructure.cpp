@@ -7,6 +7,7 @@
 #include "Params.h"
 #include "GrainStructure.h"
 #include "Distributions.h"
+#include "Polycrystall.h"
 
 namespace model
 {
@@ -18,7 +19,7 @@ namespace model
 		for (int q = 0; q < poly->totalGrainCount; q++)
 		{
 			// Выделение памяти под массивы, необходимые для работы с окружением
-			poly->c[q].neighbors = std::vector<Fragment*>(prms::grainSurroundCount);
+			poly->c[q].neighbors = std::vector<Grain*>(prms::grainSurroundCount);
 			poly->c[q].normals = std::vector<Vector>(prms::grainSurroundCount);
 		}
 

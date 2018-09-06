@@ -212,7 +212,7 @@ namespace model
 	{
 		grainCount = count;
 		totalGrainCount = (int)pow(count, 3);
-		c = std::vector<Fragment>(totalGrainCount); //Выделение памяти под массив
+		c = std::vector<Grain>(totalGrainCount); //Выделение памяти под массив
 	}
 
 	void Polycrystall::setParams()
@@ -233,10 +233,10 @@ namespace model
 				c[q].setMaterialParams(another_material);
 			}
 
-			c[q].rot_Mc = prms::rotationParamMc;	//Раздача начальных критических моментов
-			c[q].rot_A = prms::rotationParamA;	//и параметров модели ротаций
-			c[q].rot_H = prms::rotationParamH;
-			c[q].rot_L = prms::rotationParamL;
+			c[q].rotationParamMc = prms::rotationParamMc;	//Раздача начальных критических моментов
+			c[q].rotationParamA = prms::rotationParamA;	//и параметров модели ротаций
+			c[q].rotationParamH = prms::rotationParamH;
+			c[q].rotationParamL = prms::rotationParamL;
 			c[q].position = q;//Получение порядкового номера фрагмента
 
 			if (prms::orientationType == 0)
@@ -249,7 +249,7 @@ namespace model
 					double y1 = ((double)rand() / RAND_MAX);
 					double y2 = ((double)rand() / RAND_MAX);
 					double cb = y1 > 0.5 ? y2 : -y2;
-					c[q].Orientate(a, g, cb);
+					c[q].orientate(a, g, cb);
 				}
 				else//Получение ориентационного тензора (КСК=ЛСК)
 				{
@@ -275,7 +275,7 @@ namespace model
 					Vector axis;
 					axis.set(x, y, z);
 					axis.normalize();
-					c[q].OrientateAxis(cf, axis);
+					c[q].orientateAxis(cf, axis);
 				}
 				else//Получение ориентационного тензора (КСК=ЛСК)
 				{
@@ -297,7 +297,7 @@ namespace model
 					double x = sin(fi)*cos(psi)*buf;
 					double y = sin(fi)*sin(psi)*buf;
 					double z = cos(fi)*buf;
-					c[q].OrientateQuater(w, x, y, z);
+					c[q].orientateQuater(w, x, y, z);
 				}
 				else//Получение ориентационного тензора (КСК=ЛСК)
 				{
@@ -328,24 +328,22 @@ namespace model
 				c[q].size = ExpDistrib(prms::grainSizeDistribM);//Только один параметр
 				break;
 			}
-			}
-			
-			
+			}			
 
 		}
 	}
 	
 	void Polycrystall::makeGrainStruct(prms::GrainStruct structType) {
 	
-		GrainStructure structure = GrainStructure();
+		structure = new GrainStructure();
 		
 		switch (structType)
 		{
 		case prms::STRUCTURE_CUBIC:
-			structure.makeCubicStructure(this);
+			structure->makeCubicStructure(this);
 			break;
 		case prms::STRUCTURE_VORONOI:
-			structure.makeVoronoiStructure(this);
+			structure->makeVoronoiStructure(this);
 			break;
 		default:
 			break;
@@ -383,14 +381,14 @@ namespace model
 			writeDebugInfo(streamDebug[5], c[q].dsgm.c);
 			writeDebugInfo(streamDebug[6], c[q].d_in.c);
 			writeDebugInfo(streamDebug[7], c[q].w.c);
-			for (int f = 0; f < c[q].SS_count; f++)
+			for (int f = 0; f < c[q].ssCount; f++)
 			{
-				streamDebug[8] << c[q].SS[f].dgm << " ";
+				streamDebug[8] << c[q].ss[f].dgm << " ";
 			}
 			streamDebug[8] << std::endl << std::endl;
-			for (int f = 0; f < c[q].SS_count; f++)
+			for (int f = 0; f < c[q].ssCount; f++)
 			{
-				streamDebug[9] << c[q].SS[f].t << " ";
+				streamDebug[9] << c[q].ss[f].t << " ";
 			}
 			streamDebug[9] << std::endl << std::endl;
 			streamDebug[15] << c[q].moment.c[0] << " " << c[q].moment.c[1] << " " << c[q].moment.c[2] << std::endl;
@@ -473,7 +471,7 @@ namespace model
 			***********       Пересчитываем НДС      ***********
 			***************************************************/
 
-			c[q].NDScalc();
+			c[q].stressStrainCalc();
 
 			if (prms::usingHardeningBase)			//Базовое упрочнение
 			{
@@ -505,7 +503,6 @@ namespace model
 
 			c[q].sgm = OT * c[q].sgm*O;
 			c[q].d_in = OT * c[q].d_in*O;
-			c[q].iter++;
 
 		}
 		
@@ -709,17 +706,17 @@ namespace model
 			Vector M;
 			for (int q = 0; q < totalGrainCount; q++)
 			{
-				for (int i = 0; i < c[q].SS_count; i++)
+				for (int i = 0; i < c[q].ssCount; i++)
 				{
-					if (c[q].SS[i].dgm > EPS) ActiveSysCount++;//Подсчёт активных СС
+					if (c[q].ss[i].dgm > EPS) ActiveSysCount++;//Подсчёт активных СС
 				}
 
 				if (c[q].isRotate) RotCount++;		//Подсчёт вращающихся решёток
-				RotEnergy += c[q].rot_energy;		//Суммирование энергий вращения
-				RotSpeed += c[q].rot_speed;		//Суммирование скоростей вращения
-				Mc += c[q].rot_Mc;
-				angle += c[q].sum_angle;
-				H += c[q].rot_H;
+				RotEnergy += c[q].rotationEnergy;		//Суммирование энергий вращения
+				RotSpeed += c[q].rotationSpeed;		//Суммирование скоростей вращения
+				Mc += c[q].rotationParamMc;
+				angle += c[q].rotationTotalAngle;
+				H += c[q].rotationParamH;
 				M += c[q].moment;
 			}
 			M /= totalGrainCount;

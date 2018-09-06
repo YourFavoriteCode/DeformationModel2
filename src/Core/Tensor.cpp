@@ -352,7 +352,7 @@ namespace model
 		return solver.eigenvalues().col(0)[n].real();
 	}
 
-	Vector ScalMult(Tensor t, Vector v)
+	Vector scalMult(Tensor t, Vector v)
 	{
 		Vector res;
 		for (int k = 0; k < DIM; k++)
@@ -363,7 +363,7 @@ namespace model
 		return res;
 	}
 
-	Vector ScalMult(Vector v, Tensor t)
+	Vector scalMult(Vector v, Tensor t)
 	{
 		Vector res;
 		for (int k = 0; k < DIM; k++)
@@ -374,7 +374,7 @@ namespace model
 		return res;
 	}
 
-	Tensor VectMult(Vector v, Tensor t)
+	Tensor vectMult(Vector v, Tensor t)
 	{
 		Tensor res;
 		for (int k = 0; k < DIM; k++)
@@ -389,7 +389,7 @@ namespace model
 		return res;
 	}
 
-	Tensor VectMult(Tensor t, Vector v)
+	Tensor vectMult(Tensor t, Vector v)
 	{
 		Tensor res;
 		for (int k = 0; k < DIM; k++)
@@ -404,4 +404,16 @@ namespace model
 		return res;
 	}
 
+	Tensor diadMult(Vector a, Vector b)
+	{
+		Tensor res;
+		for (int i = 0; i < DIM; i++)
+		{
+			for (int j = 0; j < DIM; j++)
+			{
+				res.c[i][j] = a.c[i] * b.c[j];
+			}
+		}
+		return res;
+	}
 }

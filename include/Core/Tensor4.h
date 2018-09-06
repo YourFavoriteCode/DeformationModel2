@@ -14,20 +14,29 @@ namespace model
 	class Tensor4
 	{
 	public:
-		double c[DIM][DIM][DIM][DIM];	//Компоненты тензора
+		double c[DIM][DIM][DIM][DIM];	// Компоненты тензора
 
-		void setZero();					//Обнуление компонент тензора
-		void symmetrize();				//Симметризация компонент тензора
+		// Обнуление компонент тензора
+		void setZero();
+		// Симметризация компонент тензора
+		void symmetrize();
+		// Перевод компонент тензора в ЛСК
+		Tensor4 toLsk(Tensor O);
+		// Оператор прибавления тензора
+		void operator += (Tensor4);
+		// Оператор отнимания тензора
+		void operator -= (Tensor4);
+		// Оператор умножения тензора на число
+		void operator *= (double);
+		// Оператор деления тензора на число
+		int operator /= (double);
 
-		Tensor4 toLsk(Tensor O);		//Перевод компонент тензора в ЛСК
-
-		void operator += (Tensor4);		//Оператор прибавления тензора
-		void operator -= (Tensor4);		//Оператор отнимания тензора
-		void operator *= (double);		//Оператор умножения тензора на число
-		int operator /= (double);		//Оператор деления тензора на число
-
+		// Двойное скалярное произведение
+		Tensor doubleScalMult(Tensor);
+		
 		Tensor4();
 		~Tensor4();
+
 	private:
 	};
 }

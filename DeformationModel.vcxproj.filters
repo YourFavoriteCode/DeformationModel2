@@ -63,9 +63,6 @@
     <ClInclude Include="include\Features\Tension.h">
       <Filter>Файлы заголовков\features</Filter>
     </ClInclude>
-    <ClInclude Include="include\Model\Fragment.h">
-      <Filter>Файлы заголовков\model</Filter>
-    </ClInclude>
     <ClInclude Include="include\Model\Polycrystall.h">
       <Filter>Файлы заголовков\model</Filter>
     </ClInclude>
@@ -93,13 +90,13 @@
     <ClInclude Include="include\Model\GrainStructure.h">
       <Filter>Файлы заголовков\model</Filter>
     </ClInclude>
+    <ClInclude Include="include\Model\Grain.h">
+      <Filter>Файлы заголовков\model</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\rotations.cpp">
       <Filter>Исходные файлы\features</Filter>
-    </ClCompile>
-    <ClCompile Include="src\fragment.cpp">
-      <Filter>Исходные файлы\model</Filter>
     </ClCompile>
     <ClCompile Include="src\polycrystall.cpp">
       <Filter>Исходные файлы\model</Filter>
@@ -151,6 +148,9 @@
     </ClCompile>
     <ClCompile Include="src\Features\VoronoiStructure.cpp">
       <Filter>Исходные файлы\features</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Grain.cpp">
+      <Filter>Исходные файлы\model</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
