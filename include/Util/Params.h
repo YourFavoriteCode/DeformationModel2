@@ -115,6 +115,8 @@ namespace prms
 	extern bool save32;
 	extern bool save33;
 
+	extern bool usingFragmentation;
+
 	//Считывание параметров из файла
 	int ReadParams(const char *);			
 

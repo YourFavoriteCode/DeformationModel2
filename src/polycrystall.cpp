@@ -18,6 +18,7 @@
 #include "Hardening.h"
 #include "Functions.h"
 #include "GrainStructure.h"
+#include "Fragmentation.h"
 
 namespace model
 {
@@ -356,8 +357,8 @@ namespace model
 	{
 		for (int q = 0; q < totalGrainCount; q++)
 		{
-			GetPoleFig(&c[q]);
-			if (prms::usingStandardTriangleSaving) GetSST(&c[q]);
+			getPoleFig(&c[q]);
+			if (prms::usingStandardTriangleSaving) getSST(&c[q]);
 
 		}
 	}
@@ -391,7 +392,7 @@ namespace model
 				streamDebug[9] << c[q].ss[f].t << " ";
 			}
 			streamDebug[9] << std::endl << std::endl;
-			streamDebug[15] << c[q].moment.c[0] << " " << c[q].moment.c[1] << " " << c[q].moment.c[2] << std::endl;
+			streamDebug[15] << c[q].rotationMoment.c[0] << " " << c[q].rotationMoment.c[1] << " " << c[q].rotationMoment.c[2] << std::endl;
 
 		}
 		//Запись тензоров представительного объема
@@ -475,27 +476,32 @@ namespace model
 
 			if (prms::usingHardeningBase)			//Базовое упрочнение
 			{
-				Base_hardening(&c[q]);
+				hardeningBase(&c[q]);
 			}
 
 			if (prms::usingRotationsTaylor)		//Ротации по Тейлору
 			{
-				Taylor_rotations(&c[q]);
+				rotateByTaylor(&c[q]);
 			}
 
 			if (prms::usingRotationsTrusov && prms::usingRotationsHardening)	//Ротационное упрочнение
 			{
-				Rotation_hardening(&c[q]);
+				rotationHardening(&c[q]);
 			}
 
 			if (prms::usingHardeningBound)	//Зернограничное упрочнение
 			{
-				Boundary_hardening(&c[q]);
+				hardeningBoundary(&c[q]);
 			}
 
 			if (prms::usingRotationsTrusov)		//Ротации по Трусову
 			{
-				Trusov_rotations(&c[q]);
+				rotateByTrusov(&c[q]);
+			}
+
+			if (prms::usingFragmentation)		// Фрагментация зерен
+			{
+				fragmentate(&c[q]);
 			}
 			/**************************************************
 			************       Переходим в ЛСК       **********
@@ -717,7 +723,7 @@ namespace model
 				Mc += c[q].rotationParamMc;
 				angle += c[q].rotationTotalAngle;
 				H += c[q].rotationParamH;
-				M += c[q].moment;
+				M += c[q].rotationMoment;
 			}
 			M /= totalGrainCount;
 			H /= totalGrainCount;

@@ -12,7 +12,7 @@
 
 namespace model
 {
-	void Rotate(Grain* f, double dFi, const Vector a)
+	void rotate(Grain* f, double dFi, const Vector a)
 	{
 		/*
 		* Поворот решётки фрагмента вокруг
@@ -42,7 +42,7 @@ namespace model
 		f->o = buf;
 	}
 
-	void Taylor_rotations(Grain *f)
+	void rotateByTaylor(Grain *f)
 	{
 		f->om.setZero();
 		//f->om = f->w - f->d_in.getAntiSymmetryPart();
@@ -71,7 +71,7 @@ namespace model
 			dFi *= prms::dt;			//Получаем угол поворота
 			f->rotationTotalAngle += dFi;
 			e.normalize();
-			Rotate(f, dFi, e);
+			rotate(f, dFi, e);
 
 		}
 		else
@@ -81,7 +81,7 @@ namespace model
 		}
 	}
 
-	void Rotation_hardening(Grain *f)
+	void rotationHardening(Grain *f)
 	{
 		if (f->rotationTotalAngle > 100 * EPS)
 		{
@@ -90,7 +90,7 @@ namespace model
 		}
 	}
 
-	void Trusov_rotations(Grain *f)
+	void rotateByTrusov(Grain *f)
 	{
 		Vector dM;						//Производная вектор-момента
 
@@ -128,8 +128,8 @@ namespace model
 		}
 		dM /= f->volume;
 		double dMnorm = dM.getNorm();
-		Vector M = f->moment + dM * prms::dt;
-		f->moment = M;
+		Vector M = f->rotationMoment + dM * prms::dt;
+		f->rotationMoment = M;
 		double norm = M.getNorm();
 		if (norm > f->rotationParamMc || norm == -1)
 		{
@@ -152,7 +152,7 @@ namespace model
 			f->rotationSpeed = dFi;
 			dFi *= prms::dt;
 			f->rotationTotalAngle += dFi;			// Накопленный угол вращения увеличивается
-			Rotate(f, dFi, e);				// Вращение решетки
+			rotate(f, dFi, e);				// Вращение решетки
 			f->rotationEnergy = norm * dFi;		// Энергия ротаций
 			f->om.setZero();				// Спин решётки
 			for (int i = 0; i < DIM; i++)
@@ -175,7 +175,7 @@ namespace model
 		}
 	}
 
-	void inline SavePoints(Tensor O, const char *file, const int i, const int j, const int k)
+	void inline savePoints(Tensor O, const char *file, const int i, const int j, const int k)
 	{
 		Vector e;
 		e.set(i, j, k);
@@ -191,25 +191,25 @@ namespace model
 		of.close();
 	}
 
-	void GetPoleFig(Grain *f)
+	void getPoleFig(Grain *f)
 	{
 		/*---Семейство направлений [001]---*/
-		SavePoints(f->o, "Polus\\S001.dat", 0, 0, 1);
-		SavePoints(f->o, "Polus\\S010.dat", 0, 1, 0);
-		SavePoints(f->o, "Polus\\S100.dat", 1, 0, 0);
+		savePoints(f->o, "Polus\\S001.dat", 0, 0, 1);
+		savePoints(f->o, "Polus\\S010.dat", 0, 1, 0);
+		savePoints(f->o, "Polus\\S100.dat", 1, 0, 0);
 
 		/*---Семейство направлений [011]---*/
-		SavePoints(f->o, "Polus\\S011.dat", 0, 1, 1);
-		SavePoints(f->o, "Polus\\S110.dat", 1, 1, 0);
-		SavePoints(f->o, "Polus\\S101.dat", 1, 0, 1);
+		savePoints(f->o, "Polus\\S011.dat", 0, 1, 1);
+		savePoints(f->o, "Polus\\S110.dat", 1, 1, 0);
+		savePoints(f->o, "Polus\\S101.dat", 1, 0, 1);
 
 		/*---Семейство направлений [111]---*/
-		SavePoints(f->o, "Polus\\S1-11.dat", 1, -1, 1);
-		SavePoints(f->o, "Polus\\S-111.dat", -1, 1, 1);
-		SavePoints(f->o, "Polus\\S111.dat", 1, 1, 1);
+		savePoints(f->o, "Polus\\S1-11.dat", 1, -1, 1);
+		savePoints(f->o, "Polus\\S-111.dat", -1, 1, 1);
+		savePoints(f->o, "Polus\\S111.dat", 1, 1, 1);
 	}
 
-	void inline GetSSTPoint(Tensor O, double dFi, const char *FileName, const int i, const int j, const int k)
+	void inline saveSSTPoints(Tensor O, double dFi, const char *FileName, const int i, const int j, const int k)
 	{
 		Vector a;
 		a.set(i, j, k);
@@ -248,47 +248,45 @@ namespace model
 		Of.close();
 	}
 
-	// Сохраняет в файл проекции кристаллографических направлений
-	// на стандартный стереографический треугольник (ССТ)
-	void GetSST(Grain *f)
+	void getSST(Grain *f)
 	{
 		// Ось четвёртого порядка
 		for (double fi = 0; fi < 2 * PI; fi += PI_2)
 		{
-			GetSSTPoint(f->o, fi, "Polus\\SST001.dat", 0, 0, 1);
-			GetSSTPoint(f->o, fi, "Polus\\SST001.dat", 0, 1, 0);
-			GetSSTPoint(f->o, fi, "Polus\\SST001.dat", 1, 0, 0);
-			GetSSTPoint(f->o, fi, "Polus\\SST001.dat", 0, 0, -1);
-			GetSSTPoint(f->o, fi, "Polus\\SST001.dat", 0, -1, 0);
-			GetSSTPoint(f->o, fi, "Polus\\SST001.dat", -1, 0, 0);
+			saveSSTPoints(f->o, fi, "Polus\\SST001.dat", 0, 0, 1);
+			saveSSTPoints(f->o, fi, "Polus\\SST001.dat", 0, 1, 0);
+			saveSSTPoints(f->o, fi, "Polus\\SST001.dat", 1, 0, 0);
+			saveSSTPoints(f->o, fi, "Polus\\SST001.dat", 0, 0, -1);
+			saveSSTPoints(f->o, fi, "Polus\\SST001.dat", 0, -1, 0);
+			saveSSTPoints(f->o, fi, "Polus\\SST001.dat", -1, 0, 0);
 		}
 		// Ось второго порядка
 		for (double fi = 0; fi < 2 * PI; fi += PI)
 		{
-			GetSSTPoint(f->o, fi, "Polus\\SST011.dat", 0, 1, 1);
-			GetSSTPoint(f->o, fi, "Polus\\SST011.dat", 0, 1, -1);
-			GetSSTPoint(f->o, fi, "Polus\\SST011.dat", 1, 0, 1);
-			GetSSTPoint(f->o, fi, "Polus\\SST011.dat", 1, 1, 0);
-			GetSSTPoint(f->o, fi, "Polus\\SST011.dat", 0, -1, 1);
-			GetSSTPoint(f->o, fi, "Polus\\SST011.dat", -1, 1, 0);
-			GetSSTPoint(f->o, fi, "Polus\\SST011.dat", -1, 0, 1);
-			GetSSTPoint(f->o, fi, "Polus\\SST011.dat", -1, 0, -1);
-			GetSSTPoint(f->o, fi, "Polus\\SST011.dat", 1, 0, -1);
-			GetSSTPoint(f->o, fi, "Polus\\SST011.dat", 1, -1, 0);
-			GetSSTPoint(f->o, fi, "Polus\\SST011.dat", -1, -1, 0);
-			GetSSTPoint(f->o, fi, "Polus\\SST011.dat", 0, -1, -1);
+			saveSSTPoints(f->o, fi, "Polus\\SST011.dat", 0, 1, 1);
+			saveSSTPoints(f->o, fi, "Polus\\SST011.dat", 0, 1, -1);
+			saveSSTPoints(f->o, fi, "Polus\\SST011.dat", 1, 0, 1);
+			saveSSTPoints(f->o, fi, "Polus\\SST011.dat", 1, 1, 0);
+			saveSSTPoints(f->o, fi, "Polus\\SST011.dat", 0, -1, 1);
+			saveSSTPoints(f->o, fi, "Polus\\SST011.dat", -1, 1, 0);
+			saveSSTPoints(f->o, fi, "Polus\\SST011.dat", -1, 0, 1);
+			saveSSTPoints(f->o, fi, "Polus\\SST011.dat", -1, 0, -1);
+			saveSSTPoints(f->o, fi, "Polus\\SST011.dat", 1, 0, -1);
+			saveSSTPoints(f->o, fi, "Polus\\SST011.dat", 1, -1, 0);
+			saveSSTPoints(f->o, fi, "Polus\\SST011.dat", -1, -1, 0);
+			saveSSTPoints(f->o, fi, "Polus\\SST011.dat", 0, -1, -1);
 		}
 		// Ось третьего порядка
 		for (double fi = 0; fi < 2 * PI; fi += 2.0 * PI / 3.0)
 		{
-			GetSSTPoint(f->o, fi, "Polus\\SST111.dat", 1, 1, 1);
-			GetSSTPoint(f->o, fi, "Polus\\SST111.dat", 1, 1, -1);
-			GetSSTPoint(f->o, fi, "Polus\\SST111.dat", 1, -1, 1);
-			GetSSTPoint(f->o, fi, "Polus\\SST111.dat", -1, 1, 1);
-			GetSSTPoint(f->o, fi, "Polus\\SST111.dat", 1, -1, -1);
-			GetSSTPoint(f->o, fi, "Polus\\SST111.dat", -1, 1, -1);
-			GetSSTPoint(f->o, fi, "Polus\\SST111.dat", -1, -1, 1);
-			GetSSTPoint(f->o, fi, "Polus\\SST111.dat", -1, -1, -1);
+			saveSSTPoints(f->o, fi, "Polus\\SST111.dat", 1, 1, 1);
+			saveSSTPoints(f->o, fi, "Polus\\SST111.dat", 1, 1, -1);
+			saveSSTPoints(f->o, fi, "Polus\\SST111.dat", 1, -1, 1);
+			saveSSTPoints(f->o, fi, "Polus\\SST111.dat", -1, 1, 1);
+			saveSSTPoints(f->o, fi, "Polus\\SST111.dat", 1, -1, -1);
+			saveSSTPoints(f->o, fi, "Polus\\SST111.dat", -1, 1, -1);
+			saveSSTPoints(f->o, fi, "Polus\\SST111.dat", -1, -1, 1);
+			saveSSTPoints(f->o, fi, "Polus\\SST111.dat", -1, -1, -1);
 		}
 
 	}

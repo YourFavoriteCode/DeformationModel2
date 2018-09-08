@@ -11,7 +11,7 @@
 
 namespace model
 {
-	void Base_hardening(Grain *f)
+	void hardeningBase(Grain *f)
 	{
 		double nsd = 0;	//Накопленный сдвиг
 		for (int k = 0; k < f->ssCount; k++)
@@ -57,7 +57,7 @@ namespace model
 		}
 	}
 	
-	/*void Boundary_hardening(Grain *f)
+	/*void hardeningBoundary(Grain *f)
 	{
 		for (int k = 0; k < f->ssCount; k++)	//Цикл по СС текущего фрагмента
 		{
@@ -89,7 +89,7 @@ namespace model
 	}*/
 
 
-	void Boundary_hardening(Grain *f)
+	void hardeningBoundary(Grain *f)
 	{		
 		double G = 45.5e+9, nu = 0.35;
 		double K, K1, Rmin=5e-7;

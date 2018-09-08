@@ -54,15 +54,20 @@ namespace model
 			std::vector<double> normals;	// Нормали к каждой фасетке
 			std::vector<double> areas;		// Плаощади фасеток
 			std::vector<int> neighbors;		// ID соседнего к каждой фасетке зерна
+			std::vector<int> vertices;		// Порядок вершин многогранника
 			cell.neighbors(neighbors);
 			cell.normals(normals);
 			cell.face_areas(areas);
+			cell.vertex_orders(vertices);
+
 			int neighborCount = neighbors.size();
+			int verticesCount = vertices.size();
 
 			// Выделение памяти для всех топологических параметров структуры
 			poly->c[q].neighbors = std::vector<Grain*>(neighborCount);
 			poly->c[q].normals = std::vector<Vector>(neighborCount);
 			poly->c[q].areas = std::vector<double>(neighborCount);
+			poly->c[q].areas = std::vector<double>(verticesCount);
 
 			for (int i = 0; i < neighborCount; i++)
 			{

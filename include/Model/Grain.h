@@ -14,6 +14,7 @@ namespace model
 	class Grain
 	{
 	public:
+
 		Tensor d;							// Тензор деформации скорости
 		Tensor w;							// Тензор вихря
 		Tensor d_in;						// Тензор неупругой составляющей деформации
@@ -36,20 +37,19 @@ namespace model
 		std::vector<Grain*> neighbors;		// Ссылки на граничащие фрагменты
 		std::vector<Vector> normals;		// Вектора нормали к граничащим фрагментам
 		std::vector<double> areas;			// Площади фасеток
-		Vector moment;								
-
+		std::vector<double> disclinations;	// Мощности дисклинаций
 		int position;						// Порядковый номер данного элемента в поликристалле
 
 		bool isRotate;						// Вращается ли решётка на текущем шаге
 		double rotationSpeed;				// Скорость вращения решётки
 		double rotationTotalAngle;			// Накопленный угол поворота решётки
 		double rotationEnergy;				// Энергия ротаций фрагмента
-		
 		double rotationParamMc;				// Начальный критический момент
 		double rotationParamH;				// Коэффициент при необратимой составляющей поворота
 		double rotationParamA;				// Коэффициент при обратимой составляющей поворота
 		double rotationParamL;				// Коэффициент при скорости поверхностных моментов
-
+		Vector rotationMoment;				// Объемный вращательный момент
+		
 		// Задание материальных параметров
 		void setMaterialParams(int);
 		// Задание начальной ориентации по углам Эйлера

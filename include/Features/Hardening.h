@@ -9,8 +9,8 @@
 namespace model
 {
 
-	void Base_hardening(Grain*);			//Базовое слагаемое упрочнения
-	void Boundary_hardening(Grain*);		//Зернограничное упрочнение
+	void hardeningBase(Grain*);			// Базовое слагаемое упрочнения
+	void hardeningBoundary(Grain*);		// Зернограничное слагаемое упрочнения
 	
 }
 #endif __HARDENING_H

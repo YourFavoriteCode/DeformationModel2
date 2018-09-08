@@ -93,6 +93,9 @@
     <ClInclude Include="include\Model\Grain.h">
       <Filter>Файлы заголовков\model</Filter>
     </ClInclude>
+    <ClInclude Include="include\Features\Fragmentation.h">
+      <Filter>Файлы заголовков\features</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\rotations.cpp">
@@ -151,6 +154,9 @@
     </ClCompile>
     <ClCompile Include="src\Grain.cpp">
       <Filter>Исходные файлы\model</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Features\Fragmentation.cpp">
+      <Filter>Исходные файлы\features</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

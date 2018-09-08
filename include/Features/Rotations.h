@@ -10,22 +10,27 @@
 
 namespace model
 {
+	// Модель стеснённого поворота по Тейлору
+	void rotateByTaylor(Grain*);
+	// Модель ротаций, связанная с несовместностью сдвигов
+	void rotateByTrusov(Grain*);
+	// Модель ротационного упрочнения
+	void rotationHardening(Grain*);
 	
-	void Taylor_rotations(Grain*);		//Модель стеснённого поворота по Тейлору
-	void Trusov_rotations(Grain*);		//Модель, связанная с несовместностью сдвигов
-	void Rotation_hardening(Grain*);		//Модель ротационного упрочнения
-	void Rotate(Grain* f, double dFi, const Vector a);	//Поворот вокруг заданной оси на заданный угол
+	// Поворот вокруг заданной оси на заданный угол
+	void rotate(Grain* f, double dFi, const Vector a);
+
 	/*********************************************************
 	********	    Получение полюсных фигур и ССТ	   *******
 	*********************************************************/
-
-	void SavePoints(Tensor,	char*,
-		int, int, int);			//Запись проекций ПФ в файл
-	void GetPoleFig(Grain*);				//Сохранение полюсной фигуры
-	
-	void SaveSSTPoints(Tensor&, float,		//Запись проекций ССТ в файл
-		char*, int, int, int);
-	void GetSST(Grain*);					//Сохранение ССТ
+	//Запись проекций ПФ в файл
+	void savePoints(Tensor,	char*, int, int, int);
+	//Сохранение полюсной фигуры
+	void getPoleFig(Grain*);
+	//Запись проекций ССТ в файл
+	void saveSSTPoints(Tensor, double, char*, int, int, int);
+	//Сохранение ССТ
+	void getSST(Grain*);
 }
 
 #endif __ROTATIONS_H

@@ -225,6 +225,7 @@
     <ClInclude Include="include\Core\Tensor.h" />
     <ClInclude Include="include\Core\Tensor4.h" />
     <ClInclude Include="include\Core\Vector.h" />
+    <ClInclude Include="include\Features\Fragmentation.h" />
     <ClInclude Include="include\Features\Hardening.h" />
     <ClInclude Include="include\Features\Rotations.h" />
     <ClInclude Include="include\Features\Tension.h" />
@@ -254,6 +255,7 @@
     <ClCompile Include="src\DeformationModel.cpp" />
     <ClCompile Include="src\distributions.cpp" />
     <ClCompile Include="src\Features\BaseStructure.cpp" />
+    <ClCompile Include="src\Features\Fragmentation.cpp" />
     <ClCompile Include="src\Features\VoronoiStructure.cpp" />
     <ClCompile Include="src\Grain.cpp" />
     <ClCompile Include="src\functions.cpp" />

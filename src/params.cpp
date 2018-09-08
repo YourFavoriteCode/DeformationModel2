@@ -72,6 +72,8 @@ namespace prms
 	double hardeningParamBasePsi			= 0;
 	double hardeningParamBaseA				= 0;
 
+	bool usingFragmentation					= false;
+
 	bool usingStandardTriangleSaving		= false;
 
 	bool saveIntensity						= true;
@@ -225,6 +227,8 @@ namespace prms
 
 		getValue(rootnode, "ROT_HARD_K1", &rotationParamHardK1);
 		getValue(rootnode, "ROT_HARD_K2", &rotationParamHardK2);
+
+		getValue(rootnode, "using_fragmentation", &usingFragmentation);
 	
 		return 0;
 	}
