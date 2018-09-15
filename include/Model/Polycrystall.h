@@ -52,7 +52,7 @@ namespace model
 		~Polycrystall();
 
 		void init(int);						// Выделение памяти под зёрна
-		void makeGrainStruct(prms::GrainStruct);	// Распределение нормалей и фасеток всех фрагментов
+		void makeGrainStruct();				// Распределение нормалей и фасеток всех фрагментов
 		void setParams();					// Распределение параметров фрагментов
 		void deformate(Loading*);			// Деформирование поликристалла
 

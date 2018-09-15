@@ -107,7 +107,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	std::srand(time(NULL));
 
 	polycrystall.setParams();					//Заполнение всех параметров поликристалла
-	polycrystall.makeGrainStruct(prms::structType);	//Формирование фрагментной структуры
+	polycrystall.makeGrainStruct();	//Формирование фрагментной структуры
 
 	if (prms::fixedOrientations == 2)	//Считывание записанных ориентаций
 	{

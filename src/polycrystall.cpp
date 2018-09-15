@@ -334,21 +334,11 @@ namespace model
 		}
 	}
 	
-	void Polycrystall::makeGrainStruct(prms::GrainStruct structType) {
+	void Polycrystall::makeGrainStruct() {
 	
-		structure = new GrainStructure();
-		
-		switch (structType)
-		{
-		case prms::STRUCTURE_CUBIC:
-			structure->makeCubicStructure(this);
-			break;
-		case prms::STRUCTURE_VORONOI:
-			structure->makeVoronoiStructure(this);
-			break;
-		default:
-			break;
-		}
+		structure = new GrainStructure(this);
+		structure->makeVoronoiStructure();
+
 	}
 
 	//TODO: Перенос работы с файлами в отдельный класс

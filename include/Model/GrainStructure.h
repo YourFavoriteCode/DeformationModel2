@@ -3,6 +3,7 @@
 #define __GRAIN_STRUCTURE_H
 
 #include "Polycrystall.h"
+#include "voro++.hh"
 
 namespace model
 {
@@ -11,13 +12,16 @@ namespace model
 	{
 	public:
 		
+		GrainStructure(Polycrystall*);
+
 		std::vector<Vector> centerPos;
 
-		// Создает простую трехмерную структуру из зерен-кубиков 
-		void makeCubicStructure(Polycrystall*);
 		// Создает трехмерную структуру из многогранников Вороного
-		void makeVoronoiStructure(Polycrystall*);
+		void makeVoronoiStructure();
+
+		void updateStructure(voro::container*);
 	private:
+		Polycrystall *polycrystall;
 	};
 }
 #endif

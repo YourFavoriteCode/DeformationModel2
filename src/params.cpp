@@ -33,7 +33,6 @@ namespace prms
 	int grainSurroundCount					= 6;
 	int mainPhasePercent					= 100;
 	bool usingInititalStress				= false;
-	GrainStruct structType					= STRUCTURE_CUBIC;
 
 	DistributionType grainSizeDistribLaw	= DISTRIB_NORMAL;
 	double grainSizeDistribM				= 5e-5;
@@ -196,8 +195,6 @@ namespace prms
 		getValue(rootnode, "gradV21", &gradV.c[2][1]);
 		getValue(rootnode, "gradV22", &gradV.c[2][2]);
 	
-		getValue(rootnode, "grainStructType", &buf);
-		structType = GrainStruct(buf);
 		getValue(rootnode, "FragmSizeLaw", &buf);
 		grainSizeDistribLaw = DistributionType(buf);
 		getValue(rootnode, "FragmSizeM", &grainSizeDistribM);

@@ -15,12 +15,6 @@ namespace prms
 		DISTRIB_EXPONENT	// Показательное
 	};
 
-	// Тип зеренной структуры
-	enum GrainStruct {
-		STRUCTURE_CUBIC,	// Кубическая трехмерная укладка
-		STRUCTURE_VORONOI	// Разбиение области на многогранники Вороного
-	};
-
 	/********************************************************
 	**********   Различные параметры нагружения   ***********
 	********************************************************/
@@ -52,7 +46,6 @@ namespace prms
 	extern int grainSurroundCount;				//Кол-во учитываемых соседей
 	extern int grainCountLinear;				//Кол-во фрагментов
 	extern int mainPhasePercent;				//Процент основной фазы в материале
-	extern GrainStruct structType;				//Тип генерируемой зеренной структуры
 	extern DistributionType grainSizeDistribLaw;//Закон распределения размеров фрагментов
 	extern double grainSizeDistribM;			//Мат.ожидание размера зерна
 	extern double grainSizeDistribD;			//Дисперсия размера зерна
