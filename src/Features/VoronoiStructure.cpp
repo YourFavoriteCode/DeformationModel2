@@ -67,7 +67,6 @@ namespace model
 			poly->c[q].neighbors = std::vector<Grain*>(neighborCount);
 			poly->c[q].normals = std::vector<Vector>(neighborCount);
 			poly->c[q].areas = std::vector<double>(neighborCount);
-			poly->c[q].areas = std::vector<double>(verticesCount);
 
 			for (int i = 0; i < neighborCount; i++)
 			{
@@ -80,7 +79,7 @@ namespace model
 			}
 			// Начальный объем каждого зерна
 			poly->c[q].volume = pow(poly->c[q].size, 3) * cell.volume();
-
+			poly->c[q].position = q;
 			q++;
 		} while (loop.inc());
 	}

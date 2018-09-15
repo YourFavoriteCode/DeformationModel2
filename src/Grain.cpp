@@ -465,7 +465,7 @@ namespace model
 			************************************************************/
 			
 			// Ориентационный тензор системы скольжения
-			Tensor o = diadMult(ss[k].n, ss[k].b);
+			Tensor o = ss[k].o;
 			if (prms::isSymmetrycal)
 			{
 				o = o.getSymmetryPart();

@@ -23,6 +23,8 @@ namespace model
 
 		n.normalize();
 		b.normalize();
+
+		o = diadMult(n, b);
 	}
 
 	void SlipSystem::Initialize(int nx1, int nx2, int nx3, int nx4,
@@ -40,6 +42,8 @@ namespace model
 
 		n.normalize();
 		b.normalize();
+
+		o = diadMult(n, b);
 	}
 
 	SlipSystem::SlipSystem()
