@@ -9,41 +9,69 @@
 
 namespace model
 {
-		
+
 	double rnd() { return double(rand()) / RAND_MAX; }
 
-	GrainStructure::GrainStructure(Polycrystall* poly)
+	GrainStructure::GrainStructure(Polycrystall* poly, bool periodic)
 	{
 		this->polycrystall = poly;
+		this->periodic = periodic;
+	}
+
+
+	voro::container* GrainStructure::makeContainer()
+	{
+		// Количество вычислительных блоков для разбиения контейнера
+		const int nx = 6, ny = 6, nz = 6;
+		// Задание контейнера с описанной выше геометрией
+		// Периодическими ГУ по всем направлениям
+		// И выделяющий память под 8 частиц в ккаждом блоке
+		return new voro::container(xMin, xMax, yMin, yMax, zMin, zMax, nx, ny, nz,
+			periodic, periodic, periodic, 8);
 	}
 
 	// Укладка зерен в виде многогранников Вороного. Разбиение моделируемого объема среды
 	// на ячейки без пустот и наложений. Используется пакет voro++
 	void GrainStructure::makeVoronoiStructure()
 	{
-		// Геометрия контейнера для расчетной области
-		const double x_min = 0, x_max = 1;
-		const double y_min = 0, y_max = 1;
-		const double z_min = 0, z_max = 1;
-		// Количество вычислительных блоков для разбиения контейнера
-		const int n_x = 6, n_y = 6, n_z = 6;
+		voro::container *con = makeContainer();
 		// Количество частиц - центров кристаллизации
 		const int particles = polycrystall->totalGrainCount;
-		// Задание контейнера с описанной выше геометрией
-		// Периодическими ГУ по всем направлениям
-		// И выделяющий память под 8 частиц в ккаждом блоке
-		voro::container *con = new voro::container(x_min, x_max, y_min, y_max, z_min, z_max, n_x, n_y, n_z,
-			true, true, true, 8);
-		centerPos.clear();
+		
 		// Добавление случайно сгенерированных частиц в контейнер
 		double x, y, z;
 		for (int i = 0; i < particles; i++) {
-			x = x_min + rnd()*(x_max - x_min);
-			y = y_min + rnd()*(y_max - y_min);
-			z = z_min + rnd()*(z_max - z_min);
+			x = xMin + rnd()*(xMax - xMin);
+			y = yMin + rnd()*(yMax - yMin);
+			z = zMin + rnd()*(zMax - zMin);
 			con->put(i, x, y, z);
-			centerPos.push_back(Vector(x, y, z));
+			posMap.insert(std::pair<int, Vector>(i, Vector(x, y, z)));
+			//centerPos.push_back(Vector(x, y, z));
+			//ids.push_back(i);
 		}
+		updateStructure(con);
+	}
+
+	void GrainStructure::updateContainer()
+	{
+		voro::container *con = makeContainer();
+
+		double x, y, z;
+
+		for (std::pair<int, Vector> pair : posMap)
+		{
+			Vector v = pair.second;
+			con->put(pair.first, v.c[0], v.c[1], v.c[2]);
+		}
+	/*	for (int i = 0; i < posMap.size(); i++)
+		{
+			x = posMap[i].c[0];
+			y = posMap[i].c[1];
+			z = posMap[i].c[2];
+			int index = ids[i];
+			con->put(index, x, y, z);
+		}*/
+
 		updateStructure(con);
 	}
 
@@ -55,6 +83,8 @@ namespace model
 		voro::c_loop_all loop(*con);
 		// Основной цикл обхода контейнера
 		int q = 0;
+		std::map<int, Vector>::iterator it;
+		it = posMap.begin();
 		if (loop.start()) do if (con->compute_cell(cell, loop))
 		{
 			std::vector<double> normals;	// Нормали к каждой фасетке
@@ -69,31 +99,36 @@ namespace model
 			int neighborCount = neighbors.size();
 			int verticesCount = vertices.size();
 
+		//	Grain* grain = polycrystall->findGrainById(ids[q]);
+			int pos = polycrystall->findGrainPosById(it->first);
 			// Выделение памяти для всех топологических параметров структуры
-			polycrystall->c[q].neighbors = std::vector<Grain*>(neighborCount);
-			polycrystall->c[q].normals = std::vector<Vector>(neighborCount);
-			polycrystall->c[q].areas = std::vector<double>(neighborCount);
+		//	grain->clearTopology();
+			polycrystall->c[pos].neighbors = std::vector<Grain*>(neighborCount);
+			polycrystall->c[pos].normals = std::vector<Vector>(neighborCount);
+			polycrystall->c[pos].areas = std::vector<double>(neighborCount);
 
 			for (int i = 0; i < neighborCount; i++)
 			{
 				int curr = i * 3;
 				Vector normal(normals[curr], normals[curr + 1], normals[curr + 2]);
 				// Нормали уже отнормированы
-				polycrystall->c[q].normals[i] = normal;
-				polycrystall->c[q].neighbors[i] = &polycrystall->c[neighbors[i]];
-				polycrystall->c[q].areas[i] = areas[i];
+				polycrystall->c[pos].normals[i] = normal;
+				polycrystall->c[pos].neighbors[i] = &polycrystall->c[neighbors[i]];
+				polycrystall->c[pos].areas[i] = areas[i];
 			}
 			// Начальный объем каждого зерна
-			polycrystall->c[q].volume = pow(polycrystall->c[q].size, 3) * cell.volume();
-			polycrystall->c[q].position = q;
+			polycrystall->c[pos].volume = pow(polycrystall->c[q].size, 3) * cell.volume();
+			polycrystall->c[pos].position = q;
+			it++;
 			q++;
 		} while (loop.inc());
-		int a = 9;
+
+		lastId = q;
 	}
 
 	void printStructureInfo(voro::container *con)
 	{
-		
+
 		// Легенда:
 		// %i - ID ячейки
 		// %q - координаты в формате %x %y %z

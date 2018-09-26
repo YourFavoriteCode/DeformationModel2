@@ -62,6 +62,8 @@ namespace model
 		void stressStrainCalc();
 		// Возвращает меру разориентации с выбранным соседом
 		double disorientMeasure(int);
+		// Очищает массивы с топологическими данными
+		void clearTopology();
 
 		Grain();
 		~Grain();

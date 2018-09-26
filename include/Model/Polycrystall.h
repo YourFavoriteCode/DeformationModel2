@@ -16,7 +16,7 @@ namespace model
 	{
 	public:
 		
-		std::vector<Grain> c;			// Массив элементов поликристалла
+		std::vector<Grain> c;				// Массив элементов поликристалла
 
 		Loading *loading;					// Нагружение
 		GrainStructure *structure;			// Зеренная структура поликристалла
@@ -60,6 +60,9 @@ namespace model
 		void saveDebugData();				// Сохранение отладочных данных
 		void openAllFiles();				// Открытие всех файлов для записи
 		void closeAllFiles();				// Закрытие всех файлов для записи
+
+		Grain* findGrainById(int);
+		int findGrainPosById(int);
 
 	private:
 		void load(bool unload);				// Нагружение поликристалла

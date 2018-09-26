@@ -17,7 +17,7 @@ using namespace model;
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	if (argc == 1) return 1;	//Программа закроется, если вызвана без аргументов
+	if (argc == 1 && !prms::CONFIG_DEBUG) return 1;	//Программа закроется, если вызвана без аргументов
 	/****************************************************************
 	*********	  Создание несуществующих директорий		*********
 	****************************************************************/
@@ -38,7 +38,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	********     Интерфейс ввода/вывода параметров модели     ********
 	*****************************************************************/
 	printf(" Build date %s, %s\n", __DATE__, __TIME__);
-	std::string paramFileName = argv[1]; //"Default.xml";//
+	std::string paramFileName = prms::CONFIG_DEBUG ? "Default.xml" : argv[1]; 
 	printf(" Parameters file: %s\n", paramFileName.c_str());
 	if (prms::ReadParams(paramFileName.c_str()) == 1) printf(" Error in file!\n");		//Считали параметры из файла
 	printf(" ==========================================\n");

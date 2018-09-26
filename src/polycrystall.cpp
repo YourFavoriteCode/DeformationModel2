@@ -216,6 +216,28 @@ namespace model
 		c = std::vector<Grain>(totalGrainCount); //Выделение памяти под массив
 	}
 
+	Grain* Polycrystall::findGrainById(int id)
+	{
+		for (Grain g : c)
+		{
+			if (g.position == id)
+			{
+				return &g;
+			}
+		}
+	}
+
+	int Polycrystall::findGrainPosById(int id)
+	{
+		for (int i = 0; i < c.size(); i++)
+		{
+			if (c[i].position == id)
+			{
+				return i;
+			}
+		}
+	}
+
 	void Polycrystall::setParams()
 	{
 		for (int q = 0; q < totalGrainCount; q++)
@@ -336,7 +358,7 @@ namespace model
 	
 	void Polycrystall::makeGrainStruct() {
 	
-		structure = new GrainStructure(this);
+		structure = new GrainStructure(this, true);
 		structure->makeVoronoiStructure();
 
 	}
@@ -489,10 +511,7 @@ namespace model
 				rotateByTrusov(&c[q]);
 			}
 
-			if (prms::usingFragmentation)		// Фрагментация зерен
-			{
-				fragmentate(&c[q]);
-			}
+
 			/**************************************************
 			************       Переходим в ЛСК       **********
 			**************************************************/
@@ -500,6 +519,11 @@ namespace model
 			c[q].sgm = OT * c[q].sgm*O;
 			c[q].d_in = OT * c[q].d_in*O;
 
+		}
+
+		if (prms::usingFragmentation)		// Фрагментация зерен
+		{
+			structure->fragmentate();
 		}
 		
 		if (!prms::trueUniaxial && !unload)		//Этот блок нужен исключительно для работы с энергией!

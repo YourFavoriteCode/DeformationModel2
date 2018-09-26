@@ -19,6 +19,8 @@ namespace prms
 	*****	Если в файле параметров не будет найден параметр,	******
 	*****	его значение будет взято по-умолчанию				******
 	*****************************************************************/
+	bool CONFIG_DEBUG						= false;
+	
 	bool isSymmetrycal						= true;
 	bool trueUniaxial						= false;
 	bool withUnloading						= false;

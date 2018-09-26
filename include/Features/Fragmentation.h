@@ -6,8 +6,7 @@
 
 namespace model
 {
-	// Функция фрагментации зерна
-	void fragmentate(Grain*);
+
 }
 
 #endif

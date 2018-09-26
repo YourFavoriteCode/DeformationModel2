@@ -554,4 +554,11 @@ namespace model
 		}
 		return M;
 	}
+
+	void Grain::clearTopology()
+	{
+		neighbors.clear();
+		areas.clear();
+		normals.clear();
+	}
 }
