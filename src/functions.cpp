@@ -19,13 +19,13 @@ namespace model
 		return dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
 	}
 
-	void writeDebugInfo(std::ofstream& Stream, double Matrix[3][3])
+	void writeDebugInfo(std::ofstream& stream, double matrix[3][3])
 	{
 		for (int i = 0; i < 3; i++)
 		{
-			Stream << Matrix[i][0] << " " << Matrix[i][1] << " " << Matrix[i][2] << std::endl;
+			stream << matrix[i][0] << " " << matrix[i][1] << " " << matrix[i][2] << std::endl;
 		}
-		Stream << std::endl;
+		stream << std::endl;
 	}
 	void truncSSTFiles()
 	{

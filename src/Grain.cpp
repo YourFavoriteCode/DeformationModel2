@@ -25,6 +25,7 @@ namespace model
 		rotationParamH = 0;
 		rotationParamL = 0;
 		rotationEnergy = 0;
+		position = -1;
 	}
 
 	Grain::~Grain()

@@ -27,7 +27,7 @@ namespace prms
 	bool randomOrientations					= true;
 	int orientationType						= 0;
 	int fixedOrientations					= 0;
-	double dt								= 5e-4;
+	double dt								= 5e-3;
 	int materialType						= 0;
 	double maxStrainIntencity				= 1e-1;
 	model::Tensor gradV;
@@ -40,7 +40,7 @@ namespace prms
 	double grainSizeDistribM				= 5e-5;
 	double grainSizeDistribD				= 0;
 
-	int grainCountLinear					= 4;
+	int grainCountLinear					= 2;
 	int loadCycleCount						= 1;
 	int ompThreadCount						= 1;
 
@@ -73,7 +73,8 @@ namespace prms
 	double hardeningParamBasePsi			= 0;
 	double hardeningParamBaseA				= 0;
 
-	bool usingFragmentation					= false;
+	bool usingFragmentation					= true;
+	double fragmentationCriteria			= 1e10;
 
 	bool usingStandardTriangleSaving		= false;
 
@@ -228,7 +229,7 @@ namespace prms
 		getValue(rootnode, "ROT_HARD_K2", &rotationParamHardK2);
 
 		getValue(rootnode, "using_fragmentation", &usingFragmentation);
-	
+		getValue(rootnode, "fragmentation_criteria", &fragmentationCriteria);
 		return 0;
 	}
 }

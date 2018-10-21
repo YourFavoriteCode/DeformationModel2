@@ -240,7 +240,7 @@ namespace model
 
 	void Polycrystall::setParams()
 	{
-		for (int q = 0; q < totalGrainCount; q++)
+		for (int q = 0; q < c.size(); q++)
 		{
 			//Задание материала 
 			int another_material;//Примесная фаза
@@ -333,22 +333,22 @@ namespace model
 			{
 			case prms::DISTRIB_UNIFORM:
 			{
-				c[q].size = UniformDistrib(prms::grainSizeDistribM, prms::grainSizeDistribD);
+				c[q].size = uniformDistrib(prms::grainSizeDistribM, prms::grainSizeDistribD);
 				break;
 			}
 			case prms::DISTRIB_NORMAL:
 			{
-				c[q].size = NormalDistrib(prms::grainSizeDistribM, prms::grainSizeDistribD);
+				c[q].size = normalDistrib(prms::grainSizeDistribM, prms::grainSizeDistribD);
 				break;
 			}
 			case prms::DISTRIB_LOGNORMAL:
 			{
-				c[q].size = LogNormalDistrib(prms::grainSizeDistribM, prms::grainSizeDistribD);
+				c[q].size = logNormalDistrib(prms::grainSizeDistribM, prms::grainSizeDistribD);
 				break;
 			}
 			case prms::DISTRIB_EXPONENT:
 			{
-				c[q].size = ExpDistrib(prms::grainSizeDistribM);//Только один параметр
+				c[q].size = expDistrib(prms::grainSizeDistribM);//Только один параметр
 				break;
 			}
 			}			
@@ -367,7 +367,7 @@ namespace model
 
 	void Polycrystall::savePoleFigData()
 	{
-		for (int q = 0; q < totalGrainCount; q++)
+		for (int q = 0; q < c.size(); q++)
 		{
 			getPoleFig(&c[q]);
 			if (prms::usingStandardTriangleSaving) getSST(&c[q]);
@@ -383,7 +383,7 @@ namespace model
 		}
 
 		//Запись тензоров каждого из зерен или фрагментов
-		for (int q = 0; q < totalGrainCount; q++)
+		for (int q = 0; q < c.size(); q++)
 		{
 
 			writeDebugInfo(streamDebug[0], c[q].o.c);
@@ -424,14 +424,14 @@ namespace model
 			//Осреднение
 			P.setZero();
 			D_in.setZero();
-			for (int q = 0; q < totalGrainCount; q++)
+			for (int q = 0; q < c.size(); q++)
 			{
 				D_in += c[q].d_in;
 				P += c[q].p.toLsk(c[q].o);
 			}
 
-			D_in /= (totalGrainCount);
-			P /= (totalGrainCount);
+			D_in /= c.size();
+			P /= c.size();
 
 			//Симметризация тензора упругих констант
 			P.symmetrize();
@@ -449,21 +449,21 @@ namespace model
 		{
 			stress = 0;		//Вычисление интенсивностей осреднением
 			strain = 0;
-			for (int q = 0; q < totalGrainCount; q++)
+			for (int q = 0; q < c.size(); q++)
 			{
 				strain += c[q].strain;
 				stress += c[q].stress;
 
 			}
-			strain /= totalGrainCount;
-			stress /= totalGrainCount;
+			strain /= c.size();
+			stress /= c.size();
 		}
 
 #pragma omp parallel for
 		//Часть, которую можно паралелить
 		//Здесь необходимо гарантировать защиту данных каждого фрагмента
 		//от перезаписи другими фрагментами
-		for (int q = 0; q < totalGrainCount; q++)
+		for (int q = 0; q < c.size(); q++)
 		{
 
 			/**************************************************
@@ -530,15 +530,15 @@ namespace model
 		{
 			Sgm.setZero();
 			D_in.setZero();
-			for (int q = 0; q < totalGrainCount; q++)
+			for (int q = 0; q < c.size(); q++)
 			{
 
 				Sgm += c[q].sgm;
 				D_in += c[q].d_in;
 
 			}
-			Sgm /= totalGrainCount;
-			D_in /= totalGrainCount;
+			Sgm /= c.size();
+			D_in /= c.size();
 		}
 		
 		/************************************************************
@@ -659,7 +659,7 @@ namespace model
 
 			if (prms::saveMeso)	//Запись компонент тензоров мезоуровня
 			{
-				for (int q = 0; q < totalGrainCount; q++)
+				for (int q = 0; q < c.size(); q++)
 				{
 
 					if (prms::saveIntensity)
@@ -724,7 +724,8 @@ namespace model
 			double angle = 0;
 			double H = 0;
 			Vector M;
-			for (int q = 0; q < totalGrainCount; q++)
+			double a=0, b=0, g=0;
+			for (int q = 0; q < c.size(); q++)
 			{
 				for (int i = 0; i < c[q].ssCount; i++)
 				{
@@ -732,18 +733,24 @@ namespace model
 				}
 
 				if (c[q].isRotate) RotCount++;		//Подсчёт вращающихся решёток
-				RotEnergy += c[q].rotationEnergy;		//Суммирование энергий вращения
+				RotEnergy += c[q].rotationEnergy;	//Суммирование энергий вращения
 				RotSpeed += c[q].rotationSpeed;		//Суммирование скоростей вращения
 				Mc += c[q].rotationParamMc;
 				angle += c[q].rotationTotalAngle;
 				H += c[q].rotationParamH;
 				M += c[q].rotationMoment;
+				a += c[q].sgm.getL(0);
+				b += c[q].sgm.getL(1);
+				g += c[q].sgm.getL(2);
 			}
-			M /= totalGrainCount;
-			H /= totalGrainCount;
-			angle /= totalGrainCount;
-			Mc /= totalGrainCount;
-			ActiveSysCount /= totalGrainCount;
+			a /= c.size();
+			b /= c.size();
+			g /= c.size();
+			M /= c.size();
+			H /= c.size();
+			angle /= c.size();
+			Mc /= c.size();
+			ActiveSysCount /= c.size();
 			if (prms::saveActiveSS) streamInternalVars[0].write((char *)&ActiveSysCount, sizeof ActiveSysCount);//Запись кол-ва активных СС
 			if (RotCount != 0)
 			{
@@ -769,7 +776,7 @@ namespace model
 			streamDataTest[2] << RotEnergy << std::endl;
 			streamDataTest[3] << StepEnergy << std::endl;
 			streamDataTest[4] << StepEnergy_in << std::endl;
-			streamDataTest[5] << M.getNorm() << std::endl;
+			streamDataTest[5] << a << " " << b << " " << g << std::endl;
 			stepSavePlot = progress;
 		}
 
@@ -785,14 +792,17 @@ namespace model
 		/************************************************************
 		***********	       Запись пошаговых данных	      ***********
 		************************************************************/
-		if (loading->currentStep >= prms::saveVariablesStartStep && loading->currentStep <= prms::saveVariablesStopStep && stepSaveInternalData == prms::saveVariablesPeriodStep)
+		if (loading->currentStep >= prms::saveVariablesStartStep &&
+			loading->currentStep <= prms::saveVariablesStopStep &&
+			stepSaveInternalData == prms::saveVariablesPeriodStep)
 		{
 			stepSaveInternalData = 0;
 			saveDebugData();
 		}
 		loading->currentStep++;
 		stepShowProgress++;
-		if (loading->currentStep >= prms::saveVariablesStartStep && loading->currentStep <= prms::saveVariablesStopStep)
+		if (loading->currentStep >= prms::saveVariablesStartStep &&
+			loading->currentStep <= prms::saveVariablesStopStep)
 		{
 			stepSaveInternalData++;
 		}
@@ -867,6 +877,17 @@ namespace model
 			}
 
 		}
+		
+		// Сохранение информации о зеренной структуре в конечный момент времени
+		if (prms::usingFragmentation)
+		{
+			std::ofstream structStream;
+			structStream.open("Struct info.txt", std::ios_base::out | std::ios_base::trunc);
+			structStream << structure->posMap.size();
+			structStream.close();
+			structure->updateContainer();
+		}
+
 	}
 
 	int get1DPos(int q1, int q2, int q3)

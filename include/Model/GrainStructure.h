@@ -23,12 +23,16 @@ namespace model
 
 		void updateStructure(voro::container*);
 
+		void printStructureInfo(voro::container *, const char*);
+
+		void updateContainer();
+
 		void fragmentate();
 	private:
 		Polycrystall *polycrystall;		// Ссылка на поликристалл
 		int lastId;						// Последний зарегистрированный идентификатор
-		void split(Grain*);
-		void updateContainer();
+		void split(int);
+		
 		voro::container* makeContainer();
 		// Геометрия контейнера для расчетной области
 		const double xMin = 0, xMax = 1;

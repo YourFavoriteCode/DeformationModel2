@@ -43,7 +43,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	if (prms::ReadParams(paramFileName.c_str()) == 1) printf(" Error in file!\n");		//Считали параметры из файла
 	printf(" ==========================================\n");
 	const int grainCountTotal = (int)pow(prms::grainCountLinear, 3);	//Общее кол-во фрагментов
-	printf(" Fragments count: %d\n", grainCountTotal);
+	printf(" Grain count: %d\n", grainCountTotal);
 	printf(" Max. strain: %g\n", prms::maxStrainIntencity);
 	if (prms::loadCycleCount != 1)
 	{
@@ -95,35 +95,41 @@ int _tmain(int argc, _TCHAR* argv[])
 	{
 		printf(" Reading saved orientations and normals\n");
 	}
+	// Создание и инициализация поликристалла
 
-	Polycrystall polycrystall;				//Создание и инициализация поликристалла
+	Polycrystall polycrystall;
 	polycrystall.init(prms::grainCountLinear);
-
-	unsigned long t1, t2;			//Отсечки времени
+	// Отсечки времени
+	unsigned long t1, t2;			
 
 	printf(" Initializing all fragments... ");
 	t1 = clock();
 
 	std::srand(time(NULL));
 
-	polycrystall.setParams();					//Заполнение всех параметров поликристалла
-	polycrystall.makeGrainStruct();	//Формирование фрагментной структуры
+	// Заполнение всех параметров поликристалла
+	polycrystall.setParams();
 
-	if (prms::fixedOrientations == 2)	//Считывание записанных ориентаций
+	// Формирование фрагментной структуры
+	polycrystall.makeGrainStruct();
+
+	// Считывание записанных ориентаций
+	if (prms::fixedOrientations == 2)
 	{
 		std::ifstream StreamO("DBG\\o.txt", std::ios_base::in);
 		std::ifstream StreamNorm("DBG\\Norm.txt", std::ios_base::in);
 		for (int q = 0; q < grainCountTotal; q++)
 		{
-
-			for (int i = 0; i < DIM; i++)	//Считываем значения ориентационных тензоров
+			// Считываем значения ориентационных тензоров
+			for (int i = 0; i < DIM; i++)
 			{
 				for (int j = 0; j < DIM; j++)
 				{
 					StreamO >> polycrystall.c[q].o.c[i][j];
 				}
 			}
-			for (int h = 0; h < prms::grainSurroundCount; h++)//Считываем значения нормалей
+			// Считываем значения нормалей
+			for (int h = 0; h < prms::grainSurroundCount; h++)
 			{
 				for (int i = 0; i < DIM; i++)
 				{
@@ -135,14 +141,17 @@ int _tmain(int argc, _TCHAR* argv[])
 		StreamNorm.close();
 	}
 
-	if (prms::fixedOrientations == 1)//Запоминание начальных ориентаций
+	// Запоминание начальных ориентаций
+	if (prms::fixedOrientations == 1)
 	{
 		std::ofstream StreamO("DBG\\o.txt", std::ios_base::out | std::ios_base::trunc);
 		std::ofstream StreamNorm("DBG\\Norm.txt", std::ios_base::out | std::ios_base::trunc);
 		for (int q = 0; q < grainCountTotal; q++)
 		{
-			writeDebugInfo(StreamO, polycrystall.c[q].o.c);//Записываем значения тензоров ориентации
-			for (int h = 0; h < prms::grainSurroundCount; h++)//Записываем значения нормалей
+			// Записываем значения тензоров ориентации
+			writeDebugInfo(StreamO, polycrystall.c[q].o.c);
+			// Записываем значения нормалей
+			for (int h = 0; h < prms::grainSurroundCount; h++)
 			{
 				for (int i = 0; i < DIM; i++)
 				{
@@ -193,7 +202,8 @@ int _tmain(int argc, _TCHAR* argv[])
 	polycrystall.deformate(&loading);		//Деформирование
 	t2 = clock();							//Финальная отсечка времени
 
-	if (prms::usingInititalStress)			//Сохранение остаточных напряжений
+	//Сохранение остаточных напряжений
+	if (prms::usingInititalStress)
 	{
 		polycrystall.streamDebug[3].open("DBG\\sgm.txt", std::ios_base::out | std::ios_base::trunc);
 		for (int q = 0; q < grainCountTotal; q++)
