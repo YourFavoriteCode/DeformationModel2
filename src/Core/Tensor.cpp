@@ -26,6 +26,13 @@ namespace model
 		}
 	}
 
+	Tensor::Tensor(double c00, double c01, double c02,
+		double c10, double c11, double c12,
+		double c20, double c21, double c22)
+	{
+		set(c00, c01, c02, c10, c11, c12, c20, c21, c22);
+	}
+
 	Tensor::~Tensor()
 	{
 	}

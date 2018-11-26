@@ -51,35 +51,75 @@ namespace model
 		map->erase(it);	
 	}
 
+	Vector getIndexVector(std::map<int, Vector> *map, int num)
+	{
+		std::map<int, Vector>::iterator it;
+		it = map->find(num);
+		return it->second;
+	}
+
+	/*
+	Методом перебора ищет плоскость максимального касательного
+	напряжения, возвращает нормаль к этой плоскости
+	*/
+	Vector maxStressPlane(Tensor sgm)
+	{
+		Vector nMax;
+		double mMax = 0;
+
+		//Генерируем случайные плоскости
+		for (int i = 0; i < 200; i++)
+		{
+			//Случайное направление
+			double a = -1 + ((double)rand() / RAND_MAX) * 2;
+			double b = -1 + ((double)rand() / RAND_MAX) * 2;
+			double c = -1 + ((double)rand() / RAND_MAX) * 2;
+			Vector tau(a,b,c);				//Касательный вектор
+			double ksi = -(-a + b) / c;		//Гарантируем ортогональность
+			Vector n(1.0, 1.0, ksi);		//Вектор нормали
+			tau.normalize();
+			n.normalize();
+			double m = scalMult(tau, sgm).scalMult(n);
+			if (abs(m) > mMax)
+			{
+				nMax = n;
+			}
+		}
+		return nMax;
+	}
+
+	/*
+	Определяет позиции новых центров многогранников
+	и добавляет их в общую мезо-структуру
+	*/
 	void GrainStructure::split(int oldPos)
 	{
-		//TODO: тут ищется плоскость разделения
-
-		// Удаляем номера и центры из индекса
-		deleteIndex(&posMap, oldPos);
-
-		// Этот рандом чисто дял тестов
-		double x = xMin + getRnd()*(xMax - xMin);
-		double y = yMin + getRnd()*(yMax - yMin);
-		double z = zMin + getRnd()*(zMax - zMin);
-		Vector vector1(x, y, z);
-		x = xMin + getRnd()*(xMax - xMin);
-		y = yMin + getRnd()*(yMax - yMin);
-		z = zMin + getRnd()*(zMax - zMin);
-		Vector vector2(x, y, z);
-
 		// Для оптимизации старое зерно вместо удаления будет вторым новым субзерном
 		int n1 = lastId++, n2 = lastId++;
 		int npos = polycrystall->findGrainPosById(oldPos);
 		polycrystall->c[npos].position = n1;
+
+		// Поиск плоскости разделения
+		Vector nSplit = maxStressPlane(polycrystall->c[npos].sgm);
+		// Предполагаем, что плоскость проходит через
+		// центр многогранника Вороного
+		double coef = 1e-4;
+		Vector oldVec = getIndexVector(&posMap, oldPos);
+		// Новые центры при этом будут смещены от старого
+		// в обе стороны по линии нормали на малую величину 
+		Vector newVec1 = oldVec - nSplit * coef;
+		Vector newVec2 = oldVec + nSplit * coef;
+		// Удаляем номер и центр из индекса
+		deleteIndex(&posMap, oldPos);
+			
 		// Новое субзерно полностью сохранит состояние старого
 		// Изменится лишь его идентификатор, ориентация решетки и форма 
 		Grain newGrain = polycrystall->c[npos];
 		newGrain.position = n2;
 		polycrystall->c.push_back(newGrain);
 		polycrystall->totalGrainCount++;
-		posMap.insert(std::pair<int, Vector>(n1, Vector()));
-		posMap.insert(std::pair<int, Vector>(n2, Vector()));
+		posMap.insert(std::pair<int, Vector>(n1, newVec1));
+		posMap.insert(std::pair<int, Vector>(n2, newVec2));
 		updateContainer();
 
 	}

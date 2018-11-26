@@ -51,6 +51,9 @@ namespace model
 		int operator /= (double);					//Оператор деления тензора на число
 
 		Tensor();
+		Tensor(double, double, double,
+			double, double, double,
+			double, double, double);
 		~Tensor();
 
 	private:

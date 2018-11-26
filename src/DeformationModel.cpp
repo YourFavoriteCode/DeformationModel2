@@ -33,7 +33,9 @@ int _tmain(int argc, _TCHAR* argv[])
 	{
 		CreateDirectory((LPCTSTR)"DBG", NULL);//Для отладочных данных
 	}
-
+	// Очистка файла для фрагментации
+	std::ofstream structStream("Struct info.txt", std::ios_base::out | std::ios_base::trunc);
+	structStream.close();
 	/*****************************************************************
 	********     Интерфейс ввода/вывода параметров модели     ********
 	*****************************************************************/
@@ -79,6 +81,10 @@ int _tmain(int argc, _TCHAR* argv[])
 	{
 		printf(" Using boundary hardening\n");
 		printf("       K: %g\n", prms::hardeningParamBoundK);
+	}
+	if (prms::usingFragmentation)
+	{
+		printf(" Using fragmentation model\n");
 	}
 	if (prms::saveVariablesPeriodStep > 0)
 	{

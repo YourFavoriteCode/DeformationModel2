@@ -3,6 +3,7 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "stdafx.h"
+#include <fstream>
 
 #include "Params.h"
 #include "GrainStructure.h"
@@ -17,7 +18,7 @@ namespace model
 		this->polycrystall = poly;
 		this->periodic = periodic;
 	}
-
+	
 	voro::container* GrainStructure::makeContainer()
 	{
 		// Количество вычислительных блоков для разбиения контейнера
@@ -62,6 +63,27 @@ namespace model
 		updateStructure(con);
 	}
 
+	void saveStructureData(voro::container *con)
+	{
+		// Считаем средний размер зерна
+		voro::voronoicell_neighbor cell;
+		voro::c_loop_all loop(*con);
+		int q = 0;
+		double volume = 0;
+		if (loop.start()) do if (con->compute_cell(cell, loop))
+		{
+			volume += cell.volume();
+			q++;
+		} while (loop.inc());
+		volume /= q;
+
+		std::ofstream structStream;
+		structStream.open("Struct info.txt", std::ios_base::out | std::ios_base::app);
+		structStream << q << " " << volume << std::endl;
+		structStream.close();
+
+	}
+
 	void GrainStructure::updateStructure(voro::container* con)
 	{
 		// Ячейка, к которой будем обращаться в цикле
@@ -103,7 +125,7 @@ namespace model
 				polycrystall->c[pos].areas[i] = areas[i];
 			}
 			// Объем считается как отношение объема ячейки к объему ПО с масштабированием
-			polycrystall->c[pos].volume = pow(polycrystall->c[it->first].size, 3) * cell.volume();
+			polycrystall->c[pos].volume = pow(polycrystall->c[pos].size, 3) * cell.volume();
 
 			it++;
 		//	q++;
@@ -112,9 +134,13 @@ namespace model
 		{
 			lastId = posMap.size();
 		}
-		printStructureInfo(con, "struct");
+		
+		if (saveData)
+		{
+		//	saveStructureData(con);
+		}
+		printStructureInfo(con, "struct.txt");
 	}
-
 
 	void GrainStructure::printStructureInfo(voro::container *con, const char* filename)
 	{

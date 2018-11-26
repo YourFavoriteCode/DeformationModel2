@@ -716,6 +716,21 @@ namespace model
 				}
 			}
 
+			if (prms::usingFragmentation)
+			{
+				double avgSize = 0;
+				for (int q = 0; q < c.size(); q++)
+				{
+					avgSize += c[q].volume;
+				}
+				avgSize /= c.size();
+
+				std::ofstream structStream;
+				structStream.open("Struct info.txt", std::ios_base::out | std::ios_base::app);
+				structStream << c.size() << " " << avgSize << std::endl;
+				structStream.close();
+			}
+
 			double ActiveSysCount = 0;			//Среднее кол-во активных систем скольжения на шаге
 			double RotEnergy = 0;				//Энергия ротаций на шаге
 			double RotSpeed = 0;				//Средняя скорость вращения на шаге
@@ -878,16 +893,6 @@ namespace model
 
 		}
 		
-		// Сохранение информации о зеренной структуре в конечный момент времени
-		if (prms::usingFragmentation)
-		{
-			std::ofstream structStream;
-			structStream.open("Struct info.txt", std::ios_base::out | std::ios_base::trunc);
-			structStream << structure->posMap.size();
-			structStream.close();
-			structure->updateContainer();
-		}
-
 	}
 
 	int get1DPos(int q1, int q2, int q3)

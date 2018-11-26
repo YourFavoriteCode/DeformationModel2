@@ -19,70 +19,154 @@ namespace prms
 	*****	Если в файле параметров не будет найден параметр,	******
 	*****	его значение будет взято по-умолчанию				******
 	*****************************************************************/
+	
+
+	/********************************************************
+	********		Общие параметры программы		*********
+	********************************************************/
+
+	// Отладочный режим
 	bool CONFIG_DEBUG						= false;
+	// Кол-во вычислительных потоков OMP
+	int ompThreadCount						= 2;
 	
+
+	/********************************************************
+	**********		   Прочие параметры			 ************
+	********************************************************/
+
+	// Симметризация диад nb
 	bool isSymmetrycal						= true;
-	bool trueUniaxial						= false;
-	bool withUnloading						= false;
-	bool randomOrientations					= true;
-	int orientationType						= 0;
+	// Считывание ориентаций и нормалей из файлы
 	int fixedOrientations					= 0;
+	// Шаг интегрирования
 	double dt								= 5e-3;
-	int materialType						= 0;
-	double maxStrainIntencity				= 1e-1;
-	model::Tensor gradV;
-	
-	int grainSurroundCount					= 6;
-	int mainPhasePercent					= 100;
+	// Считывание остаточных напряжений из файла и запись в конце
 	bool usingInititalStress				= false;
+	// Сохранение информации о ССТ
+	bool usingStandardTriangleSaving		= false;
+	bool usingFragmentation					= false;
+	double fragmentationCriteria			= 4.5e7;
+	
 
-	DistributionType grainSizeDistribLaw	= DISTRIB_NORMAL;
-	double grainSizeDistribM				= 5e-5;
-	double grainSizeDistribD				= 0;
+	/********************************************************
+	**********		Параметры поликристалла	     ************
+	********************************************************/
 
-	int grainCountLinear					= 2;
-	int loadCycleCount						= 1;
-	int ompThreadCount						= 1;
+	// Используемый материал
+	int materialType = 0;
+	// Кол-во зерен
+	int grainCountLinear = 4;
+	// Закон распределения размеров зерен
+	DistributionType grainSizeDistribLaw = DISTRIB_NORMAL;
+	// Мат.ожидание размера зерна
+	double grainSizeDistribM = 5e-5;
+	// Дисперсия размера зерна
+	double grainSizeDistribD = 0;
+	// Кол-во учитываемых соседей зерна DEPRECATED
+	int grainSurroundCount = 6;
+	// Процент основной фазы в материале
+	int mainPhasePercent = 100;
+	// Случайное распределение начальных ориентаций
+	bool randomOrientations = true;
+	// Тип задания ориентации
+	int orientationType = 0;
 
-	double periodSavePlot					= 2;
-	double periodSavePolus					= 25;
-	int saveVariablesPeriodStep				= 0;
-	int saveVariablesStartStep				= 0;
-	int saveVariablesStopStep				= INT_MAX;
 
-	double shearRateLawDgm0					= 1e-5;
-	double shearRateLawM					= 100;
+	/********************************************************
+	**********   Упруговязкопластический закон   ************
+	********************************************************/
 
+	// Начальная скорость сдвига при критическом касательном напряжении
+	double shearRateLawDgm0 = 1e-5;
+	// Степенной параметр скоростной чувствительности
+	double shearRateLawM = 83;
+
+
+	/********************************************************
+	**********   Различные параметры нагружения   ***********
+	********************************************************/
+
+	// Условие одноосности НДС
+	bool trueUniaxial = false;
+	// Упругая разгрузка после каждого цикла нагружения
+	bool withUnloading = false;
+	// Кол-во циклов нагружения
+	int loadCycleCount = 1;
+	// Предел интенсивности деформаций
+	double maxStrainIntencity = 2e-1;
+	// Градиент места
+	model::Tensor gradV(0, 0, -0.0015, 0, -0.0015, 0, 0, 0, 0.003);
+
+
+	/********************************************************
+	*****************       Ротации      ********************
+	********************************************************/
+
+	// Модель ротаций Тейлора
 	bool usingRotationsTaylor				= false;
+	// Модель несовместности свдигов
 	bool usingRotationsTrusov				= false;
+	// Ротационное упрочнение
 	bool usingRotationsHardening			= false;
 
+	// Параметр упругой составляющей разворота
 	double rotationParamA					= 3e-9;
+	// Параметр пластической составляющей
 	double rotationParamH					= 1e-7;
+	// Параметр лямбда
 	double rotationParamL					= 10;
+	// Начальный критический момент
 	double rotationParamMc					= 3e4;
-
+	// Параметры ротационного упрочнения
 	double rotationParamHardK1;
 	double rotationParamHardK2;
+	
 
+	/********************************************************
+	*****************     Упрочнения     ********************
+	********************************************************/
+	
+	// Базовое слагаемое упрочнения
 	bool usingHardeningBase					= false;
+	// Зерно-граничное упрочнение
 	bool usingHardeningBound				= false;
 
-	double hardeningParamBoundK				= 0;
-	double hardeningParamBaseDelta			= 0;
-	double hardeningParamBasePsi			= 0;
-	double hardeningParamBaseA				= 0;
+	// Параметр зернограничного упрочнения
+	double hardeningParamBoundK				= 5e6;
+	// Базовое слагаемое: парметр дельта
+	double hardeningParamBaseDelta			= -0.2;
+	// Базовое слагаемое: параметр пси
+	double hardeningParamBasePsi			= 1.00002;
+	// Базовое слагаемое: парметр А
+	double hardeningParamBaseA				= 0.0057;
 
-	bool usingFragmentation					= true;
-	double fragmentationCriteria			= 1e10;
 
-	bool usingStandardTriangleSaving		= false;
+	/********************************************************
+	***********			Выходные файлы		*****************
+	********************************************************/
 
+	// Сохранение интенсивностей тензоров
 	bool saveIntensity						= true;
+	// Сохранение данных макроуровня
 	bool saveMacro							= true;
+	// Сохранение данных мехоуровня
 	bool saveMeso							= false;
+	// Сохранение активных СС
 	bool saveActiveSS						= false;
 
+	// Период сохранения диаграммы НДС (в % выполнения)
+	double periodSavePlot = 2;
+	// Период сохранения ПФ (в % выполнения)
+	double periodSavePolus = 25;
+	// Период сохранения отладочных данных
+	int saveVariablesPeriodStep = 0;
+	// Нижнее ограничение записи отладочной информации
+	int saveVariablesStartStep = 0;
+	// Верхнее ограничение записи отладочной информации
+	int saveVariablesStopStep = INT_MAX;
+
+	// Покомпонентное сохранение тензоров
 	bool save11								= false;
 	bool save12								= false;
 	bool save13								= false;
@@ -93,7 +177,8 @@ namespace prms
 	bool save32								= false;
 	bool save33								= false;
 
-	//Чтение целочисленных параметров
+
+	// Чтение целочисленных параметров
 	int getValue(tinyxml2::XMLElement *rootnode, const char* name, int* var)
 	{
 		if (rootnode->FirstChildElement(name) != NULL)//Проверка, есть ли в файле такой элемент
