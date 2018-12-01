@@ -135,10 +135,6 @@ namespace model
 			lastId = posMap.size();
 		}
 		
-		if (saveData)
-		{
-		//	saveStructureData(con);
-		}
 		printStructureInfo(con, "struct.txt");
 	}
 

@@ -718,13 +718,52 @@ namespace model
 
 			if (prms::usingFragmentation)
 			{
+				// Анализ зеренной структуры
 				double avgSize = 0;
+
+				double min = 1;
+				double max = 0;
+
 				for (int q = 0; q < c.size(); q++)
 				{
 					avgSize += c[q].volume;
+					if (c[q].volume < min)
+					{
+						min = c[q].volume;
+					}
+					else if (c[q].volume > max)
+					{
+						max = c[q].volume;
+					}
 				}
+				std::vector<int> distrib(10);
+				double dif = (max - min) / 9;
+				// Данные для диаграммы распределения размеров
+				for (int q = 0; q < c.size(); q++)
+				{
+					double v = c[q].volume;
+					for (int i = 0; i < 10; i++)
+					{
+						if (v >= min + i*dif && v < min + (i + 1)*dif)
+						{
+							distrib[i]++;
+							break;
+						}
+					}
+				}
+				// Файлы открыты для дозаписи, сброс производится при старте в DeformationModel.cpp
+				std::ofstream distribStream;
+				distribStream.open("Distribution info.txt", std::ios_base::out | std::ios_base::app);
+				for (int i = 0; i < 10; i++)
+				{
+					distribStream << distrib[i] << " ";
+				}
+				distribStream << std::endl;
+				distribStream.close();
+				// Средний объем зерен
 				avgSize /= c.size();
-
+				// Линейный размер вычисляется как кубический корень объема с нормировкой
+				avgSize = PIx4_3 * pow(avgSize, (double) 1 / 3);
 				std::ofstream structStream;
 				structStream.open("Struct info.txt", std::ios_base::out | std::ios_base::app);
 				structStream << c.size() << " " << avgSize << std::endl;

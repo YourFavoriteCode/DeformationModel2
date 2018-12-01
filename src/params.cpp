@@ -28,7 +28,7 @@ namespace prms
 	// Отладочный режим
 	bool CONFIG_DEBUG						= false;
 	// Кол-во вычислительных потоков OMP
-	int ompThreadCount						= 2;
+	int ompThreadCount						= 4;
 	
 
 	/********************************************************
@@ -45,7 +45,7 @@ namespace prms
 	bool usingInititalStress				= false;
 	// Сохранение информации о ССТ
 	bool usingStandardTriangleSaving		= false;
-	bool usingFragmentation					= false;
+	bool usingFragmentation					= true;
 	double fragmentationCriteria			= 4.5e7;
 	
 
@@ -56,7 +56,7 @@ namespace prms
 	// Используемый материал
 	int materialType = 0;
 	// Кол-во зерен
-	int grainCountLinear = 4;
+	int grainCountLinear = 2;
 	// Закон распределения размеров зерен
 	DistributionType grainSizeDistribLaw = DISTRIB_NORMAL;
 	// Мат.ожидание размера зерна

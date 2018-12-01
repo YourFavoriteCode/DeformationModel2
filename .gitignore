@@ -261,9 +261,5 @@ __pycache__/
 *.pyc
 /Plot
 /Polus
-/Test5.txt
-/Test4.txt
-/Test3.txt
-/Test2.txt
-/Test1.txt
-/Test0.txt
+*.txt
+*.xlsx

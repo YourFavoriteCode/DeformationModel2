@@ -15,6 +15,7 @@ namespace model
 	const double PI = 3.141592653589;			//Число Пи
 	const double PI_2 = 1.570796326794;			//Пи/2
 	const double PIx2 = 6.283185307179;			//2Пи
+	const double PIx4_3 = 4.188790204786;		//4Пи/3
 
 	const double EPS = 1e-10;					//Малая величина
 

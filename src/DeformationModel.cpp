@@ -33,9 +33,11 @@ int _tmain(int argc, _TCHAR* argv[])
 	{
 		CreateDirectory((LPCTSTR)"DBG", NULL);//Для отладочных данных
 	}
-	// Очистка файла для фрагментации
+	// Очистка файлов данных для анализа фрагментации
 	std::ofstream structStream("Struct info.txt", std::ios_base::out | std::ios_base::trunc);
 	structStream.close();
+	std::ofstream distribStream("Distribution info.txt", std::ios_base::out | std::ios_base::trunc);
+	distribStream.close();
 	/*****************************************************************
 	********     Интерфейс ввода/вывода параметров модели     ********
 	*****************************************************************/

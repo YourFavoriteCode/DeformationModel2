@@ -34,7 +34,6 @@ namespace model
 		Polycrystall *polycrystall;		// Ссылка на поликристалл
 		int lastId;						// Последний зарегистрированный идентификатор
 		void split(int);
-		bool saveData;					// Сохранять данные в файл или нет
 		voro::container* makeContainer();
 		// Геометрия контейнера для расчетной области
 		const double xMin = 0, xMax = 1;
