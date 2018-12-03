@@ -90,10 +90,10 @@ namespace model
 		voro::voronoicell_neighbor cell;
 		// Вспомогательный объект, обходящий все элементы контейнера
 		voro::c_loop_all loop(*con);
-		// Основной цикл обхода контейнера
-		//int q = 0;
+
 		std::map<int, Vector>::iterator it;
 		it = posMap.begin();
+		// Основной цикл обхода контейнера
 		if (loop.start()) do if (con->compute_cell(cell, loop))
 		{
 			std::vector<double> normals;	// Нормали к каждой фасетке
@@ -125,10 +125,10 @@ namespace model
 				polycrystall->c[pos].areas[i] = areas[i];
 			}
 			// Объем считается как отношение объема ячейки к объему ПО с масштабированием
-			polycrystall->c[pos].volume = pow(polycrystall->c[pos].size, 3) * cell.volume();
-
+			polycrystall->c[pos].volume = cell.volume();
+			// Линейный размер вычисляется как кубический корень объема с нормировкой
+			polycrystall->c[pos].size = pow(cell.volume(), (double) 1 / 3) / PIx4_3;
 			it++;
-		//	q++;
 		} while (loop.inc());
 		if (lastId == 0)
 		{

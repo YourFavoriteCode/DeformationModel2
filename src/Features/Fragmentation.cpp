@@ -5,14 +5,14 @@
 #include "stdafx.h"
 #include "GrainStructure.h"
 #include "Distributions.h"
+#include "Rotations.h"
 
 namespace model
 {
 	void calcDislocationsPower()
 	{
 
-	}
-	
+	}	
 
 	// Критерий Треска-Геста (максимального касательного напряжения)
 	bool criteria(Grain g)
@@ -23,22 +23,27 @@ namespace model
 		{
 			s[i] = g.sgm.getL(i);
 		}
-		double t0 = (s[1] - s[0]) / 2;
-		double t1 = (s[2] - s[0]) / 2;
-		double t2 = (s[2] - s[1]) / 2;
-		return (abs(t0) >= maxStress || abs(t1) >= maxStress || abs(t2) >= maxStress);
+		double t0 = abs(s[1] - s[0]) / 2;
+		double t1 = abs(s[2] - s[0]) / 2;
+		double t2 = abs(s[2] - s[1]) / 2;
+		return (t0 >= maxStress || t1 >= maxStress || t2 >= maxStress);
 	}
 
 	double getRnd() { return double(rand()) / RAND_MAX; }
 
 	void GrainStructure::fragmentate()
 	{
-		// Модификация массива в цикле - это плохо
-		for (Grain g : polycrystall->c)
+		// Случайным образом выбирается стартовый элемент и направление обхода 
+		std::vector<Grain>::iterator iter;
+		int randStart = std::rand() % polycrystall->c.size();
+		bool reverse = std::rand() > 0.5;
+		for (iter = polycrystall->c.begin()+randStart;
+			iter != (reverse ? polycrystall->c.begin() : polycrystall->c.end());
+			reverse ? iter-- : iter++)
 		{
-			if (criteria(g))
+			if (criteria(*iter))
 			{
-				split(g.position);
+				split((*iter).position);
 				return;
 			}
 		}
@@ -98,7 +103,8 @@ namespace model
 		int n1 = lastId++, n2 = lastId++;
 		int npos = polycrystall->findGrainPosById(oldPos);
 		polycrystall->c[npos].position = n1;
-
+		polycrystall->c[npos].sgm /= 10;
+		rotateByTaylor(&(polycrystall->c[npos]));
 		// Поиск плоскости разделения
 		Vector nSplit = maxStressPlane(polycrystall->c[npos].sgm);
 		// Предполагаем, что плоскость проходит через
@@ -116,11 +122,12 @@ namespace model
 		// Изменится лишь его идентификатор, ориентация решетки и форма 
 		Grain newGrain = polycrystall->c[npos];
 		newGrain.position = n2;
+		// Нужно поворачивать и новое и старое зерно
+		rotateByTaylor(&newGrain);
 		polycrystall->c.push_back(newGrain);
 		polycrystall->totalGrainCount++;
 		posMap.insert(std::pair<int, Vector>(n1, newVec1));
 		posMap.insert(std::pair<int, Vector>(n2, newVec2));
 		updateContainer();
-
 	}
 }

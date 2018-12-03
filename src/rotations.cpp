@@ -92,27 +92,36 @@ namespace model
 
 	void rotateByTrusov(Grain *f)
 	{
-		Vector dM;						//Производная вектор-момента
-
+		// Производная вектор-момента
+		Vector dM;						
 		// Цикл по всем фасеткам данного зерна
-		for (int h = 0; h < prms::grainSurroundCount; h++)
+		for (int h = 0; h < f->neighbors.size(); h++)
 		{
 			Tensor d_in1, d_in2;
-			for (int i = 0; i < DIM; i++)
+			//for (int i = 0; i < DIM; i++)
+			//{
+			//	for (int j = 0; j < DIM; j++)
+			//	{
+			//		for (int k = 0; k < f->ssCount; k++)
+			//		{
+			//			if (f->ss[k].b.scalMult(f->normals[h]) < 0) continue; //Скольжение от границы - вклад не вносится
+			//			d_in1.c[i][j] += f->ss[k].dgm * (f->ss[k].n.c[i] * f->ss[k].b.c[j]);
+			//		}
+			//		for (int k = 0; k < f->neighbors[h]->ssCount; k++)
+			//		{
+			//			//if (f->ss[k].b.scalMult(f->normals[h]) < 0) continue; //Скольжение от границы - вклад не вносится
+			//			d_in2.c[i][j] += f->neighbors[h]->ss[k].dgm * (f->neighbors[h]->ss[k].n.c[i] * f->neighbors[h]->ss[k].b.c[j]);
+			//		}
+			//	}
+			//}
+
+			for (int k = 0; k < f->ssCount; k++)
 			{
-				for (int j = 0; j < DIM; j++)
-				{
-					for (int k = 0; k < f->ssCount; k++)
-					{
-						if (f->ss[k].b.scalMult(f->normals[h]) < 0) continue; //Скольжение от границы - вклад не вносится
-						d_in1.c[i][j] += f->ss[k].dgm * (f->ss[k].n.c[i] * f->ss[k].b.c[j]);
-					}
-					for (int k = 0; k < f->neighbors[h]->ssCount; k++)
-					{
-						//if (f->ss[k].b.scalMult(f->normals[h]) < 0) continue; //Скольжение от границы - вклад не вносится
-						d_in2.c[i][j] += f->neighbors[h]->ss[k].dgm * (f->neighbors[h]->ss[k].n.c[i] * f->neighbors[h]->ss[k].b.c[j]);
-					}
-				}
+				d_in1 += f->ss[k].dgm * f->ss[k].o;
+			}
+			for (int k = 0; k < f->neighbors[h]->ssCount; k++)
+			{
+				d_in2 += f->neighbors[h]->ss[k].dgm * f->neighbors[h]->ss[k].o;
 			}
 			// Скачок тензора пластической деформации на границе зерен
 			Tensor Lp = Transp(d_in1 - d_in2);
@@ -128,8 +137,8 @@ namespace model
 		}
 		dM /= f->volume;
 		double dMnorm = dM.getNorm();
-		Vector M = f->rotationMoment + dM * prms::dt;
-		f->rotationMoment = M;
+		f->rotationMoment += dM * prms::dt;
+		Vector M = f->rotationMoment;
 		double norm = M.getNorm();
 		if (norm > f->rotationParamMc || norm == -1)
 		{
@@ -137,24 +146,31 @@ namespace model
 		}
 
 		double pr = M.scalMult(dM);
-		//Вычисление скорости вращения
-		double dFi = f->rotationParamA * dMnorm;		// Только упругая составляющая разворотов				
+		// Вычисление скорости вращения
+		// Только упругая составляющая разворотов
+		double dFi = f->rotationParamA * dMnorm;
 		if (norm == f->rotationParamMc && pr >= 0)
 		{
-			dFi += f->rotationParamH * norm;			// Пластическая составляющая
+			// Пластическая составляющая
+			dFi += f->rotationParamH * norm;
 		}
 
-		f->isRotate = (dFi > EPS*1e4);
+		f->isRotate = (dFi > EPS);
 		if (f->isRotate)
 		{
-			Vector e = M;					// Ось вращения решётки сонаправлена с вектором момента
+			// Ось вращения решётки сонаправлена с вектором момента
+			Vector e = M;
 			e.normalize();
 			f->rotationSpeed = dFi;
 			dFi *= prms::dt;
-			f->rotationTotalAngle += dFi;			// Накопленный угол вращения увеличивается
-			rotate(f, dFi, e);				// Вращение решетки
-			f->rotationEnergy = norm * dFi;		// Энергия ротаций
-			f->om.setZero();				// Спин решётки
+			// Накопленный угол вращения увеличивается
+			f->rotationTotalAngle += dFi;
+			// Вращение решетки
+			rotate(f, dFi, e);
+			// Энергия ротаций
+			f->rotationEnergy = norm * dFi;
+			// Спин решётки
+			f->om.setZero();
 			for (int i = 0; i < DIM; i++)
 			{
 				for (int j = 0; j < DIM; j++)

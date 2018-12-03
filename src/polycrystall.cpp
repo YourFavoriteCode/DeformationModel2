@@ -720,20 +720,21 @@ namespace model
 			{
 				// Анализ зеренной структуры
 				double avgSize = 0;
-
+				double avgVol = 0;
 				double min = 1;
 				double max = 0;
 
 				for (int q = 0; q < c.size(); q++)
 				{
-					avgSize += c[q].volume;
-					if (c[q].volume < min)
+					avgSize += c[q].size;
+					avgVol += c[q].volume;
+					if (c[q].size < min)
 					{
-						min = c[q].volume;
+						min = c[q].size;
 					}
-					else if (c[q].volume > max)
+					else if (c[q].size > max)
 					{
-						max = c[q].volume;
+						max = c[q].size;
 					}
 				}
 				std::vector<int> distrib(10);
@@ -741,10 +742,10 @@ namespace model
 				// Данные для диаграммы распределения размеров
 				for (int q = 0; q < c.size(); q++)
 				{
-					double v = c[q].volume;
+					double s = c[q].size;
 					for (int i = 0; i < 10; i++)
 					{
-						if (v >= min + i*dif && v < min + (i + 1)*dif)
+						if (s >= min + i*dif && s < min + (i + 1)*dif)
 						{
 							distrib[i]++;
 							break;
@@ -754,19 +755,19 @@ namespace model
 				// Файлы открыты для дозаписи, сброс производится при старте в DeformationModel.cpp
 				std::ofstream distribStream;
 				distribStream.open("Distribution info.txt", std::ios_base::out | std::ios_base::app);
+				distribStream << "min: " << min << " max: " << max << " ";
 				for (int i = 0; i < 10; i++)
 				{
 					distribStream << distrib[i] << " ";
 				}
 				distribStream << std::endl;
 				distribStream.close();
-				// Средний объем зерен
+				// Средний размер зерен
 				avgSize /= c.size();
-				// Линейный размер вычисляется как кубический корень объема с нормировкой
-				avgSize = PIx4_3 * pow(avgSize, (double) 1 / 3);
+				avgVol /= c.size();
 				std::ofstream structStream;
 				structStream.open("Struct info.txt", std::ios_base::out | std::ios_base::app);
-				structStream << c.size() << " " << avgSize << std::endl;
+				structStream << c.size() << " size: " << avgSize << " vol: " << avgVol << std::endl;
 				structStream.close();
 			}
 
@@ -825,7 +826,7 @@ namespace model
 
 			double StepEnergy = Sgm.doubleScalMult(D);	//Полная энергия на шаге
 			double StepEnergy_in = Sgm.doubleScalMult(D_in);	//Полная энергия на шаге
-			streamDataTest[0] << RotCount << std::endl;
+			streamDataTest[0] << M.getNorm() << std::endl;
 			streamDataTest[1] << RotSpeed << std::endl;
 			streamDataTest[2] << RotEnergy << std::endl;
 			streamDataTest[3] << StepEnergy << std::endl;

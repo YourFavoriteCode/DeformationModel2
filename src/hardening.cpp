@@ -57,59 +57,30 @@ namespace model
 		}
 	}
 	
-	/*void hardeningBoundary(Grain *f)
-	{
-		for (int k = 0; k < f->ssCount; k++)	//Цикл по СС текущего фрагмента
-		{
-			Vector b1 = scalMult(f->o, f->ss[k].b);//Перевели вектор b текущей СС данного зерна в ЛСК
-			double zgu = 0;
-			for (int h = 0; h < prms::surround_count; h++)	//Цикл по фасеткам			
-			{
-				if (f->ss[k].b.scalMult(f->normals[h]) < 0) continue; //Скольжение от границы - пропускаем
-				double zguk = prms::HARD_BOUND_K * f->ss[k].dgm * f->ss[k].gmm / f->size;
-				double min = 1.0;//Минимум
-				//min = f->disorientMeasure(h);
-				for (int p = 0; p < f->neighbors[h].ssCount; p++)	//Цикл по системам соседнего зерна
-				{
-					Vector b2 = scalMult(f->neighbors[h].o, f->neighbors[h].ss[p].b);//Перевели вектор b p-ой СС соседнего зерна в ЛСК
-					Vector diff = b1 - b2;
-					diff.Normalize();
-					double M = fabs(diff.scalMult(f->normals[h]));
-
-					if (M < min)
-					{
-						min = M;
-					}
-				}
-				zgu += zguk*min;
-			}
-
-			f->ss[k].tc += zgu;
-		}
-	}*/
-
-
 	void hardeningBoundary(Grain *f)
 	{		
 		double G = 45.5e+9, nu = 0.35;
 		double K, K1, Rmin=5e-7;
-		Tensor S;
-		S.set(3.333, 0.0, 0.0, 0.0, -0.667, 0.0, 0.0, 0.0, nu*2.667);
-		for (int k = 0; k < f->ssCount; k++)	//Цикл по СС текущего фрагмента
+		Tensor S(3.333, 0.0, 0.0, 0.0, -0.667, 0.0, 0.0, 0.0, nu*2.667);
+		// Цикл по СС текущего фрагмента
+		for (int k = 0; k < f->ssCount; k++)	
 		{
 			if (fabs(f->ss[k].dgm) < EPS) continue;
-			Vector b1 = scalMult(f->o, f->ss[k].b);//Перевели вектор b текущей СС данного зерна в ЛСК
+			// Перевели вектор b текущей СС данного зерна в ЛСК
+			Vector b1 = scalMult(f->o, f->ss[k].b);
 			double zgu = 0;
-			double tbs=0;
-			for (int h = 0; h < prms::grainSurroundCount; h++)	//Цикл по фасеткам			
+			double tbs = 0;
+			for (int h = 0; h <	f->neighbors.size(); h++)	//Цикл по фасеткам			
 			{
 				if (f->ss[k].b.scalMult(f->normals[h]) < 0) continue; //Скольжение от границы - пропускаем
 				//double zguk = prms::HARD_BOUND_K * f->ss[k].dgm * f->ss[k].gmm / f->size;
 				double min = 1.0;//Минимум
 				//min = f->disorientMeasure(h);
-				for (int p = 0; p < f->neighbors[h]->ssCount; p++)	//Цикл по системам соседнего зерна
+				// Цикл по системам соседнего зерна
+				for (int p = 0; p < f->neighbors[h]->ssCount; p++)	
 				{
-					Vector b2 = scalMult(f->neighbors[h]->o, f->neighbors[h]->ss[p].b);//Перевели вектор b p-ой СС соседнего зерна в ЛСК
+					// Перевели вектор b p-ой СС соседнего зерна в ЛСК
+					Vector b2 = scalMult(f->neighbors[h]->o, f->neighbors[h]->ss[p].b);
 					Vector diff = b1 - b2;
 					diff.normalize();
 					double M = fabs(diff.scalMult(f->normals[h]));
@@ -119,30 +90,15 @@ namespace model
 				}
 				K = 0.25;//min/**G*/ / (2 * PI*(1.0 - nu));
 				K1 = 30000;// log(f->size / Rmin) / (PI*(f->size - Rmin));
-
-				
 				Tensor OT = f->o;
 				OT.transp();
-				
 				Vector s11 = scalMult(OT, f->ss[k].n);
 				Vector s22 = scalMult(OT, f->ss[k].b);
 				s11.normalize();
 				s22.normalize();
-				double tmp = 0;
-				for (int i = 0; i < 3; i++)
-				{
-					for (int j = 0; j < 3; j++)
-					{
-						tmp += S.c[i][j] * s11.c[i] * s22.c[j];
-					}
-				}//Нашли свертку
-				tbs += tmp;
-				
-
+				tbs += S.doubleScalMult(diadMult(s11, s22));
 			}
-
 			tbs *= K*K1;
-		
 			f->ss[k].tbs += tbs * prms::hardeningParamBoundK;
 		}
 		
